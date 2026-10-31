@@ -10,15 +10,23 @@ interface VideoCardProps {
   meta?: string;
   coverLabel?: string;
   ratio?: "video" | "short";
+  /** Set when the card sits on a colour block (white text, glass cover). */
+  onColor?: boolean;
   className?: string;
 }
 
-export function VideoCard({ video, href, meta, coverLabel, ratio = "video", className }: VideoCardProps) {
+export function VideoCard({ video, href, meta, coverLabel, ratio = "video", onColor, className }: VideoCardProps) {
   const dir = video.lang === "kab" ? "ltr" : "rtl";
   return (
-    <Link href={href} className={cn("group flex flex-col gap-2.5", className)}>
+    <Link href={href} className={cn("group flex flex-col gap-2.5", onColor && "[--color-muted:rgb(255_255_255/.72)]", className)}>
       <div className="transition-transform duration-300 ease-[var(--ease-out-soft)] group-hover:-translate-y-1 group-hover:-rotate-[0.4deg]">
-        <Cover video={video} label={coverLabel} ratio={ratio} numeralClass={ratio === "short" ? "text-[120px]" : "text-[150px]"} />
+        <Cover
+          video={video}
+          label={coverLabel}
+          ratio={ratio}
+          surface={onColor ? "glass" : "tone"}
+          numeralClass={ratio === "short" ? "text-[120px]" : "text-[150px]"}
+        />
       </div>
       <div className="flex flex-col gap-1 px-0.5">
         <h3 dir={dir} lang={video.lang} className={cn("line-clamp-2 text-[15.5px] leading-snug font-bold", video.lang === "kab" && "font-latin")}>

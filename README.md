@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Chikhna — front-end
 
-## Getting Started
-
-First, run the development server:
+Next.js 16 (App Router) + TypeScript + Tailwind CSS v4. Front-end only: no
+server, no database, no accounts. Content comes from one TypeScript file and
+watch progress is saved in the visitor's browser.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # production build
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Pages
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| URL | What |
+| --- | --- |
+| `/` | Home — Arabic, right-to-left |
+| `/series` | The دلائل النبوة series, grouped by section (محور) |
+| `/watch/[id]` | Video page with player, chapters, next episode |
+| `/search?q=` | Search with kind filters |
+| `/kab`, `/kab/series`, `/kab/watch/[id]`, `/kab/search` | Same pages in Taqbaylit, left-to-right |
+| `/components` | Style guide: every component with examples (not indexed) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Press `/` or `Ctrl K` anywhere to open instant search.
 
-## Learn More
+## Where to edit what
 
-To learn more about Next.js, take a look at the following resources:
+| To change… | Edit |
+| --- | --- |
+| Colours, fonts, radii, animations | `src/app/globals.css` (`@theme` block) |
+| Which colour a kind of content uses | `src/lib/tones.ts` |
+| Fonts | `src/app/fonts.ts` |
+| Any interface text (Arabic / Taqbaylit) | `src/i18n/dictionaries.ts` |
+| Videos, series, playlists (sample data) | `src/data/content.ts` |
+| URLs | `src/lib/routes.ts` |
+| A component's look | its file in `src/components/` |
+| A page's layout | `src/features/<page>/` |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Design tokens
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Tailwind classes come straight from the tokens, so `bg-series`, `text-accent`,
+`border-line` and so on all follow `globals.css`. Each content colour has one
+meaning — keep it that way:
 
-## Deploy on Vercel
+| Token | Meaning |
+| --- | --- |
+| `paper` / `card` / `ink` / `muted` / `line` | Base surfaces and text |
+| `series` (emerald) | The دلائل النبوة series |
+| `kabyle` (terracotta) | Taqbaylit videos |
+| `short` (cobalt) | Short clips |
+| `accent` (saffron) | Play, continue, progress — always with ink text |
+| `fresh` (mint) | "New" state |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The giant outlined numbers use the `text-stroke` utility with the `--stroke`
+and `--stroke-width` variables (see `OutlineNumeral`).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Structure
+
+```
+src/
+  app/                 routes only (thin files)
+    (ar)/              Arabic root layout (<html dir="rtl">) and pages
+    (kab)/kab/         Taqbaylit root layout (<html dir="ltr">) and pages
+    globals.css        design tokens
+    fonts.ts           IBM Plex Sans Arabic + Inter via next/font
+  features/            page compositions shared by both languages
+  components/
+    ui/                Button, PlayPill, Chip, Badge, ProgressBar,
+                       SectionHeading, OutlineNumeral, icons
+    media/             Cover, VideoCard, TrackRow, SeriesTrackList,
+                       BentoTile, ContinueTile, PlaylistTile
+    player/            PlayerProvider (shared playback state),
+                       VideoPlayer, MiniPlayer
+    search/            SearchProvider + palette, SearchTrigger
+    layout/            AppShell, SiteHeader, SiteFooter, MobileTabBar, NavLink
+  data/content.ts      sample content + query helpers
+  i18n/                dictionaries
+  lib/                 types, tones, routes, format, progress, cn
+```
+
+Conventions:
+
+- Components take their text as props, so they work in both languages;
+  pages pass strings from the dictionary.
+- Server components by default; `"use client"` only where there is state
+  (player, search, progress, active nav link).
+- Use logical properties (`ms-`, `me-`, `ps-`, `start-`, `end-`) instead of
+  left/right so layouts mirror correctly between Arabic and Taqbaylit.
+- Every interactive element is a real `<a>` or `<button>` with a visible
+  focus ring; motion respects `prefers-reduced-motion`.
+
+## Placeholders and next steps
+
+- **All content is sample placeholder text** — titles, durations, dates,
+  counts, the site name and the sheikh's details. Replace
+  `src/data/content.ts`, or keep its functions and load the data from a
+  CMS or the YouTube API later.
+- **Playback is simulated** in `PlayerProvider` (a timer) so the mini-player
+  and progress saving can be tested. When there is real media, swap the
+  stage in `VideoPlayer.tsx` for a `<video>` element or an embed and call
+  `seek`/`saveProgress` from its time events.
+- **Taqbaylit strings are a first draft** for review by a native speaker.
+- The logo is a placeholder letter in `SiteHeader.tsx`; put the real file
+  in `public/` and use `next/image`.
