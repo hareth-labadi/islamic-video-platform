@@ -60,7 +60,7 @@ function Results({ locale, q }: { locale: Locale; q: string }) {
       <div role="group" aria-label={t.search.label} className="-mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0">
         {filters.map((f) => (
           <Chip key={f} selected={kind === f} dotClass={f === "all" ? undefined : tones[f].dot} onClick={() => setKind(f)}>
-            {f === "all" ? (locale === "ar" ? "الكل" : "Akk") : t.kinds[f]}
+            {f === "all" ? t.search.filterAll : t.kinds[f]}
           </Chip>
         ))}
       </div>

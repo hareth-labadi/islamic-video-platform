@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { getSheikh } from "@/data/content";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { routes } from "@/lib/routes";
 import type { Locale } from "@/lib/types";
 import { SearchTrigger } from "@/components/search/SearchTrigger";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NavLink } from "./NavLink";
 
 interface SiteHeaderProps {
@@ -11,9 +13,10 @@ interface SiteHeaderProps {
 }
 
 const navLinkClass =
-  "relative py-2 text-[15px] font-semibold text-ink/70 transition-colors hover:text-ink after:absolute after:inset-x-0 after:-bottom-0.5 after:h-[2.5px] after:origin-center after:scale-x-0 after:rounded-full after:bg-ink after:transition-transform hover:after:scale-x-100";
+  "relative py-2 text-[15px] whitespace-nowrap font-semibold text-ink/70 transition-colors hover:text-ink after:absolute after:inset-x-0 after:-bottom-0.5 after:h-[2.5px] after:origin-center after:scale-x-0 after:rounded-full after:bg-ink after:transition-transform hover:after:scale-x-100";
 
 export function SiteHeader({ locale, t }: SiteHeaderProps) {
+  const sheikh = getSheikh();
   const links = [
     { href: routes.home(locale), label: t.nav.home, exact: true },
     { href: routes.series(locale), label: t.nav.series },
@@ -28,7 +31,10 @@ export function SiteHeader({ locale, t }: SiteHeaderProps) {
             {/* Replace with the logo: <Image src="/logo.svg" … /> */}
             ع
           </span>
-          <span className="text-lg font-bold">{t.siteName}</span>
+          <span className="flex flex-col leading-tight">
+            <span className="text-lg font-bold whitespace-nowrap">{t.siteName}</span>
+            <span className="hidden text-xs font-semibold whitespace-nowrap text-muted sm:block">{sheikh.name[locale]}</span>
+          </span>
         </Link>
 
         <nav aria-label={t.nav.home} className="hidden items-center gap-6 md:flex">
@@ -40,15 +46,9 @@ export function SiteHeader({ locale, t }: SiteHeaderProps) {
         </nav>
 
         <div className="ms-auto flex items-center gap-2">
-          <SearchTrigger label={t.search.label} hint={t.search.shortcut} className="hidden w-72 lg:flex" />
-          <SearchTrigger label={t.search.label} variant="icon" className="lg:hidden" />
-          <Link
-            href={t.otherLanguageHref}
-            hrefLang={locale === "ar" ? "kab" : "ar"}
-            className="rounded-full border-[1.5px] border-ink px-3.5 py-1.5 text-[13px] font-bold transition-colors hover:bg-ink hover:text-white"
-          >
-            {t.otherLanguage}
-          </Link>
+          <SearchTrigger label={t.search.label} hint={t.search.shortcut} className="hidden w-72 xl:flex" />
+          <SearchTrigger label={t.search.label} variant="icon" className="xl:hidden" />
+          <LanguageSwitcher locale={locale} label={t.languages} />
         </div>
       </div>
     </header>

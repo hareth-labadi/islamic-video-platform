@@ -1,4 +1,4 @@
-import { getByKind, getEpisodes, getLatest, playlists, quote, series } from "@/data/content";
+import { getByKind, getEpisodes, getLatest, getSheikh, playlists, quote, series } from "@/data/content";
 import { getDictionary } from "@/i18n/dictionaries";
 import { formatDate, pad2 } from "@/lib/format";
 import { routes } from "@/lib/routes";
@@ -15,7 +15,7 @@ import { ArrowIcon } from "@/components/ui/icons";
 import { SearchTrigger } from "@/components/search/SearchTrigger";
 
 /**
- * Home page for both languages. Taqbaylit visitors see Taqbaylit videos first;
+ * Home page for every language. Taqbaylit visitors see Taqbaylit videos first;
  * the Arabic series stays labelled and available.
  */
 export function HomePage({ locale }: { locale: Locale }) {
@@ -26,6 +26,7 @@ export function HomePage({ locale }: { locale: Locale }) {
   const shorts = getByKind("short");
   const latest = getLatest(8);
   const isKab = locale === "kab";
+  const sheikh = getSheikh();
 
   const metaFor = (v: Video) =>
     v.episode ? `${t.video.episode(v.episode)} · ${formatDate(v.publishedAt, locale)}` : formatDate(v.publishedAt, locale);
@@ -35,7 +36,9 @@ export function HomePage({ locale }: { locale: Locale }) {
 
   const leadTile = isKab ? (
     <BentoTile tone="kabyle" numeral="T" numeralClass="text-[clamp(220px,32vw,460px)]" className="md:col-span-2 md:row-span-2 md:min-h-[460px]">
-      <span className="text-sm font-bold opacity-85">{t.home.kabyleTile}</span>
+      <span className="text-sm font-bold opacity-85">
+        {sheikh.name[locale]} · {t.home.kabyleTile}
+      </span>
       <h1 lang="kab" className="max-w-xl font-latin text-[clamp(30px,4.4vw,56px)] leading-[1.02] font-extrabold tracking-[-0.03em]">{kabyle[0].title}</h1>
       <div className="flex flex-wrap items-center gap-3">
         <PlayPill href={routes.watch(locale, kabyle[0].id)} label={t.video.watchNow} duration={kabyle[0].duration} />
@@ -44,9 +47,9 @@ export function HomePage({ locale }: { locale: Locale }) {
   ) : (
     <BentoTile tone="series" numeral={pad2(newest.episode!)} numeralClass="text-[clamp(220px,32vw,460px)]" className="md:col-span-2 md:row-span-2 md:min-h-[460px]">
       <span className="text-sm font-bold text-accent">
-        {t.home.latestEpisode} · {series.title}
+        {sheikh.name[locale]} · {t.home.latestEpisode}
       </span>
-      <h1 className="max-w-xl text-[clamp(30px,4.4vw,56px)] leading-[1.15] font-bold">{newest.title}</h1>
+      <h1 dir="rtl" lang="ar" className="max-w-xl self-start font-sans text-[clamp(30px,4.4vw,56px)] leading-[1.15] font-bold">{newest.title}</h1>
       <div className="flex flex-wrap items-center gap-3">
         <PlayPill href={routes.watch(locale, newest.id)} label={t.video.watchNow} duration={newest.duration} />
         <Button href={routes.series(locale)} variant="outline" className="text-white">
@@ -70,17 +73,17 @@ export function HomePage({ locale }: { locale: Locale }) {
         </BentoTile>
         {isKab ? (
           <BentoTile tone="series" numeral={pad2(newest.episode!)} numeralClass="text-[160px]" href={routes.series(locale)} delay={240}>
-            <span className="font-latin text-sm font-bold text-accent">{t.home.seriesTitle}</span>
-            <span dir="rtl" lang="ar" className="text-lg font-bold">{newest.title}</span>
+            <span className="text-sm font-bold text-accent">{t.nav.series}</span>
+            <span dir="rtl" lang="ar" className="self-start font-sans text-lg font-bold">{newest.title}</span>
           </BentoTile>
         ) : (
-          <BentoTile tone="kabyle" numeral="T" numeralClass="text-[180px]" href={routes.home("kab")} delay={240}>
+          <BentoTile tone="kabyle" numeral="T" numeralClass="text-[180px]" href={`${routes.home(locale)}#taqbaylit`} delay={240}>
             <span lang="kab" dir="ltr" className="font-latin text-xl font-extrabold">Taqbaylit</span>
             <span className="text-sm opacity-85">{t.home.kabyleTile}</span>
           </BentoTile>
         )}
         <BentoTile tone="accent" numeral="“" numeralClass="text-[200px]" delay={320} className="md:col-span-4 md:min-h-[150px]">
-          <blockquote dir="rtl" lang="ar" className="max-w-3xl text-xl leading-relaxed font-bold md:text-2xl">{quote}</blockquote>
+          <blockquote dir="rtl" lang="ar" className="max-w-3xl self-start font-sans text-xl leading-relaxed font-bold md:text-2xl">{quote}</blockquote>
           <span className="text-xs font-bold opacity-70">{t.home.quoteSource}</span>
         </BentoTile>
       </section>
@@ -110,7 +113,7 @@ export function HomePage({ locale }: { locale: Locale }) {
           <span aria-hidden="true" className="absolute -top-[0.2em] start-[-0.05em] -z-10 font-latin text-[clamp(240px,30vw,440px)] leading-none font-extrabold tracking-[-0.07em] text-stroke [--stroke:rgb(255_255_255/.2)] [--stroke-width:2px]">
             {episodes.length}
           </span>
-          <h2 id="series" className="text-4xl font-bold md:text-5xl" dir="rtl" lang="ar">
+          <h2 id="series" className="self-start font-sans text-4xl font-bold md:text-5xl" dir="rtl" lang="ar">
             {series.title}
           </h2>
           <p className="max-w-sm text-[15px] leading-relaxed text-white/80">{t.home.seriesBlurb}</p>
@@ -124,7 +127,7 @@ export function HomePage({ locale }: { locale: Locale }) {
       </section>
 
       {/* Taqbaylit band (Arabic home) or Arabic videos band (Taqbaylit home) */}
-      <section aria-labelledby="band" className="relative isolate -mx-4 overflow-hidden bg-kabyle px-4 py-12 text-white md:mx-0 md:rounded-[var(--radius-tile)] md:px-10">
+      <section id="taqbaylit" aria-labelledby="band" className="relative isolate scroll-mt-24 -mx-4 overflow-hidden bg-kabyle px-4 py-12 text-white md:mx-0 md:rounded-[var(--radius-tile)] md:px-10">
         <span aria-hidden="true" className="absolute -top-[0.2em] end-[-0.04em] -z-10 font-latin text-[clamp(220px,30vw,420px)] leading-none font-extrabold text-stroke [--stroke:rgb(255_255_255/.2)] [--stroke-width:2px]">
           T
         </span>
@@ -159,7 +162,7 @@ export function HomePage({ locale }: { locale: Locale }) {
               key={p.id}
               playlist={p}
               href={i === 0 ? routes.series(locale) : routes.search(locale)}
-              countLabel={`${p.videoIds.length} ${isKab ? "tvidyutin" : "مقطعًا"}`}
+              countLabel={t.home.videosCount(p.videoIds.length)}
               className={i === 0 ? "col-span-2 md:col-span-1" : undefined}
             />
           ))}

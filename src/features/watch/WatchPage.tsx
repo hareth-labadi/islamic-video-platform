@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getEpisodes, getNextEpisode, getVideo } from "@/data/content";
+import { getEpisodes, getNextEpisode, getSheikh, getVideo } from "@/data/content";
 import { getDictionary } from "@/i18n/dictionaries";
 import { formatDate, pad2 } from "@/lib/format";
 import { routes } from "@/lib/routes";
@@ -19,22 +19,29 @@ export function WatchPage({ locale, id }: { locale: Locale; id: string }) {
   const next = getNextEpisode(video);
   const episodes = video.kind === "series" ? getEpisodes() : [];
   const isKab = video.lang === "kab";
+  const sheikh = getSheikh(video.sheikhId);
 
   return (
     <div className="grid gap-8 pt-6 md:pt-8 lg:grid-cols-[minmax(0,1fr)_380px]">
       <div className="flex min-w-0 flex-col gap-5">
-        <VideoPlayer video={video} labels={{ play: t.player.play, pause: t.player.pause, captions: "Taqbaylit" }} />
+        <VideoPlayer video={video} labels={{ play: t.player.play, pause: t.player.pause, captions: "Taqbaylit", seek: t.player.seek }} />
 
-        <div className="flex flex-col gap-3" dir={isKab ? "ltr" : "rtl"} lang={video.lang}>
+        <div className="flex flex-col gap-3">
           {video.episode && (
             <Link href={routes.series(locale)} className="inline-flex items-center gap-2 self-start text-[13px] font-bold">
               <span aria-hidden="true" className="size-2.5 rounded-[3px] bg-series" />
               {t.nav.series} · <span className="font-latin">{pad2(video.episode)}/{pad2(episodes.length)}</span>
             </Link>
           )}
-          <h1 className={cn("text-[clamp(26px,3vw,40px)] leading-tight font-bold", isKab && "font-latin tracking-[-0.02em]")}>{video.title}</h1>
+          <h1
+            dir={isKab ? "ltr" : "rtl"}
+            lang={video.lang}
+            className={cn("self-start text-[clamp(26px,3vw,40px)] leading-tight font-bold", isKab ? "font-latin tracking-[-0.02em]" : "font-sans")}
+          >{video.title}</h1>
           <div className="flex flex-wrap items-center gap-2 text-[13px] text-muted">
-            <span>{formatDate(video.publishedAt, locale)}</span>
+            <span lang={locale} className="font-bold text-ink">{sheikh.name[locale]}</span>
+            <span aria-hidden="true">·</span>
+            <span lang={locale}>{formatDate(video.publishedAt, locale)}</span>
             {video.captions?.includes("kab") && <Badge tone="kabyle" className="font-latin">CC · Taqbaylit</Badge>}
           </div>
           <div className="flex flex-wrap gap-2">
@@ -48,7 +55,7 @@ export function WatchPage({ locale, id }: { locale: Locale; id: string }) {
             {video.description && <p className="leading-relaxed">{video.description}</p>}
             {video.chapters && (
               <>
-                <h2 className="text-sm font-bold text-muted">{t.video.chapters}</h2>
+                <h2 lang={locale} dir="auto" className="text-sm font-bold text-muted">{t.video.chapters}</h2>
                 <ol className="flex flex-col gap-2">
                   {video.chapters.map((c, i) => (
                     <li key={c.start} className="flex items-center gap-3">

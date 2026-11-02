@@ -13,19 +13,24 @@ export function durationToSeconds(duration: string): number {
     .reduce((total, part) => total * 60 + part, 0);
 }
 
-const monthsAr = [
-  "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
-  "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر",
-];
-// Draft Taqbaylit month names — to be reviewed by a native speaker.
-const monthsKab = [
-  "Yennayer", "Fuṛaṛ", "Meɣres", "Yebrir", "Mayyu", "Yunyu",
-  "Yulyu", "Ɣuct", "Ctembeṛ", "Tubeṛ", "Wambeṛ", "Dujembeṛ",
-];
+const months: Record<Locale, string[]> = {
+  ar: [
+    "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+    "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر",
+  ],
+  fr: [
+    "janvier", "février", "mars", "avril", "mai", "juin",
+    "juillet", "août", "septembre", "octobre", "novembre", "décembre",
+  ],
+  // Draft Taqbaylit month names — to be reviewed by a native speaker.
+  kab: [
+    "Yennayer", "Fuṛaṛ", "Meɣres", "Yebrir", "Mayyu", "Yunyu",
+    "Yulyu", "Ɣuct", "Ctembeṛ", "Tubeṛ", "Wambeṛ", "Dujembeṛ",
+  ],
+};
 
-/** Short date with Western digits in both languages, e.g. "16 سبتمبر". */
+/** Short date with Western digits in every language, e.g. "16 سبتمبر". */
 export function formatDate(iso: string, locale: Locale): string {
   const d = new Date(`${iso}T00:00:00Z`);
-  const months = locale === "ar" ? monthsAr : monthsKab;
-  return `${d.getUTCDate()} ${months[d.getUTCMonth()]}`;
+  return `${d.getUTCDate()} ${months[locale][d.getUTCMonth()]}`;
 }

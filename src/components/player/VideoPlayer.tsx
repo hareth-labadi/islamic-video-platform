@@ -15,7 +15,7 @@ function clock(seconds: number) {
 
 interface VideoPlayerProps {
   video: Video;
-  labels: { play: string; pause: string; captions: string };
+  labels: { play: string; pause: string; captions: string; seek: string };
 }
 
 /**
@@ -62,7 +62,7 @@ export function VideoPlayer({ video, labels }: VideoPlayerProps) {
           value={position}
           disabled={!active}
           onChange={(e) => player.seek(Number(e.target.value))}
-          aria-label="Seek"
+          aria-label={labels.seek}
           className="h-1 w-full cursor-pointer accent-[var(--color-accent)]"
         />
       </div>

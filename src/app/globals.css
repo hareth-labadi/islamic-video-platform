@@ -25,7 +25,8 @@
 
   /* Type — font variables are set by next/font in src/app/fonts.ts */
   --font-sans: var(--font-arabic), var(--font-latin), system-ui, sans-serif;
-  --font-latin: var(--font-inter), system-ui, sans-serif;
+  /* Arabic glyphs inside Latin text (e.g. a title on the French page) fall back to Plex Arabic. */
+  --font-latin: var(--font-inter), var(--font-arabic), system-ui, sans-serif;
 
   /* Shape */
   --radius-tile: 1.5rem;

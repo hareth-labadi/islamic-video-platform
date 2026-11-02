@@ -46,7 +46,8 @@ export default function ComponentsPage() {
   const short = getVideo("short-1")!;
 
   return (
-    <div className="flex flex-col gap-6 pt-8">
+    // Sample text on this page is Arabic, so it stays right-to-left in every language.
+    <div dir="rtl" lang="ar" className="flex flex-col gap-6 pt-8 font-sans">
       <header className="flex flex-col gap-2 pb-4">
         <h1 className="text-4xl font-bold md:text-5xl">المكوّنات</h1>
         <p className="text-muted">كل مكوّن بأمثلة. عدّل الألوان من <code dir="ltr" className="font-latin">src/app/globals.css</code>.</p>

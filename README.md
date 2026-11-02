@@ -1,8 +1,12 @@
-# Chikhna — front-end
+# Islamic video platform — front-end
 
 Next.js 16 (App Router) + TypeScript + Tailwind CSS v4. Front-end only: no
 server, no database, no accounts. Content comes from one TypeScript file and
 watch progress is saved in the visitor's browser.
+
+Three interface languages: Arabic (`ar`, right-to-left), French (`fr`) and
+Taqbaylit (`kab`, Latin script). The site starts with one sheikh, but every
+video, series and playlist already belongs to a sheikh so more can be added.
 
 ```bash
 npm install
@@ -15,12 +19,14 @@ npm run lint
 
 | URL | What |
 | --- | --- |
-| `/` | Home — Arabic, right-to-left |
-| `/series` | The دلائل النبوة series, grouped by section (محور) |
-| `/watch/[id]` | Video page with player, chapters, next episode |
-| `/search?q=` | Search with kind filters |
-| `/kab`, `/kab/series`, `/kab/watch/[id]`, `/kab/search` | Same pages in Taqbaylit, left-to-right |
-| `/components` | Style guide: every component with examples (not indexed) |
+| `/` | Redirects to `/ar`, `/fr` or `/kab` from the browser language (`src/proxy.ts`) |
+| `/[locale]` | Home |
+| `/[locale]/series` | The دلائل النبوة series, grouped by section (محور) |
+| `/[locale]/watch/[id]` | Video page with player, chapters, next episode |
+| `/[locale]/search?q=` | Search with kind filters |
+| `/[locale]/components` | Style guide: every component with examples (not indexed) |
+
+`[locale]` is `ar`, `fr` or `kab`. The language switcher keeps you on the same page.
 
 Press `/` or `Ctrl K` anywhere to open instant search.
 
@@ -31,7 +37,9 @@ Press `/` or `Ctrl K` anywhere to open instant search.
 | Colours, fonts, radii, animations | `src/app/globals.css` (`@theme` block) |
 | Which colour a kind of content uses | `src/lib/tones.ts` |
 | Fonts | `src/app/fonts.ts` |
-| Any interface text (Arabic / Taqbaylit) | `src/i18n/dictionaries.ts` |
+| Any interface text (Arabic / French / Taqbaylit) | `src/i18n/dictionaries.ts` |
+| Languages, their direction and labels | `src/i18n/config.ts` |
+| Sheikhs (name in each language, bio) | `sheikhs` in `src/data/content.ts` |
 | Videos, series, playlists (sample data) | `src/data/content.ts` |
 | URLs | `src/lib/routes.ts` |
 | A component's look | its file in `src/components/` |
@@ -103,3 +111,16 @@ Conventions:
 - **Taqbaylit strings are a first draft** for review by a native speaker.
 - The logo is a placeholder letter in `SiteHeader.tsx`; put the real file
   in `public/` and use `next/image`.
+
+## Languages and sheikhs
+
+- **Add a language:** add its code to `locales` in `src/i18n/config.ts`, a
+  dictionary in `src/i18n/dictionaries.ts` (TypeScript lists any missing
+  string) and month names in `src/lib/format.ts`.
+- **Name the sheikh:** edit `name` (one spelling per language) in the
+  `sheikhs` list in `src/data/content.ts`. It shows in the header, the home
+  hero, the video page and the footer.
+- **Add a sheikh:** add an object to `sheikhs` and give their videos, series
+  and playlists that `sheikhId`. Pages still show the first sheikh
+  (`featuredSheikhId`); a sheikh page and a sheikh filter are the next step
+  once there is more than one.
