@@ -18,7 +18,8 @@ interface PlayerState {
   playing: boolean;
   /** Seconds watched. */
   position: number;
-  play: (videoId: string) => void;
+  /** Start a video, optionally from a saved position (seconds). */
+  play: (videoId: string, startAt?: number) => void;
   toggle: () => void;
   seek: (seconds: number) => void;
   close: () => void;
@@ -46,10 +47,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, [playing, video]);
 
   const play = useCallback(
-    (videoId: string) => {
+    (videoId: string, startAt = 0) => {
       if (video?.id !== videoId) {
-        positionRef.current = 0;
-        setPosition(0);
+        positionRef.current = startAt;
+        setPosition(startAt);
         setVideo(getVideo(videoId) ?? null);
       }
       setPlaying(true);

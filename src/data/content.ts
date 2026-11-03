@@ -1,10 +1,10 @@
-import type { Playlist, Series, Sheikh, Video } from "@/lib/types";
+import type { ContentKind, Playlist, Series, Sheikh, Video } from "@/lib/types";
 
 /*
- * SAMPLE PLACEHOLDER CONTENT.
+ * SAMPLE PLACEHOLDER CONTENT — mirrors the Claude Design boards.
  * Every name, title, duration, date and count below is invented for layout only.
  * Replace this file (or swap it for a CMS / YouTube feed later) — components
- * only depend on the types in src/lib/types.ts.
+ * only depend on the types in src/lib/types.ts and the helpers at the bottom.
  */
 
 /*
@@ -16,7 +16,7 @@ export const sheikhs: Sheikh[] = [
     id: "sheikh-1",
     slug: "sheikh-1",
     // Write the sheikh's real name in each language here.
-    name: { ar: "الشيخ (الاسم)", fr: "Cheikh (nom)", kab: "Ccix (isem)" },
+    name: { ar: "الشيخ [الاسم]", fr: "Cheikh [nom]", kab: "Ccix [isem]" },
     bio: {
       ar: "نص مؤقت: سطر قصير يعرّف بالشيخ.",
       fr: "Texte provisoire : une ligne qui présente le cheikh.",
@@ -34,68 +34,111 @@ export const series: Series = {
   id: "dalail",
   sheikhId: S,
   title: "دلائل النبوّة",
-  description: "نص مؤقت لوصف السلسلة: سلسلة حلقات يشرح فيها الشيخ دلائل النبوّة بالترتيب.",
+  description:
+    "[وصف السلسلة كما يكتبه فريق الموقع: ما المقصود بدلائل النبوّة، ولماذا رُتّبت الحلقات بهذا الترتيب، ولمن هي.]",
+  plannedCount: 24,
   sections: [
-    { id: "s1", title: "المحور الأول — عنوان مؤقت" },
-    { id: "s2", title: "المحور الثاني — عنوان مؤقت" },
-    { id: "s3", title: "المحور الثالث — عنوان مؤقت" },
+    { id: "s1", title: "[عنوان المحور الأول]" },
+    { id: "s2", title: "[عنوان المحور الثاني]" },
+    { id: "s3", title: "[عنوان المحور الثالث]" },
   ],
 };
 
-const ordinals = [
-  "الأولى", "الثانية", "الثالثة", "الرابعة", "الخامسة", "السادسة",
-  "السابعة", "الثامنة", "التاسعة", "العاشرة", "الحادية عشرة", "الثانية عشرة",
+const episodeTitles = [
+  "مقدّمة: لماذا ندرس دلائل النبوّة؟",
+  "عنوان الحلقة الثانية يظهر هنا",
+  "عنوان أطول للحلقة الثالثة يلتفّ على سطرين كحدٍّ أقصى",
+  "عنوان الحلقة الرابعة",
+  "عنوان الحلقة الخامسة يظهر هنا",
+  "عنوان الحلقة السادسة",
+  "عنوان الحلقة السابعة",
+  "عنوان الحلقة الثامنة",
+  "عنوان الحلقة التاسعة",
+  "عنوان الحلقة العاشرة يظهر هنا",
+  "عنوان الحلقة الحادية عشرة",
+  "عنوان أحدث حلقة من سلسلة دلائل النبوّة",
 ];
-const seriesDurations = ["18:42", "21:05", "16:20", "24:10", "17:33", "21:02", "23:40", "18:15", "20:44", "19:30", "22:18", "18:42"];
+const episodeDurations = ["14:20", "22:05", "19:48", "25:10", "17:33", "21:02", "23:40", "18:15", "20:44", "19:30", "21:16", "18:42"];
+const episodeDates = [
+  "2026-09-02", "2026-09-06", "2026-09-09", "2026-09-13", "2026-09-16", "2026-09-20",
+  "2026-09-23", "2026-09-27", "2026-09-30", "2026-10-05", "2026-10-27", "2026-11-01",
+];
 
-const episodes: Video[] = ordinals.map((ordinal, i) => ({
+const episodes: Video[] = episodeTitles.map((title, i) => ({
   id: `ep-${i + 1}`,
   sheikhId: S,
-  title: `عنوان الحلقة ${ordinal}`,
+  title,
   lang: "ar",
   kind: "series",
-  duration: seriesDurations[i],
-  publishedAt: `2026-${String(5 + Math.floor(i / 2)).padStart(2, "0")}-${String(4 + (i % 2) * 14).padStart(2, "0")}`,
+  duration: episodeDurations[i],
+  publishedAt: episodeDates[i],
   episode: i + 1,
-  sectionId: i < 4 ? "s1" : i < 8 ? "s2" : "s3",
+  sectionId: i < 3 ? "s1" : i < 6 ? "s2" : "s3",
   captions: i % 3 === 0 ? ["kab"] : undefined,
-  description: "نص مؤقت للوصف. يكتب هنا ملخص قصير لما يشرحه الشيخ في هذه الحلقة.",
+  summary: "سطر واحد يلخّص موضوع الحلقة قبل مشاهدتها.",
+  description: "[وصف الحلقة كما يكتبه فريق الموقع: ما الدليل الذي تتناوله، وكيف يرتبط بما قبله وما بعده في السلسلة.]",
   chapters: [
-    { start: "00:00", title: "مقدّمة" },
-    { start: "05:02", title: "عنوان الفصل الثاني" },
-    { start: "11:40", title: "عنوان الفصل الثالث" },
+    { start: "00:00", title: "مقدمة" },
+    { start: "03:10", title: "الفصل الأول: عنوان الفصل" },
+    { start: "05:02", title: "الفصل الثاني: عنوان الفصل" },
+    { start: "09:40", title: "الفصل الثالث: عنوان الفصل" },
+    { start: "14:55", title: "خلاصة الحلقة" },
   ],
 }));
 
-const others: Video[] = [
-  { id: "v-kab-1", sheikhId: S, title: "Azwel n tvidyut s teqbaylit", lang: "kab", kind: "kabyle", duration: "14:20", publishedAt: "2026-10-12" },
-  { id: "v-kab-2", sheikhId: S, title: "Azwel n tvidyut nniḍen", lang: "kab", kind: "kabyle", duration: "09:48", publishedAt: "2026-10-02" },
-  { id: "v-kab-3", sheikhId: S, title: "Azwel ɣef lmuɛjizat", lang: "kab", kind: "kabyle", duration: "12:05", publishedAt: "2026-09-21" },
-  { id: "v-kab-4", sheikhId: S, title: "Azwel n tsekkilt n tezwart", lang: "kab", kind: "kabyle", duration: "08:31", publishedAt: "2026-09-08" },
-  { id: "v-qa-1", sheikhId: S, title: "عنوان مقطع أسئلة وأجوبة", lang: "ar", kind: "qa", duration: "11:12", publishedAt: "2026-10-20" },
-  { id: "v-mix-1", sheikhId: S, title: "عنوان مقطع متنوّع", lang: "ar", kind: "mixed", duration: "07:45", publishedAt: "2026-10-15" },
-  { id: "v-mix-2", sheikhId: S, title: "عنوان مقطع متنوّع آخر", lang: "ar", kind: "mixed", duration: "13:02", publishedAt: "2026-09-30" },
-  ...Array.from({ length: 6 }, (_, i): Video => ({
-    id: `short-${i + 1}`,
-    sheikhId: S,
-    title: `عنوان مقطع قصير ${i + 1}`,
-    lang: i === 2 ? "kab" : "ar",
-    kind: "short",
-    duration: `0:${String(38 + i * 4).padStart(2, "0")}`,
-    publishedAt: `2026-10-${String(25 - i * 3).padStart(2, "0")}`,
-  })),
+const kabyle: Video[] = [
+  { id: "v-kab-1", sheikhId: S, title: "Azwel n tvidyut s teqbaylit", lang: "kab", kind: "kabyle", duration: "11:05", publishedAt: "2026-10-31", summary: "Agzul wezzilen n tvidyut." },
+  { id: "v-kab-2", sheikhId: S, title: "Azwel aɣezfan n tvidyut i d-yesskanen akken yettuɣal ɣef sin yizirig", lang: "kab", kind: "kabyle", duration: "16:48", publishedAt: "2026-10-12" },
+  { id: "v-kab-3", sheikhId: S, title: "Azwel n tvidyut nniḍen", lang: "kab", kind: "kabyle", duration: "13:20", publishedAt: "2026-10-01" },
+  { id: "v-kab-4", sheikhId: S, title: "Tikti deg yiwet n tesdat", lang: "kab", kind: "kabyle", duration: "0:44", publishedAt: "2026-09-20" },
 ];
 
-export const videos: Video[] = [...episodes, ...others];
+const others: Video[] = [
+  { id: "v-mix-1", sheikhId: S, title: "عنوان مقطع متنوّع أطول قليلًا يلتفّ على سطرين كحدٍّ أقصى", lang: "ar", kind: "mixed", duration: "09:37", publishedAt: "2026-10-29" },
+  { id: "v-qa-1", sheikhId: S, title: "عنوان جواب عن سؤال", lang: "ar", kind: "qa", duration: "06:12", publishedAt: "2026-10-09" },
+  { id: "v-mix-2", sheikhId: S, title: "عنوان مقطع متنوّع آخر", lang: "ar", kind: "mixed", duration: "12:30", publishedAt: "2026-10-09" },
+];
+
+/** Shorts: `tone` gives each its source colour, `mark` its number on the cover. */
+const shorts: Video[] = (
+  [
+    ["فكرة واحدة في أقل من دقيقة", "short", "0:58", "2026-09-28", "ar"],
+    ["Tikti deg yiwet n tesdat", "kabyle", "0:44", "2026-09-26", "kab"],
+    ["جواب مختصر عن سؤال", "mixed", "1:12", "2026-09-24", "ar"],
+    ["تذكير قصير", "qa", "0:29", "2026-09-22", "ar"],
+    ["من حلقة دلائل النبوّة 3", "series", "0:51", "2026-09-18", "ar"],
+    ["عنوان مقطع قصير آخر", "short", "0:36", "2026-09-15", "ar"],
+  ] as const
+).map(([title, tone, duration, publishedAt, lang], i) => ({
+  id: `short-${i + 1}`,
+  sheikhId: S,
+  title,
+  lang,
+  kind: "short" as ContentKind,
+  tone,
+  duration,
+  publishedAt,
+  mark: String(i + 1).padStart(2, "0"),
+}));
+
+export const videos: Video[] = [...episodes, ...kabyle, ...others, ...shorts];
 
 export const playlists: Playlist[] = [
-  { id: "pl-series", sheikhId: S, title: "دلائل النبوّة كاملة", kind: "series", glyph: "د", videoIds: episodes.map((e) => e.id) },
+  { id: "pl-series", sheikhId: S, title: "دلائل النبوّة", kind: "series", glyph: "د", videoIds: episodes.map((e) => e.id) },
   { id: "pl-qa", sheikhId: S, title: "أسئلة وأجوبة", kind: "qa", glyph: "؟", videoIds: ["v-qa-1"] },
-  { id: "pl-kab", sheikhId: S, title: "Taqbaylit", kind: "kabyle", glyph: "T", videoIds: ["v-kab-1", "v-kab-2", "v-kab-3", "v-kab-4"] },
-  { id: "pl-shorts", sheikhId: S, title: "مقاطع قصيرة", kind: "short", glyph: "1′", videoIds: others.filter((v) => v.kind === "short").map((v) => v.id) },
+  { id: "pl-kab", sheikhId: S, title: "Tividyutin s teqbaylit", kind: "kabyle", glyph: "T", videoIds: kabyle.map((v) => v.id) },
+  { id: "pl-shorts", sheikhId: S, title: "مقاطع قصيرة", kind: "short", glyph: "1′", videoIds: shorts.map((v) => v.id) },
 ];
 
-export const quote = "نص مؤقت لاقتباس قصير من كلام الشيخ يظهر هنا في سطرين.";
+/** Site motto shown in the quote tile. */
+export const quote = { text: "يحمِلُ هذا العلمَ من كلِّ خلَفٍ عدولُه", source: "من شعار الموقع" };
+
+/** Suggested searches shown in the home search tile. */
+export const searchSuggestions = [
+  { label: "المعجزات", lang: "ar" },
+  { label: "البشارات", lang: "ar" },
+  { label: "nnbi", lang: "kab" },
+] as const;
 
 /* Query helpers — swap their bodies when the data source changes. */
 
@@ -111,6 +154,11 @@ export function getEpisodes(): Video[] {
   return episodes;
 }
 
+export function getSectionEpisodes(sectionId: string): Video[] {
+  return episodes.filter((e) => e.sectionId === sectionId);
+}
+
+/** Newest first, shorts excluded. */
 export function getLatest(limit = 8): Video[] {
   return [...videos]
     .filter((v) => v.kind !== "short")
@@ -122,16 +170,28 @@ export function getByKind(kind: Video["kind"]): Video[] {
   return videos.filter((v) => v.kind === kind);
 }
 
+/** Videos spoken in a language (e.g. every Taqbaylit video, shorts excluded). */
+export function getByLanguage(lang: Video["lang"]): Video[] {
+  return videos.filter((v) => v.lang === lang && v.kind !== "short");
+}
+
 export function getNextEpisode(video: Video): Video | undefined {
   if (!video.episode) return undefined;
   return episodes.find((e) => e.episode === video.episode! + 1);
 }
 
-/** Plain substring search over titles and descriptions (front-end only). */
+/** Plain substring search over titles, summaries and descriptions (front-end only). */
 export function searchVideos(query: string): Video[] {
   const q = normalize(query);
   if (!q) return [];
-  return videos.filter((v) => normalize(`${v.title} ${v.description ?? ""}`).includes(q));
+  return videos.filter((v) => normalize(`${v.title} ${v.summary ?? ""} ${v.description ?? ""}`).includes(q));
+}
+
+/** Series sections whose title matches the query. */
+export function searchSections(query: string) {
+  const q = normalize(query);
+  if (!q) return [];
+  return series.sections.filter((s) => normalize(s.title).includes(q));
 }
 
 /** Ignore Arabic diacritics, tatweel and alef/ya/ta-marbuta variants. */

@@ -6,23 +6,26 @@ interface OutlineNumeralProps {
   /** Stroke colour, e.g. "rgb(255 255 255 / .38)". */
   stroke?: string;
   strokeWidth?: string;
+  /** Physical side the numeral hangs from (covers bleed off the top-left in Arabic, top-right in Taqbaylit). */
+  align?: "left" | "right";
   className?: string;
+  style?: CSSProperties;
 }
 
 /**
- * The signature graphic: a huge outlined number that bleeds off the top edge
- * of its tile. Place it inside a `relative overflow-hidden` parent and size it
- * with a text-[…] class. Decorative only (aria-hidden).
+ * The signature graphic: a huge outlined number that bleeds off an edge of
+ * its tile. Place it inside a `relative overflow-hidden` parent, size it with
+ * a text-[…] class and nudge it with top/bottom classes. Decorative only.
  */
-export function OutlineNumeral({ value, stroke, strokeWidth, className }: OutlineNumeralProps) {
-  const style = { "--stroke": stroke, "--stroke-width": strokeWidth } as CSSProperties;
+export function OutlineNumeral({ value, stroke, strokeWidth, align = "left", className, style }: OutlineNumeralProps) {
   return (
     <span
       aria-hidden="true"
       dir="ltr"
-      style={style}
+      style={{ "--stroke": stroke, "--stroke-width": strokeWidth, ...style } as CSSProperties}
       className={cn(
-        "pointer-events-none absolute -top-[0.2em] start-[-0.05em] font-latin leading-none font-extrabold tracking-[-0.06em] text-stroke select-none",
+        "pointer-events-none absolute -top-[0.2em] font-latin leading-none font-extrabold tracking-[-0.06em] text-stroke select-none",
+        align === "left" ? "left-[-0.04em]" : "right-[-0.04em]",
         className,
       )}
     >

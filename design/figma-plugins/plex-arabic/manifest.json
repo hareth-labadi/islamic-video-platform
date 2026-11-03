@@ -1,0 +1,8 @@
+{
+  "name": "Switch Arabic to IBM Plex Sans Arabic",
+  "id": "islamic-video-platform-plex-arabic",
+  "api": "1.0.0",
+  "main": "code.js",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page"
+}

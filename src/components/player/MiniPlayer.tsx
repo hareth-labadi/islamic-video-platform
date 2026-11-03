@@ -2,21 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { durationToSeconds, pad2 } from "@/lib/format";
-import { kindGlyph, tones } from "@/lib/tones";
+import { getDictionary } from "@/i18n/dictionaries";
 import { cn } from "@/lib/cn";
+import { durationToSeconds } from "@/lib/format";
 import { routes } from "@/lib/routes";
+import { markOf, toneOf } from "@/lib/tones";
 import type { Locale } from "@/lib/types";
-import { CloseIcon, PauseIcon, PlayIcon } from "@/components/ui/icons";
+import { OutlineNumeral } from "@/components/ui/OutlineNumeral";
+import { PauseIcon, PlayIcon } from "@/components/ui/icons";
 import { usePlayer } from "./PlayerProvider";
 
-interface MiniPlayerProps {
-  locale: Locale;
-  labels: { play: string; pause: string; close: string; nowPlaying: string };
-}
-
 /** Saffron pill that keeps the current video playing while browsing. */
-export function MiniPlayer({ locale, labels }: MiniPlayerProps) {
+export function MiniPlayer({ locale }: { locale: Locale }) {
+  const t = getDictionary(locale);
   const { video, playing, position, toggle, close } = usePlayer();
   const pathname = usePathname();
   const href = video ? routes.watch(locale, video.id) : "";
@@ -25,35 +23,44 @@ export function MiniPlayer({ locale, labels }: MiniPlayerProps) {
   if (!video || pathname === href) return null;
 
   const pct = (position / durationToSeconds(video.duration)) * 100;
-  const tone = tones[video.kind];
+  const tone = toneOf(video);
+  const title = video.episode ? `${t.player.episode(video.episode)} · ${video.title}` : video.title;
 
   return (
     <div
       role="region"
-      aria-label={labels.nowPlaying}
-      className="fixed inset-x-3 bottom-[76px] z-40 mx-auto max-w-xl animate-rise md:bottom-5"
+      aria-label={t.player.region}
+      className="fixed inset-x-2.5 bottom-[72px] z-40 animate-rise md:inset-x-auto md:end-6 md:bottom-[18px] md:w-[420px]"
     >
-      <div className="relative flex items-center gap-3 overflow-hidden rounded-full bg-accent py-2 ps-2 pe-2 text-ink shadow-[0_10px_30px_-10px_rgb(22_22_22/.45)]">
-        <span className={cn("grid size-12 shrink-0 place-items-center rounded-full font-latin font-extrabold", tone.bg, tone.text)}>
-          {video.episode ? pad2(video.episode) : kindGlyph[video.kind]}
+      <div className="flex items-center gap-2.5 rounded-full bg-accent py-1.5 ps-3 pe-1.5 text-ink shadow-[0_20px_40px_-18px_rgb(0_0_0/.5)] md:gap-3 md:py-2 md:ps-4 md:pe-2">
+        <span className={cn("relative grid size-[46px] shrink-0 place-items-center overflow-hidden rounded-full md:size-[76px]", tone.bg, tone.fg)}>
+          <span className="font-latin text-base font-extrabold md:hidden">{markOf(video)}</span>
+          <OutlineNumeral value={markOf(video)} stroke={tone.stroke} className="top-1 left-2 hidden text-[60px] md:block" />
         </span>
-        <Link href={href} className="min-w-0 flex-1 truncate text-sm font-bold">
-          {video.title}
-        </Link>
+        <span className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <Link href={href} className="truncate text-[13px] font-bold md:text-[13.5px]">
+            {title}
+          </Link>
+          <span className="h-[3px] overflow-hidden rounded-full bg-ink/18">
+            <span className="block h-full rounded-full bg-ink transition-[width] duration-1000 ease-linear" style={{ width: `${pct}%` }} />
+          </span>
+        </span>
         <button
           type="button"
           onClick={toggle}
-          aria-label={playing ? labels.pause : labels.play}
-          className="grid size-11 shrink-0 place-items-center rounded-full bg-ink text-accent"
+          aria-label={playing ? t.player.pause : t.player.play}
+          className="grid size-[42px] shrink-0 place-items-center rounded-full bg-ink text-accent md:size-11"
         >
-          {playing ? <PauseIcon size={18} /> : <PlayIcon size={18} />}
+          {playing ? <PauseIcon size={15} /> : <PlayIcon size={15} />}
         </button>
-        <button type="button" onClick={close} aria-label={labels.close} className="grid size-9 shrink-0 place-items-center rounded-full hover:bg-ink/10">
-          <CloseIcon size={16} />
+        <button
+          type="button"
+          onClick={close}
+          aria-label={t.player.close}
+          className="hidden size-[34px] shrink-0 place-items-center rounded-full text-lg hover:bg-ink/10 md:grid"
+        >
+          ×
         </button>
-        <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[3px] bg-ink/15">
-          <span className="block h-full bg-ink transition-[width] duration-1000 ease-linear" style={{ width: `${pct}%` }} />
-        </span>
       </div>
     </div>
   );

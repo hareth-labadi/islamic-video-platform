@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { series } from "@/data/content";
 import { getDictionary } from "@/i18n/dictionaries";
 import type { Locale } from "@/lib/types";
 import { MiniPlayer } from "@/components/player/MiniPlayer";
@@ -13,17 +14,17 @@ export function AppShell({ locale, children }: { locale: Locale; children: React
   const t = getDictionary(locale);
   return (
     <PlayerProvider>
-      <SearchProvider locale={locale} labels={t.search}>
+      <SearchProvider locale={locale}>
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:start-3 focus:z-50 focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:font-bold">
           {t.skipToContent}
         </a>
         <SiteHeader locale={locale} t={t} />
-        <main id="main" className="mx-auto max-w-[1360px] px-4 md:px-8">
+        <main id="main" className="mx-auto max-w-[1280px] md:px-8">
           {children}
         </main>
         <SiteFooter locale={locale} t={t} />
-        <MiniPlayer locale={locale} labels={t.player} />
-        <MobileTabBar locale={locale} labels={t.tabs} />
+        <MiniPlayer locale={locale} />
+        <MobileTabBar locale={locale} labels={t.tabs} seriesCount={series.plannedCount} />
       </SearchProvider>
     </PlayerProvider>
   );

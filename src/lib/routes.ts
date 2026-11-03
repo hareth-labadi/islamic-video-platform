@@ -5,8 +5,15 @@ export const routes = {
   home: (locale: Locale) => `/${locale}`,
   series: (locale: Locale) => `/${locale}/series`,
   watch: (locale: Locale, id: string) => `/${locale}/watch/${id}`,
-  search: (locale: Locale, q?: string) => `/${locale}/search${q ? `?q=${encodeURIComponent(q)}` : ""}`,
+  search: (locale: Locale, q?: string, kind?: string) => {
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (kind) params.set("kind", kind);
+    const qs = params.toString();
+    return `/${locale}/search${qs ? `?${qs}` : ""}`;
+  },
   playlists: (locale: Locale) => `/${locale}#playlists`,
+  about: (locale: Locale) => `/${locale}/about`,
   components: (locale: Locale) => `/${locale}/components`,
 };
 

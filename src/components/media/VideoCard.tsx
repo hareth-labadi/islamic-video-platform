@@ -1,43 +1,69 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
+import { toneOf } from "@/lib/tones";
 import type { Video } from "@/lib/types";
 import { Cover } from "./Cover";
 
 interface VideoCardProps {
   video: Video;
   href: string;
-  /** Line under the title, e.g. "الحلقة 5 · 16 سبتمبر". */
-  meta?: string;
+  /** Label printed on the cover, e.g. "دلائل النبوّة · ح 12". */
   coverLabel?: string;
-  ratio?: "video" | "short";
-  /** Set when the card sits on a colour block (white text, glass cover). */
+  /** Where it belongs, e.g. "دلائل النبوّة". */
+  list?: string;
+  /** Relative or short date (text or <RelativeDate>). */
+  date?: React.ReactNode;
+  /** Set when the card sits on a colour block (white cover, white text). */
   onColor?: boolean;
   className?: string;
 }
 
-export function VideoCard({ video, href, meta, coverLabel, ratio = "video", onColor, className }: VideoCardProps) {
-  const dir = video.lang === "kab" ? "ltr" : "rtl";
+/**
+ * Video card: cover, title (two lines max), meta line with colour dot.
+ * On phones it becomes a row (cover 130px beside the text).
+ */
+export function VideoCard({ video, href, coverLabel, list, date, onColor, className }: VideoCardProps) {
+  const ltr = video.lang !== "ar";
+  const tone = toneOf(video);
   return (
-    <Link href={href} className={cn("group flex flex-col gap-2.5", onColor && "[--color-muted:rgb(255_255_255/.72)]", className)}>
-      <div className="transition-transform duration-300 ease-[var(--ease-out-soft)] group-hover:-translate-y-1 group-hover:-rotate-[0.4deg]">
+    <Link
+      href={href}
+      className={cn(
+        "group flex items-center gap-3 px-4 py-[9px] md:flex-col md:items-stretch md:gap-2.5 md:p-0",
+        onColor && "md:px-0",
+        className,
+      )}
+    >
+      <div className="w-[130px] shrink-0 transition-transform duration-300 ease-[var(--ease-out-soft)] group-hover:-translate-y-1 group-hover:-rotate-[0.4deg] md:w-auto">
         <Cover
           video={video}
           label={coverLabel}
-          ratio={ratio}
-          surface={onColor ? "glass" : "tone"}
-          numeralClass={ratio === "short" ? "text-[120px]" : "text-[150px]"}
+          surface={onColor ? "white" : "tone"}
+          numeralClass="text-[80px] md:text-[150px]"
+          radiusClass="rounded-xl md:rounded-2xl"
+          className="max-md:px-2 max-md:py-1.5 max-md:[&_.cover-label]:hidden"
         />
       </div>
-      <div className="flex flex-col gap-1 px-0.5">
-        <h3 dir={dir} lang={video.lang} className={cn("line-clamp-2 text-[15.5px] leading-snug font-bold", video.lang === "kab" && "font-latin")}>
+      <div className="flex min-w-0 flex-1 flex-col gap-1 md:gap-2.5">
+        <h3
+          dir={ltr ? "ltr" : "rtl"}
+          lang={video.lang}
+          className={cn(
+            "line-clamp-2 text-[14.5px] leading-[1.5] font-bold md:text-base md:leading-[1.55]",
+            ltr ? "font-latin md:text-[15.5px] md:leading-[1.4]" : "font-sans",
+            onColor ? "text-white" : "text-ink",
+          )}
+        >
           {video.title}
         </h3>
-        <p className="flex items-center gap-1.5 text-[12.5px] text-muted">
-          {meta && <span>{meta}</span>}
-          <span className="font-latin" dir="ltr">
-            {video.duration}
-          </span>
-        </p>
+        {(list || date) && (
+          <p className={cn("flex flex-wrap items-center gap-1.5 text-xs md:text-[13px]", onColor ? "text-white/85" : "text-muted")}>
+            {!onColor && <span aria-hidden="true" className={cn("size-[7px] rounded-[2px] md:size-2 md:rounded-full", tone.dot)} />}
+            {list && <span>{list}</span>}
+            {list && date && <span aria-hidden="true">·</span>}
+            {date && <span>{date}</span>}
+          </p>
+        )}
       </div>
     </Link>
   );

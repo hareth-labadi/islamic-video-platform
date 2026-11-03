@@ -35,10 +35,16 @@ export interface Video {
   episode?: number;
   /** Section (محور) id inside the series. */
   sectionId?: string;
+  /** One line shown under the title in lists. */
+  summary?: string;
   description?: string;
   chapters?: Chapter[];
   /** Video has Taqbaylit (or Arabic) captions. */
   captions?: Locale[];
+  /** Cover colour when it should differ from the kind (e.g. a short taken from the series). */
+  tone?: ContentKind;
+  /** Big outlined mark on the cover when it isn't the episode number (e.g. "01" for shorts). */
+  mark?: string;
   /** Optional real thumbnail; the branded cover is used when absent. */
   thumbnail?: string;
 }
@@ -58,6 +64,8 @@ export interface Series {
   sheikhId: string;
   title: string;
   description: string;
+  /** Number of episodes planned for the whole series (published ones may be fewer). */
+  plannedCount: number;
   sections: SeriesSection[];
 }
 
