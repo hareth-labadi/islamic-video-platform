@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getByLanguage, getEpisodes, quote, series, videos } from "@/data/content";
+import { getByLanguage, getEpisodes, getFeaturedSeries, quote, videos } from "@/data/content";
 import { getDictionary } from "@/i18n/dictionaries";
 import { pad2 } from "@/lib/format";
 import { routes } from "@/lib/routes";
@@ -18,7 +18,8 @@ export function KabyleHomePage() {
   const t = getDictionary(locale);
   const kabyle = getByLanguage("kab");
   const lead = kabyle[0];
-  const episodes = getEpisodes();
+  const series = getFeaturedSeries();
+  const episodes = getEpisodes(series.id);
 
   return (
     <div className="flex flex-col gap-[34px] pb-16 font-latin md:gap-[72px]">
@@ -40,7 +41,7 @@ export function KabyleHomePage() {
           <SearchTrigger label={t.search.placeholder} variant="field" ariaLabel={t.search.label} />
         </BentoTile>
 
-        <BentoTile tone="series" href={routes.series(locale)} className="min-h-[168px] justify-between md:col-start-3 md:row-start-2 md:min-h-0">
+        <BentoTile tone="series" href={routes.seriesPage(locale, series.slug)} className="min-h-[168px] justify-between md:col-start-3 md:row-start-2 md:min-h-0">
           <OutlineNumeral value={series.plannedCount} stroke="rgb(255 255 255 / .2)" strokeWidth="1.5px" align="right" className="-z-10 top-auto -bottom-[50px] text-[160px] md:text-[200px]" />
           <span className="text-[12.5px] font-bold text-accent">{t.home.seriesKicker}</span>
           <span dir="rtl" lang="ar" className="self-start font-sans text-[30px] font-bold">

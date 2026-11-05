@@ -2,38 +2,44 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { getEpisodes, series } from "@/data/content";
+import { getEpisodes, getSeries, getSeriesOf, getSheikh } from "@/data/content";
 import { getDictionary } from "@/i18n/dictionaries";
 import { cn } from "@/lib/cn";
 import { durationToSeconds, formatDate, pad2 } from "@/lib/format";
+import { hasToken, normalize, tokenize } from "@/lib/normalize";
 import { useProgress } from "@/lib/progress";
 import { routes } from "@/lib/routes";
 import type { Locale, WatchState } from "@/lib/types";
+import { SeriesTile } from "@/components/media/SeriesTile";
 import { SeriesTrackList } from "@/components/media/SeriesTrackList";
 import { OutlineNumeral } from "@/components/ui/OutlineNumeral";
 import { PlayPill } from "@/components/ui/PlayPill";
+import { SheikhAvatar } from "@/components/ui/SheikhAvatar";
 import { SearchIcon } from "@/components/ui/icons";
 
 const PAGE = 9;
 
-/** The دلائل النبوة series: header block, section tabs, episodes grouped by section. */
-export function SeriesPage({ locale }: { locale: Locale }) {
+/** One lesson series: header block, section tabs, episodes grouped by section, then other series. */
+export function SeriesPage({ locale, seriesId }: { locale: Locale; seriesId: string }) {
   const t = getDictionary(locale);
+  const series = getSeries(seriesId)!;
+  const sheikh = getSheikh(series.sheikhId);
   const progress = useProgress();
-  const episodes = getEpisodes();
+  const episodes = getEpisodes(series.id);
   const [section, setSection] = useState<string>("all");
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState(false);
 
   const watched = episodes.filter((e) => progress.videos[e.id]?.done).length;
   const current = episodes.find((e) => progress.videos[e.id] && !progress.videos[e.id].done) ?? episodes.find((e) => !progress.videos[e.id]) ?? episodes[0];
-  const left = Math.max(1, Math.round((durationToSeconds(current.duration) - (progress.videos[current.id]?.at ?? 0)) / 60));
+  const left = current ? Math.max(1, Math.round((durationToSeconds(current.duration) - (progress.videos[current.id]?.at ?? 0)) / 60)) : 0;
   const withCaptions = episodes.filter((e) => e.captions?.includes("kab")).length;
 
-  const q = query.trim();
-  const visible = episodes.filter((e) => (section === "all" || e.sectionId === section) && (!q || e.title.includes(q)));
+  const tokens = tokenize(query);
+  const visible = episodes.filter((e) => (section === "all" || e.sectionId === section) && tokens.every((tk) => hasToken(normalize(e.title), tk)));
   const shown = expanded ? visible : visible.slice(0, PAGE);
   const hidden = visible.length - shown.length;
+  const others = getSeriesOf().filter((s) => s.id !== series.id);
 
   const hrefs = Object.fromEntries(episodes.map((e) => [e.id, routes.watch(locale, e.id)]));
   const metas = Object.fromEntries(
@@ -52,29 +58,39 @@ export function SeriesPage({ locale }: { locale: Locale }) {
         <OutlineNumeral value={series.plannedCount} stroke="rgb(255 255 255 / .18)" strokeWidth="2px" className="-z-10 -top-[60px] -left-5 text-[300px] tracking-[-0.07em] md:-top-[110px] md:-left-[30px] md:text-[520px]" />
         <div className="flex flex-col gap-4">
           <nav aria-label={t.series.breadcrumb} className="text-[13px] opacity-80">
-            <Link href={routes.home(locale)}>{t.nav.home}</Link> ‹ <Link href={routes.playlists(locale)}>{t.series.playlists}</Link>
+            <Link href={routes.home(locale)}>{t.nav.home}</Link> ‹ <Link href={routes.series(locale)}>{t.series.playlists}</Link>
           </nav>
-          <span className="text-[13px] font-semibold text-accent">{t.series.kicker(series.plannedCount, series.sections.length)}</span>
-          <h1 dir="rtl" lang="ar" className="self-start font-sans text-[44px] leading-[1.1] font-bold tracking-[-0.015em] md:text-[76px]">
+          <span className="flex flex-wrap items-center gap-2 text-[13px] font-semibold text-accent">
+            {series.featured && <span className="rounded-full bg-accent px-2.5 py-0.5 text-ink">{t.library.featured}</span>}
+            <span className="rounded-full border border-white/40 px-2.5 py-0.5 text-white">{series.status === "complete" ? t.library.complete : t.library.ongoing}</span>
+            {t.series.kicker(series.plannedCount, series.sections.length)}
+          </span>
+          <h1 dir="rtl" lang={series.lang} className="self-start font-sans text-[44px] leading-[1.15] font-bold tracking-[-0.015em] md:text-[72px]">
             {series.title}
           </h1>
-          <p dir="rtl" lang="ar" className="max-w-[560px] font-sans text-[17px] leading-[1.85] opacity-88">
+          <Link href={routes.sheikh(locale, sheikh.slug)} className="flex items-center gap-2 self-start text-[15px] font-bold hover:text-accent">
+            <SheikhAvatar sheikh={sheikh} size="sm" tone="accent" />
+            {sheikh.name[locale]}
+          </Link>
+          <p dir="rtl" lang={series.lang} className="max-w-[560px] font-sans text-[17px] leading-[1.85] opacity-88">
             {series.description}
           </p>
         </div>
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-3 text-[13px]">
-            <span className="h-[5px] flex-1 overflow-hidden rounded-full bg-white/20">
-              <span className="block h-full rounded-full bg-accent" style={{ width: `${Math.round((watched / series.plannedCount) * 100)}%` }} />
-            </span>
-            <span>{t.series.watched(watched, series.plannedCount)}</span>
+        {current && (
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-3 text-[13px]">
+              <span className="h-[5px] flex-1 overflow-hidden rounded-full bg-white/20">
+                <span className="block h-full rounded-full bg-accent" style={{ width: `${Math.round((watched / series.plannedCount) * 100)}%` }} />
+              </span>
+              <span>{t.series.watched(watched, series.plannedCount)}</span>
+            </div>
+            <div className="flex flex-wrap gap-2.5">
+              <PlayPill href={routes.watch(locale, current.id)} label={t.series.continueEpisode(current.episode!)} chip={t.series.left(left)} icon size="lg" />
+              <PlayPill href={routes.watch(locale, episodes[0].id)} label={t.series.fromStart} variant="outline" size="lg" />
+            </div>
+            <span className="text-[12.5px] opacity-75">{withCaptions > 0 ? t.series.note(withCaptions) : t.library.published(episodes.length, series.plannedCount)}</span>
           </div>
-          <div className="flex flex-wrap gap-2.5">
-            <PlayPill href={routes.watch(locale, current.id)} label={t.series.continueEpisode(current.episode!)} chip={t.series.left(left)} icon size="lg" />
-            <PlayPill href={routes.watch(locale, episodes[0].id)} label={t.series.fromStart} variant="outline" size="lg" />
-          </div>
-          <span className="text-[12.5px] opacity-75">{t.series.note(withCaptions)}</span>
-        </div>
+        )}
       </section>
 
       <div className="sticky top-0 z-20 mt-7 flex flex-wrap items-center justify-between gap-x-7 gap-y-3 border-b border-line bg-paper px-4 pt-5 md:px-3.5">
@@ -112,7 +128,7 @@ export function SeriesPage({ locale }: { locale: Locale }) {
         </label>
       </div>
 
-      <div dir="rtl" lang="ar" className="font-sans">
+      <div dir="rtl" lang={series.lang} className="font-sans">
         {series.sections.map((s, i) => {
           const eps = shown.filter((e) => e.sectionId === s.id);
           if (eps.length === 0) return null;
@@ -130,6 +146,7 @@ export function SeriesPage({ locale }: { locale: Locale }) {
             </section>
           );
         })}
+        {visible.length === 0 && <p className="px-4 pt-11 text-center text-muted">{t.series.noMatch}</p>}
       </div>
 
       {hidden > 0 && (
@@ -138,6 +155,31 @@ export function SeriesPage({ locale }: { locale: Locale }) {
             {t.series.showMore(hidden)}
           </button>
         </div>
+      )}
+
+      {others.length > 0 && (
+        <section aria-labelledby="more-series-h" className="mt-16 flex flex-col gap-4 px-3 md:px-0">
+          <div className="flex items-end justify-between gap-4 px-1">
+            <h2 id="more-series-h" className="text-2xl font-bold md:text-[30px]">
+              {t.home.moreSeries}
+            </h2>
+            <Link href={routes.series(locale)} className="inline-flex h-10 items-center rounded-full border-[1.5px] border-ink px-4 text-sm font-semibold hover:bg-ink hover:text-white">
+              {t.library.title}
+            </Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {others.map((s) => {
+              return (
+                <SeriesTile
+                  key={s.id}
+                  series={s}
+                  locale={locale}
+                  size="sm"
+                />
+              );
+            })}
+          </div>
+        </section>
       )}
     </div>
   );

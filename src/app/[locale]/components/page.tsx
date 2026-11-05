@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { getByKind, getEpisodes, getVideo, playlists } from "@/data/content";
+import { getAnsweredQuestions, getEpisodes, getSheikh, getVideo, playlists, shorts } from "@/data/content";
+import { pad2 } from "@/lib/format";
 import { BentoTile } from "@/components/media/BentoTile";
 import { Cover } from "@/components/media/Cover";
 import { PlaylistTile } from "@/components/media/PlaylistTile";
+import { ShortThumb } from "@/components/media/ShortThumb";
+import { QuestionCard } from "@/components/qa/QuestionCard";
+import { VoicePlayer } from "@/components/qa/VoicePlayer";
+import { SheikhAvatar } from "@/components/ui/SheikhAvatar";
 import { TrackRow } from "@/components/media/TrackRow";
 import { VideoCard } from "@/components/media/VideoCard";
 import { Badge } from "@/components/ui/Badge";
@@ -46,7 +51,6 @@ export default function ComponentsPage() {
   const eps = getEpisodes();
   const kab = getVideo("v-kab-1")!;
   const mixed = getVideo("v-mix-1")!;
-  const shorts = getByKind("short");
 
   return (
     // Sample text on this page is Arabic, so it stays right-to-left in every language.
@@ -115,21 +119,21 @@ export default function ComponentsPage() {
           <Cover video={kab} label="Taqbaylit" />
           <Cover video={mixed} label="مقطع متنوّع" />
           <Cover video={getVideo("v-qa-1")!} label="أسئلة وأجوبة" />
-          <Cover video={shorts[0]} label="مقطع قصير" />
+          <Cover video={{ kind: "short", tone: "short", duration: shorts[0].duration, lang: "ar" }} label="مقطع قصير" />
           <span className="rounded-2xl bg-kabyle p-2">
             <Cover video={kab} label="Taqbaylit" surface="white" />
           </span>
         </div>
         <div className="grid grid-cols-3 gap-3 md:grid-cols-6">
-          {shorts.map((v) => (
-            <Cover key={v.id} video={v} ratio="short" numeralClass="text-[120px] -top-[18px]" radiusClass="rounded-[18px]" title={v.title} />
+          {shorts.map((s, i) => (
+            <ShortThumb key={s.id} short={s} href="#" mark={pad2(i + 1)} sheikh={getSheikh(s.sheikhId)} className="w-auto" />
           ))}
         </div>
       </Block>
 
       <Block title="بطاقات المقاطع" file="components/media/VideoCard.tsx">
         <div className="grid gap-4 md:grid-cols-4">
-          <VideoCard video={eps[11]} href="#" coverLabel="دلائل النبوّة · ح 12" list="دلائل النبوّة" date="منذ يومين" />
+          <VideoCard video={eps[11]} href="#" coverLabel="دلائل النبوّة · ح 12" list="دلائل النبوّة" date="منذ يومين" sheikh={{ sheikh: getSheikh(), name: getSheikh().name.ar }} />
           <VideoCard video={kab} href="#" coverLabel="Taqbaylit" list="بالقبائلية" date="منذ 3 أيام" />
           <VideoCard video={mixed} href="#" coverLabel="مقطع متنوّع" list="مقاطع متنوعة" date="منذ 5 أيام" />
         </div>
@@ -170,6 +174,23 @@ export default function ComponentsPage() {
           {playlists.map((p) => (
             <PlaylistTile key={p.id} playlist={p} href="#" countLabel={`${p.videoIds.length} مقطعًا`} />
           ))}
+        </div>
+      </Block>
+
+      <Block title="الشيخ والأسئلة والأجوبة" file="ui/SheikhAvatar.tsx · qa/QuestionCard.tsx · qa/VoicePlayer.tsx">
+        <div className="flex flex-wrap items-center gap-3">
+          {(["xs", "sm", "md", "lg"] as const).map((size) => (
+            <SheikhAvatar key={size} sheikh={getSheikh("sheikh-2")} size={size} />
+          ))}
+          <SheikhAvatar sheikh={getSheikh()} size="lg" tone="accent" />
+        </div>
+        <VoicePlayer id="style-guide" src="/media/samples/voice-1.m4a" duration="0:42" locale="ar" className="max-w-md" />
+        <div className="grid gap-3 md:grid-cols-3">
+          {getAnsweredQuestions()
+            .filter((q, i, all) => all.findIndex((x) => x.answer?.kind === q.answer?.kind) === i)
+            .map((q) => (
+              <QuestionCard key={q.id} question={q} locale="ar" />
+            ))}
         </div>
       </Block>
     </div>

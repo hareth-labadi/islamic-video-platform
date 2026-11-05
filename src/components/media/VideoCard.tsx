@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { toneOf } from "@/lib/tones";
-import type { Video } from "@/lib/types";
+import type { Sheikh, Video } from "@/lib/types";
+import { SheikhAvatar } from "@/components/ui/SheikhAvatar";
 import { Cover } from "./Cover";
 
 interface VideoCardProps {
@@ -13,16 +14,18 @@ interface VideoCardProps {
   list?: string;
   /** Relative or short date (text or <RelativeDate>). */
   date?: React.ReactNode;
+  /** Who gives the lesson: shown with a small avatar under the title. */
+  sheikh?: { sheikh: Pick<Sheikh, "monogram" | "photo">; name: string };
   /** Set when the card sits on a colour block (white cover, white text). */
   onColor?: boolean;
   className?: string;
 }
 
 /**
- * Video card: cover, title (two lines max), meta line with colour dot.
+ * Video card: cover, title (two lines max), the sheikh, then a meta line with a colour dot.
  * On phones it becomes a row (cover 130px beside the text).
  */
-export function VideoCard({ video, href, coverLabel, list, date, onColor, className }: VideoCardProps) {
+export function VideoCard({ video, href, coverLabel, list, date, sheikh, onColor, className }: VideoCardProps) {
   const ltr = video.lang !== "ar";
   const tone = toneOf(video);
   return (
@@ -44,7 +47,7 @@ export function VideoCard({ video, href, coverLabel, list, date, onColor, classN
           className="max-md:px-2 max-md:py-1.5 max-md:[&_.cover-label]:hidden"
         />
       </div>
-      <div className="flex min-w-0 flex-1 flex-col gap-1 md:gap-2.5">
+      <div className="flex min-w-0 flex-1 flex-col gap-1 md:gap-2">
         <h3
           dir={ltr ? "ltr" : "rtl"}
           lang={video.lang}
@@ -56,6 +59,12 @@ export function VideoCard({ video, href, coverLabel, list, date, onColor, classN
         >
           {video.title}
         </h3>
+        {sheikh && (
+          <p className={cn("flex min-w-0 items-center gap-1.5 text-xs font-semibold md:text-[13px]", onColor ? "text-white" : "text-ink")}>
+            <SheikhAvatar sheikh={sheikh.sheikh} size="xs" tone={onColor ? "light" : "ink"} />
+            <span className="truncate">{sheikh.name}</span>
+          </p>
+        )}
         {(list || date) && (
           <p className={cn("flex flex-wrap items-center gap-1.5 text-xs md:text-[13px]", onColor ? "text-white/85" : "text-muted")}>
             {!onColor && <span aria-hidden="true" className={cn("size-[7px] rounded-[2px] md:size-2 md:rounded-full", tone.dot)} />}

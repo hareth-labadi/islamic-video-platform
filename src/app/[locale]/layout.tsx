@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { getSheikh } from "@/data/content";
 import { getDictionary } from "@/i18n/dictionaries";
 import { localeConfig, locales } from "@/i18n/config";
 import { localeFrom } from "@/i18n/params";
@@ -17,7 +16,7 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
   const t = getDictionary(locale);
   return {
     title: { default: t.siteName, template: `%s — ${t.siteName}` },
-    description: t.footer.about(getSheikh().name[locale]),
+    description: t.footer.about,
     alternates: { languages: Object.fromEntries(locales.map((l) => [l, `/${l}`])) },
   };
 }

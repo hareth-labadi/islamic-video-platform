@@ -5,8 +5,12 @@ server, no database, no accounts. Content comes from one TypeScript file and
 watch progress is saved in the visitor's browser.
 
 Three interface languages: Arabic (`ar`, right-to-left), French (`fr`) and
-Taqbaylit (`kab`, Latin script). The site starts with one sheikh, but every
-video, series and playlist already belongs to a sheikh so more can be added.
+Taqbaylit (`kab`, Latin script). Several sheikhs can publish: every video,
+series, short and answered question belongs to a sheikh, and cards show whose
+lesson it is.
+
+Feature specs, the content model and the API the backend should provide are in
+[`docs/`](docs/README.md).
 
 ```bash
 npm install
@@ -21,14 +25,29 @@ npm run lint
 | --- | --- |
 | `/` | Redirects to `/ar`, `/fr` or `/kab` from the browser language (`src/proxy.ts`) |
 | `/[locale]` | Home |
-| `/[locale]/series` | The دلائل النبوة series, grouped by section (محور) |
-| `/[locale]/watch/[id]` | Video page with player, chapters, next episode |
-| `/[locale]/search?q=` | Search with kind filters |
+| `/[locale]/series` | Library: every series, collections, archive by month |
+| `/[locale]/series/[slug]` | One series, grouped by section (محور) |
+| `/[locale]/watch/[id]` | Video page with player, chapters, next episode, sheikh |
+| `/[locale]/shorts` · `/[locale]/shorts/[id]` | Vertical feed of short clips (opens on a clip) |
+| `/[locale]/questions` | Q&A: answers, anonymous ask form, follow a question |
+| `/[locale]/questions/[id]` | One question and its answer (text, voice or video) |
+| `/[locale]/sheikhs` · `/[locale]/sheikhs/[slug]` | Sheikhs and each sheikh's page |
+| `/[locale]/search?q=` | Search everything, with scopes and filters |
+| `/[locale]/about` | Redirects to the main sheikh's page |
 | `/[locale]/components` | Style guide: every component with examples (not indexed) |
 
 `[locale]` is `ar`, `fr` or `kab`. The language switcher keeps you on the same page.
 
-Press `/` or `Ctrl K` anywhere to open instant search.
+Press `/` or `Ctrl K` anywhere to open search.
+
+Import the sheikh's TikTok clips (needs yt-dlp; see `docs/specs/0003-shorts-from-tiktok.md`):
+
+```bash
+npm run import:tiktok -- --sheikh sheikh-1 https://www.tiktok.com/@ACCOUNT
+```
+
+Questions are sent to `NEXT_PUBLIC_API_URL` when it is set; without it the
+ask form runs in demo mode (questions stay in the visitor's browser).
 
 ## Where to edit what
 
@@ -39,8 +58,12 @@ Press `/` or `Ctrl K` anywhere to open instant search.
 | Fonts | `src/app/fonts.ts` |
 | Any interface text (Arabic / French / Taqbaylit) | `src/i18n/dictionaries.ts` |
 | Languages, their direction and labels | `src/i18n/config.ts` |
-| Sheikhs (name in each language, bio) | `sheikhs` in `src/data/content.ts` |
-| Videos, series, playlists (sample data) | `src/data/content.ts` |
+| Sheikhs (name, bio, Telegram/TikTok links) | `sheikhs` in `src/data/content.ts` |
+| Series (any number) | `seriesList` in `src/data/content.ts` |
+| Videos, playlists, Q&A, categories (sample data) | `src/data/content.ts` |
+| Shorts | `src/data/shorts.imported.json` (written by the import script) |
+| Search matching rules | `src/lib/normalize.ts`, `src/data/search.ts` |
+| Sending questions | `src/lib/api/questions.ts` |
 | URLs | `src/lib/routes.ts` |
 | A component's look | its file in `src/components/` |
 | A page's layout | `src/features/<page>/` |
@@ -54,7 +77,7 @@ meaning — keep it that way:
 | Token | Meaning |
 | --- | --- |
 | `paper` / `card` / `ink` / `muted` / `line` | Base surfaces and text |
-| `series` (emerald) | The دلائل النبوة series |
+| `series` (emerald) | Lesson series (any series; told apart by glyph and title) |
 | `kabyle` (terracotta) | Taqbaylit videos |
 | `short` (cobalt) | Short clips |
 | `accent` (saffron) | Play, continue, progress — always with ink text |
@@ -67,24 +90,33 @@ and `--stroke-width` variables (see `OutlineNumeral`).
 
 ```
 src/
-  app/                 routes only (thin files)
-    (ar)/              Arabic root layout (<html dir="rtl">) and pages
-    (kab)/kab/         Taqbaylit root layout (<html dir="ltr">) and pages
+  app/[locale]/        routes only (thin files); layout sets lang + dir
     globals.css        design tokens
     fonts.ts           IBM Plex Sans Arabic + Inter via next/font
-  features/            page compositions shared by both languages
+  features/            page compositions: home, library, series, watch,
+                       shorts, questions, sheikhs, search
   components/
-    ui/                Button, PlayPill, Chip, Badge, ProgressBar,
-                       SectionHeading, OutlineNumeral, icons
-    media/             Cover, VideoCard, TrackRow, SeriesTrackList,
-                       BentoTile, ContinueTile, PlaylistTile
+    ui/                Button, PlayPill, Chip, Badge, ProgressBar, Sticker,
+                       SectionHeading, OutlineNumeral, SheikhAvatar,
+                       PageSkeleton, icons
+    media/             Cover, VideoCard, TrackRow, SeriesTrackList, SeriesTile,
+                       ShortThumb, BentoTile, ContinueTile, PlaylistTile
+    qa/                QuestionCard, VoicePlayer
     player/            PlayerProvider (shared playback state),
                        VideoPlayer, MiniPlayer
-    search/            SearchProvider + palette, SearchTrigger
+    search/            SearchProvider + panel, SearchTrigger, Highlight
     layout/            AppShell, SiteHeader, SiteFooter, MobileTabBar, NavLink
-  data/content.ts      sample content + query helpers
+  data/
+    content.ts         sample content + query helpers
+    search.ts          search over everything
+    present.ts         labels cards print (series title, sheikh line)
+    shorts.imported.json  shorts written by scripts/import-tiktok.mjs
   i18n/                dictionaries
-  lib/                 types, tones, routes, format, progress, cn
+  lib/                 types, tones, routes, format, progress, normalize, cn
+    api/questions.ts   send / follow anonymous questions
+scripts/
+  import-tiktok.mjs    download TikTok clips into the site
+docs/                  feature specs and the content model
 ```
 
 Conventions:
@@ -118,9 +150,11 @@ Conventions:
   dictionary in `src/i18n/dictionaries.ts` (TypeScript lists any missing
   string) and month names in `src/lib/format.ts`.
 - **Name the sheikh:** edit `name` (one spelling per language) in the
-  `sheikhs` list in `src/data/content.ts`. It shows in the header, the home
-  hero, the video page and the footer.
-- **Add a sheikh:** add an object to `sheikhs` and give their videos, series
-  and playlists that `sheikhId`. Pages still show the first sheikh
-  (`featuredSheikhId`); a sheikh page and a sheikh filter are the next step
-  once there is more than one.
+  `sheikhs` list in `src/data/content.ts`. It shows on cards, the home hero,
+  the video page, the sheikh page and the footer.
+- **Add a sheikh:** add an object to `sheikhs` and give their videos, series,
+  shorts and questions that `sheikhId`. Cards, filters and the sheikh pages
+  pick it up. The second sample sheikh ("الشيخ محمد شريف") is an example only.
+- **Add a series:** add an object to `seriesList` and give its videos
+  `seriesId`, `episode` and `sectionId`. Mark one series `featured` for the
+  home spotlight.

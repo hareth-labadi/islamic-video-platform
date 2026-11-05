@@ -34,9 +34,9 @@ export function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary }) {
   const links = [
     { href: routes.home(locale), label: t.nav.home, exact: true },
     { href: routes.series(locale), label: t.nav.series },
-    { href: routes.search(locale), label: t.nav.videos },
-    { href: routes.playlists(locale), label: t.nav.playlists },
-    { href: routes.about(locale), label: t.nav.about },
+    { href: routes.shorts(locale), label: t.nav.shorts },
+    { href: routes.questions(locale), label: t.nav.questions },
+    { href: routes.sheikhs(locale), label: t.nav.sheikhs },
   ];
 
   return (

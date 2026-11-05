@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { series } from "@/data/content";
 import { getDictionary } from "@/i18n/dictionaries";
 import type { Locale } from "@/lib/types";
 import { MiniPlayer } from "@/components/player/MiniPlayer";
@@ -24,7 +23,7 @@ export function AppShell({ locale, children }: { locale: Locale; children: React
         </main>
         <SiteFooter locale={locale} t={t} />
         <MiniPlayer locale={locale} />
-        <MobileTabBar locale={locale} labels={t.tabs} seriesCount={series.plannedCount} />
+        <MobileTabBar locale={locale} labels={t.tabs} />
       </SearchProvider>
     </PlayerProvider>
   );
