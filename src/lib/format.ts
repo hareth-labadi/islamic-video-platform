@@ -54,3 +54,9 @@ export function relativeDate(iso: string, locale: Locale, t: Dictionary, now = n
   if (diff < 14) return t.dates.week;
   return formatDate(iso, locale);
 }
+
+/** "نوفمبر 2026" — month and year, for archive headings. */
+export function formatMonth(iso: string, locale: Locale): string {
+  const d = new Date(`${iso}T00:00:00Z`);
+  return `${months[locale][d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+}

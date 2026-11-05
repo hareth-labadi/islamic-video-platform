@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
-import { series } from "@/data/content";
+import { getDictionary } from "@/i18n/dictionaries";
 import { localeFrom } from "@/i18n/params";
-import { SeriesPage } from "@/features/series/SeriesPage";
+import { LibraryPage } from "@/features/library/LibraryPage";
 
-export const metadata: Metadata = { title: series.title };
+export async function generateMetadata({ params }: PageProps<"/[locale]/series">): Promise<Metadata> {
+  const t = getDictionary(await localeFrom(params)).library;
+  return { title: t.title, description: t.intro };
+}
 
 export default async function Page({ params }: PageProps<"/[locale]/series">) {
-  return <SeriesPage locale={await localeFrom(params)} />;
+  return <LibraryPage locale={await localeFrom(params)} />;
 }

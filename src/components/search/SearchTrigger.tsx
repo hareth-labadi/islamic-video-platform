@@ -24,7 +24,7 @@ export function SearchTrigger({ label, variant = "pill", ariaLabel, className }:
     return (
       <button
         type="button"
-        onClick={openSearch}
+        onClick={() => openSearch()}
         aria-label={ariaLabel}
         className={cn("flex h-[52px] w-full items-center gap-2.5 rounded-2xl bg-paper px-4 text-start text-sm text-muted transition-colors hover:bg-line-soft", className)}
       >
@@ -37,7 +37,7 @@ export function SearchTrigger({ label, variant = "pill", ariaLabel, className }:
   return (
     <button
       type="button"
-      onClick={openSearch}
+      onClick={() => openSearch()}
       aria-label={ariaLabel}
       className={cn("flex h-11 items-center gap-2 rounded-full bg-card px-4 text-sm text-muted transition-colors hover:bg-line-soft", className)}
     >

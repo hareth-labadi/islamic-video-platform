@@ -27,10 +27,15 @@
   --color-accent: #f2b035;
   --color-fresh: #cfe5d6;
 
+  /* Sticker colours — only for the floating emoji pills, never for content */
+  --color-lilac: #d6d0ef;
+  --color-pink: #f6c1dc;
+
   /* Type — font variables are set by next/font in src/app/fonts.ts */
   --font-sans: var(--font-arabic), var(--font-latin), system-ui, sans-serif;
   /* Arabic glyphs inside Latin text (e.g. a title on the French page) fall back to Plex Arabic. */
   --font-latin: var(--font-inter), var(--font-arabic), system-ui, sans-serif;
+  --font-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
 
   /* Shape */
   --radius-tile: 1.5rem;
@@ -40,6 +45,18 @@
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --animate-rise: rise 0.6s var(--ease-out-soft) both;
   --animate-pulse-ring: pulse-ring 2.4s ease-out infinite;
+  --animate-float: float 5s ease-in-out infinite;
+
+  /* Stickers: a slow bob that keeps each sticker's own tilt (set via --tilt). */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0) rotate(var(--tilt, 0deg));
+    }
+    50% {
+      transform: translateY(-5px) rotate(calc(var(--tilt, 0deg) * 0.6));
+    }
+  }
 
   @keyframes rise {
     from {
@@ -93,5 +110,13 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
+  }
+}
+
+/* Horizontal chip rows that scroll on phones: no visible scrollbar. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }

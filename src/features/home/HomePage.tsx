@@ -1,43 +1,61 @@
 import Link from "next/link";
-import { getByKind, getByLanguage, getEpisodes, getLatest, getSheikh, playlists, quote, searchSuggestions, series, videos } from "@/data/content";
+import {
+  getAnsweredQuestions,
+  getByLanguage,
+  getEpisodes,
+  getFeaturedSeries,
+  getSeriesOf,
+  getSheikh,
+  quote,
+  searchSuggestions,
+  sheikhs,
+  shorts,
+  videos,
+} from "@/data/content";
 import { getDictionary } from "@/i18n/dictionaries";
 import { cn } from "@/lib/cn";
 import { pad2 } from "@/lib/format";
 import { routes } from "@/lib/routes";
-import type { Locale, Video, WatchState } from "@/lib/types";
+import { tones } from "@/lib/tones";
+import type { Locale, WatchState } from "@/lib/types";
 import { BentoTile } from "@/components/media/BentoTile";
 import { ContinueTile } from "@/components/media/ContinueTile";
-import { Cover } from "@/components/media/Cover";
-import { PlaylistTile } from "@/components/media/PlaylistTile";
+import { SeriesTile } from "@/components/media/SeriesTile";
 import { SeriesTrackList } from "@/components/media/SeriesTrackList";
+import { ShortThumb } from "@/components/media/ShortThumb";
 import { VideoCard } from "@/components/media/VideoCard";
+import { QuestionCard } from "@/components/qa/QuestionCard";
 import { OutlineNumeral } from "@/components/ui/OutlineNumeral";
 import { PlayPill } from "@/components/ui/PlayPill";
 import { RelativeDate } from "@/components/ui/RelativeDate";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SheikhAvatar } from "@/components/ui/SheikhAvatar";
+import { Sticker } from "@/components/ui/Sticker";
+import { TelegramIcon } from "@/components/ui/icons";
 import { SearchTrigger } from "@/components/search/SearchTrigger";
+import { LatestVideos } from "./LatestVideos";
 import { SeriesSpotlight } from "./SeriesSpotlight";
 
 /** Home for Arabic and French (Taqbaylit has its own layout: KabyleHomePage). */
 export function HomePage({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
   const sheikh = getSheikh();
-  const episodes = getEpisodes();
+  const featured = getFeaturedSeries();
+  const episodes = getEpisodes(featured.id);
   const newest = episodes[episodes.length - 1];
   const kabyle = getByLanguage("kab");
-  const shorts = getByKind("short");
-  const latest = getLatest(8);
+  const answers = getAnsweredQuestions().slice(0, 2);
   const hrefs = Object.fromEntries(episodes.map((e) => [e.id, routes.watch(locale, e.id)]));
-  const sectionNames = Object.fromEntries(series.sections.map((s) => [s.id, s.title]));
+  const sectionNames = Object.fromEntries(featured.sections.map((s) => [s.id, s.title]));
   const subtitles = Object.fromEntries(episodes.map((e) => [e.id, sectionNames[e.sectionId!]]));
   const stateLabels = { ...t.state, unwatched: t.state.new } as Record<WatchState, string>;
-
-  const coverLabel = (v: Video) => (v.episode ? `${t.kinds.series} · ${t.home.episodeShort(String(v.episode))}` : t.kinds[v.kind]);
+  const telegram = sheikh.socials?.telegram;
+  const multiSheikh = sheikhs.length > 1;
 
   return (
     <div className="flex flex-col gap-[34px] pb-10 md:gap-[72px]">
       {/* Bento hero */}
-      <section aria-label={t.home.newEpisode} className="grid grid-cols-2 gap-2.5 px-3 pt-1 md:grid-cols-4 md:grid-rows-[250px_250px] md:gap-3.5 md:px-0 md:pt-2">
+      <section aria-label={t.home.newEpisode} className="relative grid grid-cols-2 gap-2.5 px-3 pt-1 md:grid-cols-4 md:grid-rows-[250px_250px] md:gap-3.5 md:px-0 md:pt-2">
         <BentoTile tone="series" className="col-span-2 min-h-[300px] justify-end gap-2.5 p-[22px] md:row-span-2 md:min-h-0 md:gap-3.5 md:p-8">
           <OutlineNumeral
             value={pad2(newest.episode!)}
@@ -47,10 +65,14 @@ export function HomePage({ locale }: { locale: Locale }) {
           />
           <span className="absolute top-[18px] start-5 flex items-center gap-1.5 text-xs font-semibold md:top-7 md:start-8 md:gap-2 md:text-[13px]">
             <span aria-hidden="true" className="size-[7px] rounded-full bg-accent md:size-2" />
-            {t.home.newEpisode} · {t.nav.series}
+            {t.home.newEpisode} · {featured.title}
           </span>
           <span dir="rtl" lang="ar" className="max-w-[520px] self-start font-sans text-[28px] leading-[1.35] font-bold md:text-[44px] md:leading-[1.3] md:tracking-[-0.01em]">
             {newest.title}
+          </span>
+          <span className="flex items-center gap-2 text-[13px] font-semibold">
+            <SheikhAvatar sheikh={sheikh} size="xs" tone="light" />
+            {sheikh.name[locale]}
           </span>
           <span className="hidden max-w-[460px] text-[15px] leading-[1.75] opacity-85 md:block">{newest.summary}</span>
           <span className="flex flex-wrap gap-2.5 md:mt-1.5">
@@ -59,7 +81,7 @@ export function HomePage({ locale }: { locale: Locale }) {
             </span>
             <span className="hidden gap-2.5 md:flex">
               <PlayPill href={routes.watch(locale, newest.id)} label={t.home.watchNow} chip={newest.duration} icon />
-              <PlayPill href={routes.series(locale)} label={t.home.episodeOf(newest.episode!, series.plannedCount)} variant="outline" />
+              <PlayPill href={routes.seriesPage(locale, featured.slug)} label={t.home.episodeOf(newest.episode!, featured.plannedCount)} variant="outline" />
             </span>
           </span>
         </BentoTile>
@@ -70,7 +92,7 @@ export function HomePage({ locale }: { locale: Locale }) {
           <span className="text-2xl leading-[1.3] font-bold">{t.home.searchIn(videos.length)}</span>
           <SearchTrigger label={t.search.placeholder} variant="field" ariaLabel={t.search.label} />
           <span className="flex flex-wrap gap-1.5">
-            {searchSuggestions.map((s) => (
+            {searchSuggestions.slice(0, 3).map((s) => (
               <Link
                 key={s.label}
                 href={routes.search(locale, s.label)}
@@ -111,30 +133,54 @@ export function HomePage({ locale }: { locale: Locale }) {
           </p>
           <span className="text-xs font-semibold opacity-75">{locale === "ar" ? quote.source : sheikh.name[locale]}</span>
         </BentoTile>
+
+        {/* Stickers over the tile edges */}
+        <Sticker emoji="🌙" tilt={-8} className="absolute top-[280px] end-7 md:top-[237px] md:end-auto md:start-[calc(75%-25px)]" />
+        <Sticker emoji="📱" label={t.home.stickers.listen} tilt={-3} delay={900} className="absolute -top-3 start-[26%] max-md:hidden" />
+        <Sticker emoji="🌍" label={t.home.stickers.language} tone="lilac" tilt={4} delay={1800} className="absolute -bottom-5 start-[calc(50%+40px)] max-md:hidden" />
       </section>
 
-      {/* Latest videos */}
-      <section aria-labelledby="latest-h">
-        <SectionHeading id="latest-h" title={t.home.latest} count={videos.length} more={{ href: routes.search(locale), label: `${t.home.allVideos} ←` }} />
-        <div className="flex flex-col md:grid md:grid-cols-4 md:gap-x-[18px] md:gap-y-[34px] max-md:[&>*:nth-child(n+5)]:hidden">
-          {latest.map((v) => (
-            <VideoCard
-              key={v.id}
-              video={v}
-              href={routes.watch(locale, v.id)}
-              coverLabel={coverLabel(v)}
-              list={t.lists[v.kind]}
-              date={<RelativeDate iso={v.publishedAt} locale={locale} />}
-            />
-          ))}
+      {/* Latest videos, with the sheikh on every card */}
+      <LatestVideos locale={locale} />
+
+      {/* Featured series: green block + album-style track list */}
+      <section aria-labelledby="series-h" className="flex flex-col gap-2.5 md:grid md:grid-cols-[400px_minmax(0,1fr)] md:items-start md:gap-12">
+        <SeriesSpotlight locale={locale} sticker={<Sticker emoji="✨" label={t.home.stickers.journey} tone="pink" tilt={-4} delay={600} className="absolute -top-5 end-6 md:end-10" />} />
+        <div dir="rtl" lang="ar" className="font-sans max-md:[&_li:nth-child(-n+3)]:hidden">
+          <SeriesTrackList episodes={episodes.slice(0, 7)} hrefFor={hrefs} stateLabels={stateLabels} subtitles={subtitles} />
         </div>
       </section>
 
-      {/* Series: green block + album-style track list */}
-      <section aria-labelledby="series-h" className="flex flex-col gap-2.5 md:grid md:grid-cols-[400px_minmax(0,1fr)] md:items-start md:gap-12">
-        <SeriesSpotlight locale={locale} />
-        <div dir="rtl" lang="ar" className="font-sans max-md:[&_li:nth-child(-n+3)]:hidden">
-          <SeriesTrackList episodes={episodes.slice(0, 7)} hrefFor={hrefs} stateLabels={stateLabels} subtitles={subtitles} />
+      {/* Questions & answers */}
+      <section aria-labelledby="qa-home-h" className="relative px-3 md:px-0">
+        <Sticker emoji="🎙️" label={t.home.stickers.ask} tone="white" tilt={4} delay={1200} className="absolute -top-4 start-8 md:start-[30%]" />
+        <div className="relative isolate grid gap-6 overflow-hidden rounded-[22px] bg-accent p-5 pt-8 text-ink md:grid-cols-[minmax(0,0.85fr)_minmax(0,2fr)] md:gap-8 md:rounded-[28px] md:p-9">
+          <OutlineNumeral value="؟" stroke="rgb(22 22 22 / .12)" strokeWidth="2px" className="-z-10 -top-20 font-sans text-[300px] font-bold tracking-normal md:-top-28 md:text-[420px]" />
+          <div className="flex flex-col gap-3.5">
+            <h2 id="qa-home-h" className="text-[30px] leading-[1.2] font-bold md:text-[40px]">
+              {t.questions.title}
+            </h2>
+            <p className="text-[15px] leading-[1.8]">{t.questions.homeText}</p>
+            <div className="flex flex-wrap gap-2">
+              <Link href={routes.ask(locale)} className="inline-flex h-11 items-center rounded-full bg-ink px-5 text-sm font-bold text-white">
+                {t.questions.askCta}
+              </Link>
+              {telegram && (
+                <a href={telegram} target="_blank" rel="noopener noreferrer" aria-label={t.questions.telegramCta} className="inline-flex h-11 items-center gap-2 rounded-full border-[1.5px] border-ink px-4 text-sm font-bold hover:bg-ink hover:text-white">
+                  <TelegramIcon size={17} />
+                  Telegram
+                </a>
+              )}
+            </div>
+            <Link href={routes.questions(locale)} className="mt-auto self-start text-sm font-bold underline underline-offset-4">
+              {t.questions.allQuestions} ({getAnsweredQuestions().length})
+            </Link>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {answers.map((q) => (
+              <QuestionCard key={q.id} question={q} locale={locale} hideSheikh={!multiSheikh} />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -170,43 +216,51 @@ export function HomePage({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      {/* Shorts */}
-      <section aria-labelledby="shorts-h">
-        <SectionHeading id="shorts-h" title={t.home.shorts} count={shorts.length} more={{ href: routes.search(locale, undefined, "short"), label: `${t.home.all} ←` }} />
+      {/* Shorts (open the vertical feed) */}
+      <section aria-labelledby="shorts-h" className="relative">
+        <Sticker emoji="⚡" label={t.home.stickers.shorts} tone="ink" tilt={5} delay={300} className="absolute top-[42px] end-5 md:top-[50px] md:end-[30%]" />
+        <SectionHeading id="shorts-h" title={t.home.shorts} count={shorts.length} more={{ href: routes.shorts(locale), label: `${t.home.all} ←` }} />
         <div className="flex gap-2.5 overflow-x-auto px-4 md:grid md:grid-cols-6 md:gap-3.5 md:overflow-visible md:px-0">
-          {shorts.map((v) => (
-            <Link key={v.id} href={routes.watch(locale, v.id)} className="group w-[136px] shrink-0 md:w-auto">
-              <div className="transition-transform duration-300 ease-[var(--ease-out-soft)] group-hover:-translate-y-1 group-hover:-rotate-[0.4deg]">
-                <Cover
-                  video={v}
-                  ratio="short"
-                  numeralClass="text-[96px] -top-[14px] md:text-[120px] md:-top-[18px]"
-                  radiusClass="rounded-[22px] md:rounded-[18px]"
-                  className="max-md:h-[210px] max-md:p-3 max-md:[&>span:nth-child(2)]:hidden"
-                  title={<span dir={v.lang === "ar" ? "rtl" : "ltr"} lang={v.lang} className={cn("block text-[13px] md:text-[15px]", v.lang !== "ar" && "font-latin")}>{v.title}</span>}
-                />
-              </div>
-            </Link>
+          {shorts.slice(0, 6).map((s, i) => (
+            <ShortThumb key={s.id} short={s} href={routes.shorts(locale, s.id)} mark={pad2(i + 1)} sheikh={multiSheikh ? getSheikh(s.sheikhId) : undefined} />
           ))}
         </div>
       </section>
 
-      {/* Playlists */}
+      {/* Library: every series + the collections */}
       <section id="playlists" aria-labelledby="pl-h" className="scroll-mt-6 px-3 md:px-0">
-        <SectionHeading id="pl-h" title={t.home.playlists} className="px-1" />
-        <div className="grid grid-cols-2 gap-2.5 md:grid-cols-[2fr_1fr_1fr_1fr] md:gap-3.5">
-          {playlists.map((p, i) => (
-            <PlaylistTile
-              key={p.id}
-              playlist={p}
-              href={p.kind === "series" ? routes.series(locale) : routes.search(locale, undefined, p.kind)}
-              countLabel={p.kind === "series" ? t.home.seriesCount(series.plannedCount) : t.home.videosCount(p.videoIds.length)}
-              className={i === 0 ? "col-span-2 md:col-span-1" : undefined}
-            />
+        <SectionHeading id="pl-h" title={t.home.playlists} more={{ href: routes.series(locale), label: `${t.home.all} ←` }} className="px-1" />
+        <div className="grid grid-cols-2 gap-2.5 md:grid-cols-3 md:gap-3.5">
+          {getSeriesOf().map((s, i) => {
+            return (
+              <SeriesTile
+                key={s.id}
+                series={s}
+                locale={locale}
+                size="sm"
+                className={i === 0 ? "col-span-2 md:col-span-1" : undefined}
+              />
+            );
+          })}
+          {[
+            { href: routes.questions(locale), tone: "qa" as const, glyph: "؟", title: t.lists.qa, sub: t.library.questionsTile(getAnsweredQuestions().length) },
+            { href: routes.search(locale, undefined, "kabyle"), tone: "kabyle" as const, glyph: "T", title: "Tividyutin s teqbaylit", sub: t.library.kabyleTile(kabyle.length), latin: true },
+            { href: routes.shorts(locale), tone: "short" as const, glyph: "1′", title: t.lists.short, sub: t.library.shortsTile(shorts.length), latin: true },
+          ].map((c) => (
+            <Link
+              key={c.href}
+              href={c.href}
+              className={cn("group relative isolate flex min-h-[200px] flex-col justify-end gap-1.5 overflow-hidden rounded-[22px] p-5 transition-transform duration-300 hover:-translate-y-1", tones[c.tone].bg, tones[c.tone].fg)}
+            >
+              <OutlineNumeral value={c.glyph} stroke={tones[c.tone].stroke} className={cn("-z-10 -top-10 text-[160px] md:text-[200px]", !c.latin && "font-sans font-bold tracking-normal")} />
+              <span className="text-[12.5px] font-semibold opacity-85">{c.sub}</span>
+              <span dir={c.latin && c.glyph === "T" ? "ltr" : undefined} className={cn("text-[22px] leading-[1.3] font-bold", c.latin && c.glyph === "T" && "self-start font-latin")}>
+                {c.title}
+              </span>
+            </Link>
           ))}
         </div>
       </section>
     </div>
   );
 }
-

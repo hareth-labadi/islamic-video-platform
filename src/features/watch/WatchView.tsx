@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { getEpisodes, getLatest, getNextEpisode, getVideo, series } from "@/data/content";
+import { getEpisodes, getLatest, getNextEpisode, getQuestionForVideo, getSeries, getSheikh, getVideo } from "@/data/content";
 import { getDictionary } from "@/i18n/dictionaries";
 import { cn } from "@/lib/cn";
 import { clock, durationToSeconds, formatDate, pad2 } from "@/lib/format";
@@ -13,6 +13,7 @@ import type { Locale, Video } from "@/lib/types";
 import { VideoPlayer } from "@/components/player/VideoPlayer";
 import { usePlayer } from "@/components/player/PlayerProvider";
 import { OutlineNumeral } from "@/components/ui/OutlineNumeral";
+import { SheikhAvatar } from "@/components/ui/SheikhAvatar";
 
 /** Video page: player, title block, description/chapters card; next tile and series list beside it. */
 export function WatchView({ locale, videoId }: { locale: Locale; videoId: string }) {
@@ -25,12 +26,16 @@ export function WatchView({ locale, videoId }: { locale: Locale; videoId: string
 
   const position = player.video?.id === video.id ? player.position : progress.videos[video.id]?.at ?? 0;
   const next = getNextEpisode(video);
-  const episodes = video.kind === "series" ? getEpisodes() : [];
+  const series = video.seriesId ? getSeries(video.seriesId) : undefined;
+  const sheikh = getSheikh(video.sheikhId);
+  const answers = getQuestionForVideo(video.id);
+  const episodes = series ? getEpisodes(series.id) : [];
   const ltr = video.lang !== "ar";
   const chapters = video.chapters ?? [];
   const currentChapter = chapters.reduce((cur, c, i) => (durationToSeconds(c.start) <= position ? i : cur), 0);
   const watchedCount = episodes.filter((e) => progress.videos[e.id]?.done).length;
-  const sideList = episodes.length > 0 ? episodes : getLatest(8).filter((v) => v.id !== video.id);
+  // Not in a series: more from the same sheikh, then the newest overall.
+  const sideList = episodes.length > 0 ? episodes : [...getLatest(8, video.sheikhId), ...getLatest(8)].filter((v, i, all) => v.id !== video.id && all.findIndex((x) => x.id === v.id) === i).slice(0, 8);
 
   const actionClass =
     "inline-flex h-10 shrink-0 items-center gap-2 rounded-full border-[1.5px] border-ink px-[15px] text-[13px] font-semibold transition-colors hover:bg-ink hover:text-white md:h-11 md:px-[18px] md:text-sm";
@@ -41,8 +46,8 @@ export function WatchView({ locale, videoId }: { locale: Locale; videoId: string
         <VideoPlayer video={video} locale={locale} minimizeHref={routes.home(locale)} />
 
         <div className="flex flex-col gap-2 px-4 md:gap-3 md:px-0">
-          {video.episode && (
-            <Link href={routes.series(locale)} className="inline-flex items-center gap-2 self-start text-[12.5px] font-bold md:text-[13px]">
+          {series && video.episode && (
+            <Link href={routes.seriesPage(locale, series.slug)} className="inline-flex items-center gap-2 self-start text-[12.5px] font-bold md:text-[13px]">
               <span aria-hidden="true" className="size-[9px] rounded-[3px] bg-series md:size-2.5" />
               <span dir="rtl" lang="ar" className="font-sans">
                 {series.title}
@@ -59,6 +64,10 @@ export function WatchView({ locale, videoId }: { locale: Locale; videoId: string
           </h1>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted md:gap-2 md:text-sm">
+              <Link href={routes.sheikh(locale, sheikh.slug)} className="me-1 flex items-center gap-2 font-bold text-ink hover:underline">
+                <SheikhAvatar sheikh={sheikh} size="sm" />
+                {sheikh.name[locale]}
+              </Link>
               <span>{formatDate(video.publishedAt, locale, true)}</span>
               <span aria-hidden="true">·</span>
               <span>{ltr ? t.video.inKabyle : t.video.inArabic}</span>
@@ -76,6 +85,20 @@ export function WatchView({ locale, videoId }: { locale: Locale; videoId: string
             </div>
           </div>
         </div>
+
+        {answers && (
+          <Link href={routes.question(locale, answers.id)} className="mx-3 flex items-start gap-3.5 rounded-[18px] bg-accent p-4 text-ink md:mx-0 md:p-5">
+            <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-full bg-ink font-sans text-xl font-bold text-accent">
+              ؟
+            </span>
+            <span className="flex min-w-0 flex-col gap-1">
+              <span className="text-[12.5px] font-bold">{t.questions.answersThis}</span>
+              <span dir="auto" className="text-[15px] leading-[1.6] font-semibold">
+                {answers.body}
+              </span>
+            </span>
+          </Link>
+        )}
 
         {/* Phone: current chapter bar */}
         {chapters.length > 0 && (
@@ -182,7 +205,7 @@ export function WatchView({ locale, videoId }: { locale: Locale; videoId: string
         )}
 
         <div className="overflow-hidden rounded-[var(--radius-tile)] bg-card">
-          {episodes.length > 0 && (
+          {series && episodes.length > 0 && (
             <div className="flex flex-col gap-2.5 px-[18px] pt-[18px] pb-3.5">
               <div className="flex items-baseline justify-between">
                 <span dir="rtl" lang="ar" className="font-sans text-xl font-bold">
@@ -197,6 +220,7 @@ export function WatchView({ locale, videoId }: { locale: Locale; videoId: string
               </span>
             </div>
           )}
+          {!series && <h2 className="px-[18px] pt-[18px] pb-3 text-lg font-bold">{t.video.moreBySheikh}</h2>}
           <ol className="max-h-[560px] list-none overflow-auto">
             {sideList.map((e) => (
               <SideRow key={e.id} video={e} current={e.id === video.id} state={watchStateOf(progress, e.id)} locale={locale} />
