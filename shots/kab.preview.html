@@ -1,0 +1,232 @@
+<!doctype html><html lang="kab"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=IBM+Plex+Sans+Arabic:wght@400;500;600&amp;family=Inter:wght@400;500;600;700&amp;family=Noto+Serif+Display:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#FBF8F2}
+a{color:#065A4C;text-decoration:none}
+a:hover{color:#0B3D34}
+button{font:inherit}
+:focus-visible{outline:3px solid #AD9559;outline-offset:3px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 32px;box-sizing:border-box}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.serif{font-family:'Noto Serif Display',serif;font-weight:500}
+.ar{font-family:'IBM Plex Sans Arabic',sans-serif}
+.amiri{font-family:'Amiri',serif;font-weight:700}
+.kick{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:#7A6532;letter-spacing:.02em}
+.kick::before{content:"";width:22px;height:1.5px;background:#AD9559}
+.zg{background-image:url(assets/zellige-gold.svg);background-size:96px 96px}
+.zl{background-image:url(assets/zellige-light.svg);background-size:96px 96px}
+.thumb{position:relative;overflow:hidden;aspect-ratio:16/9;border-radius:14px;background-color:#DCE7E0;display:flex;align-items:center;justify-content:center;transition:transform .45s cubic-bezier(.2,.7,.2,1),box-shadow .45s}
+.thumb .pt{position:absolute;inset:0;background-image:url(assets/zellige-green.svg);background-size:64px 64px}
+.dur{position:absolute;bottom:8px;right:8px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;color:#FFFFFF;background:rgba(20,28,25,.82);padding:3px 7px;border-radius:6px}
+.badge{position:absolute;top:8px;left:8px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;background:#FFFFFF;color:#0B3D34}
+.vcard{display:flex;flex-direction:column;gap:10px;color:inherit}
+.vcard:hover .thumb{transform:translateY(-5px);box-shadow:0 22px 34px -22px rgba(11,61,52,.55)}
+.vt{margin:0;font-size:16px;font-weight:600;line-height:1.55;color:#1D2522;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.meta{font-size:13px;color:#5B635F;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
+.ltag{font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;background:#F4EBD6;color:#5E4D22}
+.ltag.a{background:#E1EEE8;color:#0B3D34}
+.navlink{font-size:15px;color:#3E4743;padding:8px 2px;border-bottom:2px solid transparent;white-space:nowrap}
+.navlink.on{color:#0B3D34;font-weight:600;border-bottom-color:#AD9559}
+.btn{display:inline-flex;align-items:center;gap:10px;height:54px;padding:0 26px;border-radius:999px;font-size:16px;font-weight:600;box-sizing:border-box;transition:transform .25s,box-shadow .25s,background .25s}
+.btn-p{background:#065A4C;color:#FFFFFF}
+.btn-p:hover{background:#0B3D34;color:#FFFFFF;transform:translateY(-2px)}
+.btn-g{background:#FFFFFF;color:#0B3D34;border:1.5px solid #D9CCAE}
+.seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:#ECE3D1}
+.seg button{border:0;background:transparent;padding:9px 18px;border-radius:999px;font-size:14px;color:#3E4743;cursor:pointer}
+.seg button.on{background:#FFFFFF;color:#0B3D34;font-weight:600;box-shadow:0 1px 3px rgba(29,37,34,.12)}
+.sec{padding-top:100px}
+.sec-h{display:flex;align-items:flex-end;justify-content:space-between;gap:20px 32px;flex-wrap:wrap;margin-bottom:30px}
+.sec-h h2{margin:8px 0 0;font-family:'Noto Serif Display',serif;font-size:46px;line-height:1.1;font-weight:500;color:#0B3D34;letter-spacing:-.01em}
+.sec-h p{margin:10px 0 0;font-size:16px;line-height:1.65;color:#5B635F;max-width:560px}
+.num{flex:none;width:46px;height:46px;border-radius:999px;border:1.5px solid #AD9559;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif Display',serif;font-size:19px;color:#7A6532;background:#FBF8F2}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%{transform:scale(1);opacity:.5}100%{transform:scale(1.5);opacity:0}}
+.rise{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+.d1{animation-delay:.08s}.d2{animation-delay:.18s}.d3{animation-delay:.28s}.d4{animation-delay:.38s}
+.spin{animation:spin 90s linear infinite}
+.pulse{animation:pulse 2.4s ease-out infinite}
+@media (prefers-reduced-motion:reduce){.rise,.spin,.pulse{animation:none}}
+</style>
+<style>*{animation-play-state:paused!important;animation-delay:-10s!important}</style><script>const STATE={};</script>
+<script>
+class DCLogic { constructor(p){ this.props = p || {}; this.state = {}; } setState(s){ Object.assign(this.state, typeof s === 'function' ? s(this.state) : s); } forceUpdate(){} }
+function look(scope, path){ path = path.trim(); if (path === 'true') return true; if (path === 'false') return false; if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+  let v = scope; for (const k of path.split('.')) { if (v == null) return undefined; v = v[k]; } return v; }
+function interp(str, scope){ const m = str.match(/^\s*\{\{([^}]+)\}\}\s*$/); if (m) return look(scope, m[1]);
+  return str.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = look(scope, p); return v == null ? '' : String(v); }); }
+function render(node, scope, out){
+  if (node.nodeType === 3) { out.appendChild(document.createTextNode(interp(node.textContent, scope))); return; }
+  if (node.nodeType !== 1) return;
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'sc-for') { const list = interp(node.getAttribute('list'), scope) || []; const as = node.getAttribute('as');
+    list.forEach((item, i) => { const s = Object.assign(Object.create(scope), { [as]: item, $index: i }); node.childNodes.forEach(c => render(c, s, out)); }); return; }
+  if (tag === 'sc-if') { if (interp(node.getAttribute('value'), scope)) node.childNodes.forEach(c => render(c, scope, out)); return; }
+  const el = document.createElementNS(node.namespaceURI, node.localName);
+  for (const a of node.attributes) { if (/^on[A-Z]/.test(a.name) || a.name.startsWith('hint-')) continue; const v = interp(a.value, scope); if (v === false || v == null) continue; el.setAttribute(a.name, typeof v === 'function' ? '' : v); }
+  const src = tag === 'template' ? node.content : node;
+  src.childNodes.forEach(c => render(c, scope, el));
+  out.appendChild(el);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const C = new Function('DCLogic', document.getElementById('logic').textContent + '; return Component;')(DCLogic);
+  const inst = new C({}); Object.assign(inst.state, STATE);
+  const vals = inst.renderVals();
+  const tpl = document.getElementById('tpl').content;
+  const host = document.getElementById('host');
+  tpl.childNodes.forEach(c => render(c, vals, host));
+});
+</script>
+</head><body><template id="tpl">
+
+<div style="width:100%;min-height:100vh;background:#FBF8F2;font-family:'Inter',system-ui,sans-serif;color:#1D2522" dir="ltr" lang="kab">
+
+  <div lang="en" style="background:#0E4A3F;color:#E4D5AE;font-size:13px;font-weight:500;text-align:center;padding:9px 16px">Concept · every Taqbaylit string on this page is a first draft for review by a native Kabyle speaker</div>
+
+  <section style="position:relative;background:#F5EFE3;overflow:hidden">
+    <div class="zg" aria-hidden="true" style="position:absolute;inset:0;opacity:.7;-webkit-mask-image:radial-gradient(ellipse 60% 70% at 78% 45%,#000 0,transparent 70%);mask-image:radial-gradient(ellipse 60% 70% at 78% 45%,#000 0,transparent 70%)"></div>
+    <header class="wrap" style="position:relative;display:flex;align-items:center;gap:20px 36px;min-height:88px;flex-wrap:wrap">
+      <a href="#" style="display:flex;align-items:center;gap:12px;flex:none" aria-label="Ilm Nafi' — asebter agejdan">
+        <img src="assets/mark.png" alt="" style="height:46px;width:auto">
+        <span lang="ar" dir="rtl" class="amiri" style="font-size:30px;color:#0B3D34;line-height:1">علم نافع</span>
+      </a>
+      <nav aria-label="Umuɣ agejdan" style="display:flex;gap:28px;overflow-x:auto;margin-inline-start:12px">
+        <a class="navlink on" href="#" aria-current="page">Agejdan</a>
+        <a class="navlink" href="Playlist.dc.html" lang="ar" dir="rtl" style="font-family:'IBM Plex Sans Arabic',sans-serif">دلائل النبوّة</a>
+        <a class="navlink" href="#">Tividyutin</a>
+        <a class="navlink" href="#">Tigrummiwin</a>
+        <a class="navlink" href="#">Timeẓẓyanin</a>
+        <a class="navlink" href="#">Ɣef ccix</a>
+      </nav>
+      <div style="display:flex;align-items:center;gap:10px;margin-inline-start:auto">
+        <a href="Search.dc.html" aria-label="Nadi" style="width:46px;height:46px;border-radius:999px;background:#FFFFFF;border:1px solid #E3DACA;display:flex;align-items:center;justify-content:center;color:#0B3D34"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></a>
+        <a href="Home.dc.html" lang="ar" dir="rtl" style="display:flex;align-items:center;gap:8px;height:46px;padding:0 16px;border-radius:999px;background:#FFFFFF;border:1px solid #E3DACA;color:#0B3D34;font-family:'IBM Plex Sans Arabic',sans-serif;font-size:14px;font-weight:500"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg>العربية</a>
+      </div>
+    </header>
+
+    <div class="wrap" style="position:relative;display:flex;flex-wrap:wrap;gap:56px 72px;align-items:center;padding-top:36px;padding-bottom:110px">
+      <div style="flex:1 1 480px;display:flex;flex-direction:column;gap:20px;max-width:600px">
+        <span class="kick rise d1">Asmel unṣib n ccix [isem]</span>
+        <h1 lang="ar" dir="rtl" class="amiri rise d2" style="margin:0;font-size:96px;line-height:1.25;color:#0B3D34;text-align:left">دلائل النبوّة</h1>
+        <p class="serif rise d3" style="margin:-10px 0 0;font-size:30px;line-height:1.3;font-weight:400;color:#7A6532">Asegzi s tvidyut, d tvidyutin nniḍen s taɛrabt d teqbaylit</p>
+        <p class="rise d3" style="margin:0;font-size:17px;line-height:1.75;color:#4A534F">[Tafyirt i d-yesskanen ayen yellan deg usmel: tasilsla n Dala’il n nnubuwa s umizwer, akked tvidyutin nniḍen s snat n tutlayin.]</p>
+        <div class="rise d4" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:6px">
+          <a class="btn btn-p" href="Watch.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"></path></svg>Bdu seg tvidyut tamezwarut</a>
+          <a class="btn btn-g" href="#k-latest">Tividyutin timaynutin</a>
+        </div>
+      </div>
+      <div class="rise d3" style="flex:1 1 420px;position:relative;display:flex;justify-content:center;min-height:540px;align-items:flex-end">
+        <div aria-hidden="true" style="position:absolute;bottom:0;width:390px;height:510px;border-radius:195px 195px 28px 28px;border:1.5px solid #AD9559;transform:translate(22px,-22px)"></div>
+        <a href="Watch.dc.html" class="zl" aria-label="Wali tavidyut tamaynut" style="position:relative;width:390px;height:510px;border-radius:195px 195px 28px 28px;background-color:#0E4A3F;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;color:#FFFFFF;box-shadow:0 40px 60px -40px rgba(11,61,52,.7)">
+          <svg class="spin" aria-hidden="true" width="400" height="400" viewBox="0 0 100 100" fill="none" stroke="#C9AE6A" stroke-width=".35" stroke-opacity=".75" style="position:absolute;top:24px;left:-5px"><rect x="18" y="18" width="64" height="64"></rect><rect x="18" y="18" width="64" height="64" transform="rotate(45 50 50)"></rect><circle cx="50" cy="50" r="27"></circle><circle cx="50" cy="50" r="45"></circle></svg>
+          <span style="position:absolute;top:176px;left:50%;margin-left:-46px;width:92px;height:92px;display:flex;align-items:center;justify-content:center">
+            <span class="pulse" aria-hidden="true" style="position:absolute;inset:0;border-radius:999px;border:2px solid #E4D5AE"></span>
+            <span style="position:relative;width:92px;height:92px;border-radius:999px;background:#FBF8F2;display:flex;align-items:center;justify-content:center"><svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="#065A4C"></path></svg></span>
+          </span>
+          <div style="position:relative;padding:28px 30px 30px;background:linear-gradient(to top,rgba(8,36,31,.92) 0,rgba(8,36,31,.6) 65%,rgba(8,36,31,0) 100%);display:flex;flex-direction:column;gap:10px">
+            <span style="align-self:flex-start;font-size:12px;font-weight:600;padding:4px 12px;border-radius:999px;background:#E4D5AE;color:#3D3214">Tamaynut · Taqbaylit</span>
+            <span class="serif" style="font-size:30px;line-height:1.2">Azwel n tvidyut s teqbaylit</span>
+            <span style="font-size:13.5px;color:#CFE3DD">3 n wussan aya · 11:05</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap" style="position:relative;margin-top:-50px;z-index:2">
+    <form role="search" style="display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center;padding:14px;border-radius:28px;background:#FFFFFF;border:1px solid #E3DACA;box-shadow:0 30px 60px -36px rgba(11,61,52,.45)">
+      <label for="kq" class="sr">Nadi deg tvidyutin</label>
+      <div style="flex:1 1 420px;display:flex;align-items:center;gap:12px;height:64px;padding:0 22px;border-radius:20px;background:#FBF8F2">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0C7765" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <input id="kq" type="search" placeholder="Nadi s teqbaylit neɣ s taɛrabt…" style="flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:17px;outline:none">
+      </div>
+      <button type="submit" class="btn btn-p" style="border:0;height:64px;padding:0 34px;border-radius:20px;cursor:pointer">Nadi</button>
+    </form>
+  </div>
+
+  <main class="wrap" style="padding-bottom:110px">
+    <section class="sec" aria-labelledby="k-latest">
+      <div class="sec-h">
+        <div><span class="kick">Seg usmel</span><h2 id="k-latest">Tividyutin timaynutin</h2><p>Akk tividyutin, s snat n tutlayin. Fren tutlayt i tebɣiḍ.</p></div>
+        <div class="seg" role="group" aria-label="Tutlayt">
+          <sc-for list="{{langs}}" as="l" hint-placeholder-count="3">
+            <button type="button" class="{{l.cls}}" aria-pressed="{{l.pressed}}" onClick="{{l.pick}}" lang="{{l.lc}}" style="font-family:{{l.ff}}">{{l.name}}</button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(256px,1fr));gap:40px 24px">
+        <sc-for list="{{vids}}" as="v" hint-placeholder-count="8">
+          <a class="vcard" href="Watch.dc.html">
+            <div class="thumb" style="background-color:{{v.tone}}"><span class="pt"></span><sc-if value="{{v.badge}}" hint-placeholder-val="{{ false }}"><span class="badge" lang="ar" dir="rtl" style="font-family:'IBM Plex Sans Arabic',sans-serif">{{v.badge}}</span></sc-if><span class="dur">{{v.dur}}</span></div>
+            <h3 class="vt" dir="{{v.dir}}" lang="{{v.lc}}" style="font-family:{{v.ff}}">{{v.title}}</h3>
+            <div class="meta"><span>{{v.date}}</span><span class="{{v.tagCls}}">{{v.langName}}</span><sc-if value="{{v.cc}}" hint-placeholder-val="{{ false }}"><span class="ltag">CC · Taqbaylit</span></sc-if></div>
+          </a>
+        </sc-for>
+      </div>
+      <div style="margin-top:36px;display:flex;gap:14px;align-items:flex-start;padding:18px 22px;border-radius:18px;background:#F5EFE3;max-width:760px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7A6532" stroke-width="1.8" aria-hidden="true" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16h.01"></path></svg>
+        <p style="margin:0;font-size:15px;line-height:1.7;color:#4A534F">Kra n tvidyutin llant s taɛrabt kan. Ma yella usuqel s teqbaylit (CC), ad t-tafeḍ ɣef tkarḍa. <span lang="en" style="color:#7A6532">— Honest fallback: Arabic-only videos are labelled, never hidden.</span></p>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="k-dl">
+      <div class="sec-h">
+        <div><span class="kick">Tasilsla tagejdant</span><h2 id="k-dl"><span lang="ar" dir="rtl" class="amiri" style="font-size:50px">دلائل النبوّة</span> · Seg tamezwarut</h2><p>Tasilsla s taɛrabt; kra n tvidyutin sɛant asuqel s teqbaylit.</p></div>
+        <a class="btn btn-g" href="Playlist.dc.html" style="height:48px;font-size:15px">Tasilsla meṛṛa →</a>
+      </div>
+      <div style="display:flex;gap:22px;overflow-x:auto;padding:6px 2px 18px">
+        <sc-for list="{{eps}}" as="e" hint-placeholder-count="4">
+          <a href="Watch.dc.html" style="flex:none;width:280px;display:flex;flex-direction:column;gap:12px;color:inherit">
+            <div style="display:flex;align-items:center;gap:12px"><span class="num">{{e.n}}</span><span style="flex:1;height:1.5px;background:#E3DACA"></span></div>
+            <div class="thumb" style="background-color:{{e.tone}}"><span class="pt"></span><span class="dur">{{e.dur}}</span></div>
+            <h3 class="vt" lang="ar" dir="rtl" style="font-family:'IBM Plex Sans Arabic',sans-serif">{{e.title}}</h3>
+            <div class="meta"><span class="ltag a">العربية</span><sc-if value="{{e.cc}}" hint-placeholder-val="{{ false }}"><span class="ltag">CC · Taqbaylit</span></sc-if></div>
+          </a>
+        </sc-for>
+      </div>
+    </section>
+  </main>
+
+  <footer style="background:#ECE3D1">
+    <div class="zg" aria-hidden="true" style="height:44px;background-color:#E4D8C0"></div>
+    <div class="wrap" style="padding-top:44px;padding-bottom:32px;display:flex;flex-wrap:wrap;gap:24px 64px;justify-content:space-between;align-items:center">
+      <div style="display:flex;align-items:center;gap:12px"><img src="assets/mark.png" alt="" style="height:46px;width:auto"><span lang="ar" dir="rtl" class="amiri" style="font-size:30px;color:#0B3D34">علم نافع</span></div>
+      <nav aria-label="Iseɣwan" style="display:flex;flex-wrap:wrap;gap:12px 26px;font-size:14.5px"><a href="#" style="color:#3E4743">Tividyutin</a><a href="#" style="color:#3E4743">Tigrummiwin</a><a href="#" style="color:#3E4743">Ɣef ccix</a><a href="#" style="color:#3E4743">Nermes-aɣ</a></nav>
+      <span style="font-size:13px;color:#5B635F">© 2026 Ilm Nafi'</span>
+    </div>
+  </footer>
+</div>
+</template><div id="host"></div><script type="text/plain" id="logic">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { lang: 'all' };
+  }
+  renderVals() {
+    const AR = "'IBM Plex Sans Arabic', sans-serif";
+    const LA = "'Inter', sans-serif";
+    const tones = ['#DCE7E0', '#EADFCB', '#D9E3E4', '#E9DAD0', '#E3E8D6'];
+    const langDefs = [
+      { key: 'all', name: 'Akk', lc: 'kab', ff: LA },
+      { key: 'kab', name: 'Taqbaylit', lc: 'kab', ff: LA },
+      { key: 'ar', name: 'العربية', lc: 'ar', ff: AR }
+    ];
+    const langs = langDefs.map((l) => ({ name: l.name, lc: l.lc, ff: l.ff, cls: this.state.lang === l.key ? 'on' : '', pressed: this.state.lang === l.key ? 'true' : 'false', pick: () => this.setState({ lang: l.key }) }));
+    const k = (o) => Object.assign({ dir: 'ltr', lc: 'kab', ff: LA, langName: 'Taqbaylit', tagCls: 'ltag', l: 'kab', badge: '', cc: false }, o);
+    const a = (o) => Object.assign({ dir: 'rtl', lc: 'ar', ff: AR, langName: 's taɛrabt', tagCls: 'ltag a', l: 'ar', badge: '', cc: false }, o);
+    const all = [
+      k({ title: 'Azwel n tvidyut s teqbaylit', date: '3 n wussan aya', dur: '11:05', tone: tones[1] }),
+      a({ title: 'عنوان أحدث حلقة من دلائل النبوّة يظهر هنا', date: '2 n wussan aya', dur: '18:42', tone: tones[0], badge: 'دلائل النبوّة · 12', cc: true }),
+      k({ title: 'Azwel aɣezfan n tvidyut i d-yesskanen akken yettuɣal ɣef sin yizirig', date: '12 Tubeṛ', dur: '16:48', tone: tones[4] }),
+      a({ title: 'عنوان مقطع متنوّع بالعربية', date: '9 Tubeṛ', dur: '06:12', tone: tones[2] }),
+      k({ title: 'Azwel n tvidyut nniḍen', date: '1 Tubeṛ', dur: '13:20', tone: tones[3] }),
+      a({ title: 'عنوان الحلقة الحادية عشرة', date: '28 Ctembeṛ', dur: '21:16', tone: tones[1], badge: 'دلائل النبوّة · 11' }),
+      k({ title: 'Tikti deg yiwet n tesdat', date: '20 Ctembeṛ', dur: '0:44', tone: tones[2] }),
+      a({ title: 'عنوان جواب عن سؤال', date: '11 Ctembeṛ', dur: '04:58', tone: tones[0] })
+    ];
+    const vids = this.state.lang === 'all' ? all : all.filter((v) => v.l === this.state.lang);
+    const eps = ['مقدّمة: لماذا ندرس دلائل النبوّة؟', 'عنوان الحلقة الثانية يظهر هنا', 'عنوان الحلقة الثالثة', 'عنوان الحلقة الرابعة'].map((title, i) => ({ n: String(i + 1).padStart(2, '0'), title, dur: ['14:20', '22:05', '19:48', '25:10'][i], tone: tones[i], cc: i % 3 === 0 }));
+    return { langs, vids, eps };
+  }
+}
+</script></body></html>

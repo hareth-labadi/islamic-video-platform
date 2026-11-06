@@ -1,0 +1,237 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-30T15:45:00Z"
+  },
+  "title": "Ilm Nafi' — Video Platform Redesign",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "UX.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 2570,
+      "title": "01 · v3 UX rethink — less landing page, more video app"
+    },
+    "Main.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 4500,
+      "title": "02 · Your feedback, Figma audit & vision"
+    },
+    "References.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 1830,
+      "title": "03 · Research & references (v2 round)"
+    },
+    "Directions.dc.html": {
+      "x": 4560,
+      "y": 0,
+      "w": 1440,
+      "h": 1710,
+      "title": "04 · Three home directions (v2 round)"
+    },
+    "Home.dc.html": {
+      "x": 0,
+      "y": 4920,
+      "w": 1440,
+      "h": 3640,
+      "expand": "fill",
+      "title": "05 · Home — Arabic (RTL)"
+    },
+    "Playlist.dc.html": {
+      "x": 1520,
+      "y": 4920,
+      "w": 1440,
+      "h": 2380,
+      "expand": "fill",
+      "title": "06 · Series — دلائل النبوّة"
+    },
+    "Watch.dc.html": {
+      "x": 3040,
+      "y": 4920,
+      "w": 1440,
+      "h": 1140,
+      "expand": "fill",
+      "title": "07 · Video page"
+    },
+    "SearchPalette.dc.html": {
+      "x": 4560,
+      "y": 4920,
+      "w": 1440,
+      "h": 900,
+      "expand": "fill",
+      "title": "08 · Instant search (press / anywhere)"
+    },
+    "Search.dc.html": {
+      "x": 4560,
+      "y": 5960,
+      "w": 1440,
+      "h": 1480,
+      "expand": "fill",
+      "title": "09 · Search results & no-results"
+    },
+    "MobileHome.dc.html": {
+      "x": 0,
+      "y": 8960,
+      "w": 390,
+      "h": 1880,
+      "title": "10 · Mobile home"
+    },
+    "MobileWatch.dc.html": {
+      "x": 470,
+      "y": 8960,
+      "w": 390,
+      "h": 900,
+      "title": "11 · Mobile video"
+    },
+    "MobileSearch.dc.html": {
+      "x": 940,
+      "y": 8960,
+      "w": 390,
+      "h": 700,
+      "title": "12 · Mobile search"
+    },
+    "HomeKabyle.dc.html": {
+      "x": 1410,
+      "y": 8960,
+      "w": 1440,
+      "h": 1640,
+      "expand": "fill",
+      "title": "13 · Home — Taqbaylit (LTR)"
+    },
+    "System.dc.html": {
+      "x": 0,
+      "y": 11240,
+      "w": 1440,
+      "h": 2260,
+      "title": "14 · Design system v4 — ink, paper & colour blocks"
+    },
+    "Roadmap.dc.html": {
+      "x": 1520,
+      "y": 11240,
+      "w": 1440,
+      "h": 3390,
+      "title": "15 · Site map, phasing, decisions & next steps"
+    }
+  },
+  "order": [
+    "UX.dc.html",
+    "Main.dc.html",
+    "References.dc.html",
+    "Directions.dc.html",
+    "Home.dc.html",
+    "Playlist.dc.html",
+    "Watch.dc.html",
+    "SearchPalette.dc.html",
+    "Search.dc.html",
+    "MobileHome.dc.html",
+    "MobileWatch.dc.html",
+    "MobileSearch.dc.html",
+    "HomeKabyle.dc.html",
+    "System.dc.html",
+    "Roadmap.dc.html"
+  ],
+  "notes": {
+    "row1": {
+      "x": 0,
+      "y": -300,
+      "text": "1 · Why v3, your feedback, and the research",
+      "kind": "title1",
+      "maxW": 6000
+    },
+    "row2": {
+      "x": 0,
+      "y": 4620,
+      "text": "2 · Desktop — Arabic, right-to-left",
+      "kind": "title1",
+      "maxW": 6000
+    },
+    "row3": {
+      "x": 0,
+      "y": 8660,
+      "text": "3 · Phone + Taqbaylit left-to-right",
+      "kind": "title1",
+      "maxW": 2850
+    },
+    "row4": {
+      "x": 0,
+      "y": 10940,
+      "text": "4 · Design system, scope and decisions",
+      "kind": "title1",
+      "maxW": 2960
+    },
+    "sampleNote": {
+      "x": 6080,
+      "y": 0,
+      "w": 420,
+      "size": "m",
+      "fill": "orange",
+      "text": "All titles, episode names, durations, counts, section names (محاور) and the sheikh's details are SAMPLE PLACEHOLDERS. Taqbaylit interface strings are a first draft for review by a native Kabyle speaker."
+    },
+    "noteFont": {
+      "x": 6080,
+      "y": 600,
+      "w": 420,
+      "size": "m",
+      "fill": "yellow",
+      "text": "Font decided: IBM Plex Sans Arabic for all Arabic text (bold titles, regular text), Inter for Taqbaylit and digits. Open licence, free to self-host."
+    },
+    "noteHome": {
+      "x": 6080,
+      "y": 4920,
+      "w": 420,
+      "size": "m",
+      "fill": "teal",
+      "text": "Home v4: a bento grid instead of one hero — the newest episode (big emerald tile), 'continue ep. 05' (ink), search, Taqbaylit (terracotta) and a quote. Then latest videos as branded covers, the series as an album-style track list, a Taqbaylit band, shorts, colour playlist tiles and a saffron mini-player pill."
+    },
+    "noteWatch": {
+      "x": 6080,
+      "y": 5540,
+      "w": 420,
+      "size": "m",
+      "fill": "teal",
+      "text": "Series & video pages: the series header is a big emerald block with its episode count; episodes read like an album track list with watched / continue / new states saved on the device. Video page: player, saffron 'Next' tile with autoplay off by default, chapters as time pills."
+    },
+    "noteSearch": {
+      "x": 6080,
+      "y": 6160,
+      "w": 420,
+      "size": "m",
+      "fill": "teal",
+      "text": "Search: press / (or tap search) anywhere for instant grouped results — episodes, videos, sections — that jump to the matching chapter. 'All results' opens the full page with filter chips, 'why it matched' and spelling help."
+    },
+    "noteMobile": {
+      "x": 2930,
+      "y": 8960,
+      "w": 420,
+      "size": "m",
+      "fill": "teal",
+      "text": "Phone: continue card first, newest episode, compact lists; mini-player above a 4-tab bar (Home · Series · Search · Playlists). The video page shows the current chapter and what's next; search shows instant results while typing."
+    },
+    "noteKab": {
+      "x": 2930,
+      "y": 9580,
+      "w": 420,
+      "size": "m",
+      "fill": "teal",
+      "text": "Taqbaylit: same layout mirrored left-to-right; Taqbaylit videos first, then the Arabic series and Arabic videos clearly labelled 's taɛrabt' with CC where captions exist."
+    },
+    "noteColor": {
+      "x": 6080,
+      "y": 1200,
+      "w": 420,
+      "size": "m",
+      "fill": "green",
+      "text": "v4 colours (round 5): paper + ink base with flat colour blocks that each mean a kind of content — emerald = دلائل النبوّة series, terracotta = Taqbaylit, cobalt = short clips, saffron = play / continue / progress. Giant outlined numbers are the signature (covers, hero tiles, track lists). No gradients, no soft beige cards."
+    }
+  },
+  "designSystems": []
+}

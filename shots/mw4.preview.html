@@ -1,0 +1,89 @@
+<!doctype html><html lang="ar"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0;background:#F4F1EA}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+.lat{font-family:'Inter',sans-serif}
+.act{flex:none;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 15px;border-radius:999px;border:1.5px solid #111111;background:transparent;font-size:13px;font-weight:600;color:#111111}
+.trk{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 16px;border-top:1px solid #DDD8CC}
+.trk .n{font-family:'Inter',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1px #111111;text-align:center}
+</style>
+<style>*{animation-play-state:paused!important;animation-delay:-10s!important}</style><script>const STATE={};</script>
+<script>
+class DCLogic { constructor(p){ this.props = p || {}; this.state = {}; } setState(s){ Object.assign(this.state, typeof s === 'function' ? s(this.state) : s); } forceUpdate(){} }
+function look(scope, path){ path = path.trim(); if (path === 'true') return true; if (path === 'false') return false; if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+  let v = scope; for (const k of path.split('.')) { if (v == null) return undefined; v = v[k]; } return v; }
+function interp(str, scope){ const m = str.match(/^\s*\{\{([^}]+)\}\}\s*$/); if (m) return look(scope, m[1]);
+  return str.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = look(scope, p); return v == null ? '' : String(v); }); }
+function render(node, scope, out){
+  if (node.nodeType === 3) { out.appendChild(document.createTextNode(interp(node.textContent, scope))); return; }
+  if (node.nodeType !== 1) return;
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'sc-for') { const list = interp(node.getAttribute('list'), scope) || []; const as = node.getAttribute('as');
+    list.forEach((item, i) => { const s = Object.assign(Object.create(scope), { [as]: item, $index: i }); node.childNodes.forEach(c => render(c, s, out)); }); return; }
+  if (tag === 'sc-if') { if (interp(node.getAttribute('value'), scope)) node.childNodes.forEach(c => render(c, scope, out)); return; }
+  const el = document.createElementNS(node.namespaceURI, node.localName);
+  for (const a of node.attributes) { if (/^on[A-Z]/.test(a.name) || a.name.startsWith('hint-')) continue; const v = interp(a.value, scope); if (v === false || v == null) continue; el.setAttribute(a.name, typeof v === 'function' ? '' : v); }
+  const src = tag === 'template' ? node.content : node;
+  src.childNodes.forEach(c => render(c, scope, el));
+  out.appendChild(el);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const C = new Function('DCLogic', document.getElementById('logic').textContent + '; return Component;')(DCLogic);
+  const inst = new C({}); Object.assign(inst.state, STATE);
+  const vals = inst.renderVals();
+  const tpl = document.getElementById('tpl').content;
+  const host = document.getElementById('host');
+  tpl.childNodes.forEach(c => render(c, vals, host));
+});
+</script>
+</head><body><template id="tpl">
+
+<div style="position:relative;width:390px;height:1080px;overflow:hidden;background:#F4F1EA;color:#111111;font-family:'IBM Plex Sans Arabic',system-ui,sans-serif" dir="rtl" lang="ar">
+  <div role="region" aria-label="مشغّل الفيديو" style="position:relative;aspect-ratio:16/10;background:#0B5D45;overflow:hidden;display:flex;align-items:center;justify-content:center">
+    <span aria-hidden="true" class="lat" style="position:absolute;top:-40px;left:-12px;font-size:250px;font-weight:800;line-height:1;letter-spacing:-.07em;color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.18)">05</span>
+    <a href="MobileHome.dc.html" aria-label="تصغير المشغّل" style="position:absolute;top:8px;right:8px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#FFFFFF"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></a>
+    <button type="button" aria-label="إيقاف مؤقت" style="position:relative;width:64px;height:64px;border-radius:999px;border:0;background:#F2B035;color:#161616;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg></button>
+    <div dir="ltr" style="position:absolute;left:0;right:0;bottom:0;padding:20px 12px 8px;display:flex;flex-direction:column;gap:6px;font-family:'Inter',sans-serif;font-size:11.5px;color:#FFFFFF">
+      <div style="display:flex;justify-content:space-between"><span>05:26 / 17:33</span><span style="font-weight:700">CC · 1×</span></div>
+      <div style="position:relative;height:4px;border-radius:999px;background:rgba(255,255,255,.28)"><div style="position:absolute;left:0;top:0;bottom:0;width:31%;border-radius:999px;background:#F2B035"></div><span style="position:absolute;left:31%;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:999px;background:#FFFFFF"></span></div>
+    </div>
+  </div>
+
+  <div style="padding:16px 16px 0;display:flex;flex-direction:column;gap:8px">
+    <a href="Playlist.dc.html" style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700"><span style="width:9px;height:9px;border-radius:3px;background:#0B5D45"></span>دلائل النبوّة · <span class="lat">05/24</span></a>
+    <h1 style="margin:0;font-size:26px;font-weight:700;line-height:1.4">عنوان الحلقة الخامسة يظهر هنا</h1>
+    <div style="display:flex;gap:6px;align-items:center;font-size:12px;color:#6A6862"><span><span class="lat">16</span> سبتمبر</span><span>·</span><span>بالعربية</span><span class="lat" style="font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#C2512F;color:#FFFFFF">CC · Taqbaylit</span></div>
+    <div style="display:flex;gap:8px;overflow-x:auto;margin:4px -16px 0;padding:0 16px"><button type="button" class="act">مشاركة</button><button type="button" class="act" aria-pressed="false">صوت فقط</button><button type="button" class="act">الفصول</button><button type="button" class="act">الوصف</button></div>
+  </div>
+
+  <div style="margin:16px 12px 0;padding:14px 16px;border-radius:18px;background:#161616;color:#FFFFFF;display:flex;align-items:center;gap:12px">
+    <span class="lat" style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:#F2B035;color:#161616">05:02</span>
+    <span style="font-size:14px;font-weight:600">الفصل الحالي: عنوان الفصل الثاني</span>
+  </div>
+
+  <a href="#" style="position:relative;overflow:hidden;display:flex;flex-direction:column;gap:4px;margin:10px 12px 0;padding:16px 18px;border-radius:18px;background:#F2B035;color:#161616">
+    <span aria-hidden="true" class="lat" style="position:absolute;top:-24px;left:-6px;font-size:110px;font-weight:800;line-height:1;letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1.2px rgba(22,22,22,.18)">06</span>
+    <span style="position:relative;font-size:11.5px;font-weight:700">التالي · <span class="lat">21:02</span></span><span style="position:relative;font-size:16px;font-weight:700">عنوان الحلقة السادسة</span>
+  </a>
+
+  <ol style="list-style:none;margin:18px 0 0;padding:0">
+    <sc-for list="{{eps}}" as="e" hint-placeholder-count="5">
+      <li><a class="trk" href="#" style="background:{{e.bg}}"><span class="n" style="-webkit-text-stroke-color:{{e.nc}};color:{{e.fill}}">{{e.n}}</span><span style="font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{e.title}}</span><span class="lat" style="font-size:12px;color:#6A6862">{{e.dur}}</span></a></li>
+    </sc-for>
+  </ol>
+</div>
+</template><div id="host"></div><script type="text/plain" id="logic">
+class Component extends DCLogic {
+  renderVals() {
+    const titles = ['عنوان الحلقة الخامسة', 'عنوان الحلقة السادسة', 'عنوان الحلقة السابعة', 'عنوان الحلقة الثامنة', 'عنوان الحلقة التاسعة'];
+    const durs = ['17:33', '21:02', '23:40', '18:15', '20:44'];
+    const eps = titles.map((title, i) => {
+      const cur = i === 0;
+      return { n: String(i + 5).padStart(2, '0'), title, dur: durs[i], bg: cur ? '#FFFFFF' : 'transparent', nc: cur ? '#0B5D45' : '#111111', fill: cur ? '#0B5D45' : 'transparent' };
+    });
+    return { eps };
+  }
+}
+</script></body></html>

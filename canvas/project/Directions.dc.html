@@ -1,0 +1,128 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Three UX directions</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#FBF8F2}
+.tag{display:inline-flex;align-items:center;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px;border-radius:999px}
+.t-rec{background:#F4EBD6;color:#5E4D22}
+.t-open{background:#F6E2DA;color:#7A2E14}
+.kick{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#7A6532}
+.col{background:#FFFFFF;border:1px solid #E3DACA;border-radius:24px;padding:30px;display:flex;flex-direction:column;gap:22px}
+.wf{direction:rtl;background:#F5EFE3;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;height:340px;box-sizing:border-box;overflow:hidden}
+.b{background:#E3D8C2;border-radius:5px}
+.bd{background:#0E4A3F;border-radius:6px}
+.bl{background:#FFFFFF;border:1px solid #E3DACA;border-radius:6px}
+.p{margin:0;font-size:15px;line-height:1.6;color:#5B635F}
+.lbl{margin:0;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.row{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.55;color:#1D2522}
+.plus{color:#0C7765;font-weight:700;flex:none;width:14px}
+.minus{color:#9A3A1A;font-weight:700;flex:none;width:14px}
+.L{font-family:'Inter',sans-serif;font-size:46px;line-height:1;color:#AD9559}
+.zl{background-image:url(/_blob/de156f642dbe0f2c5d1136220702a6e7);background-size:96px 96px}
+</style>
+</helmet>
+<div style="width:1440px;min-height:1710px;box-sizing:border-box;padding:80px 80px 96px;font-family:'Inter',system-ui,sans-serif;color:#1D2522;background:#FBF8F2;display:flex;flex-direction:column;gap:44px">
+  <header style="display:flex;flex-direction:column;gap:14px;max-width:960px">
+    <span class="kick">Home-page concepts · v2</span>
+    <h1 style="margin:0;font-family:'Inter',sans-serif;font-size:56px;line-height:1.06;font-weight:800;letter-spacing:-.035em;color:#0B3D34">Three directions — and why the series leads</h1>
+    <p class="p" style="font-size:17px">Each answers a different first question: “what should I watch now?”, “what’s new?”, or “where do I start the series?”. Wireframes are mirrored for Arabic (RTL).</p>
+  </header>
+
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+    <section class="col">
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="L">A</span><h2 style="margin:0;font-size:24px;font-weight:600">Featured episode</h2><p class="p">One chosen video leads in an arch; collections follow.</p></div>
+      <div class="wf" aria-hidden="true">
+        <div style="display:flex;gap:8px;align-items:center"><div class="bd" style="width:22px;height:16px"></div><div class="b" style="flex:1;height:9px"></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-end;padding:8px 4px">
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px"><div style="background:#0B3D34;height:18px;width:80%;border-radius:4px"></div><div class="b" style="height:8px"></div><div class="b" style="height:8px;width:70%"></div><div style="background:#065A4C;height:18px;width:50%;border-radius:999px;margin-top:6px"></div></div>
+          <div class="bd" style="width:42%;height:150px;border-radius:999px 999px 10px 10px"></div>
+        </div>
+        <div class="bl" style="height:22px;border-radius:10px"></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px"><div class="b" style="aspect-ratio:16/9"></div><div class="b" style="aspect-ratio:16/9"></div><div class="b" style="aspect-ratio:16/9"></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <p class="lbl" style="color:#0C7765">Strengths</p>
+        <div class="row"><span class="plus">+</span><span>Strongest identity; feels intentional, not algorithmic.</span></div>
+        <div class="row"><span class="plus">+</span><span>Can promote a new episode at the right moment.</span></div>
+        <p class="lbl" style="color:#9A3A1A;margin-top:6px">Drawbacks</p>
+        <div class="row"><span class="minus">–</span><span>Needs curation, or defaults to “newest”.</span></div>
+      </div>
+    </section>
+
+    <section class="col">
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="L">B</span><h2 style="margin:0;font-size:24px;font-weight:600">Video feed</h2><p class="p">A dense grid of everything new, short clips mixed in.</p></div>
+      <div class="wf" aria-hidden="true">
+        <div style="display:flex;gap:8px;align-items:center"><div class="bd" style="width:22px;height:16px"></div><div class="b" style="flex:1;height:9px"></div></div>
+        <div style="display:flex;gap:6px"><div class="bd" style="width:40px;height:14px;border-radius:999px"></div><div class="b" style="width:40px;height:14px;border-radius:999px"></div><div class="b" style="width:40px;height:14px;border-radius:999px"></div></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px"><div class="b" style="aspect-ratio:16/9"></div><div class="b" style="aspect-ratio:16/9"></div><div class="b" style="aspect-ratio:16/9"></div><div class="b" style="aspect-ratio:16/9"></div><div class="b" style="aspect-ratio:16/9"></div><div class="b" style="aspect-ratio:16/9"></div><div class="b" style="aspect-ratio:16/9"></div><div class="b" style="aspect-ratio:16/9"></div></div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px"><div class="bd" style="aspect-ratio:9/16;opacity:.5"></div><div class="bd" style="aspect-ratio:9/16;opacity:.5"></div><div class="bd" style="aspect-ratio:9/16;opacity:.5"></div><div class="bd" style="aspect-ratio:9/16;opacity:.5"></div><div class="bd" style="aspect-ratio:9/16;opacity:.5"></div><div class="bd" style="aspect-ratio:9/16;opacity:.5"></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <p class="lbl" style="color:#0C7765">Strengths</p>
+        <div class="row"><span class="plus">+</span><span>Most videos above the fold; familiar from YouTube.</span></div>
+        <div class="row"><span class="plus">+</span><span>Updates itself.</span></div>
+        <p class="lbl" style="color:#9A3A1A;margin-top:6px">Drawbacks</p>
+        <div class="row"><span class="minus">–</span><span>Breaks the series’ order; feels like a social feed.</span></div>
+      </div>
+    </section>
+
+    <section class="col">
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="L">C</span><h2 style="margin:0;font-size:24px;font-weight:600">Playlist library</h2><p class="p">Playlists lead; videos live inside them in order.</p></div>
+      <div class="wf" aria-hidden="true">
+        <div style="display:flex;gap:8px;align-items:center"><div class="bd" style="width:22px;height:16px"></div><div class="b" style="flex:1;height:9px"></div></div>
+        <div class="bl" style="height:22px;border-radius:10px"></div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+          <div style="display:flex;gap:8px;align-items:center;background:#FFFFFF;border-radius:8px;padding:6px"><span style="width:16px;height:16px;border-radius:999px;border:1.5px solid #AD9559"></span><div class="b" style="width:34%;aspect-ratio:16/9"></div><div class="b" style="flex:1;height:7px"></div></div>
+          <div style="display:flex;gap:8px;align-items:center;background:#FFFFFF;border-radius:8px;padding:6px"><span style="width:16px;height:16px;border-radius:999px;border:1.5px solid #AD9559"></span><div class="b" style="width:34%;aspect-ratio:16/9"></div><div class="b" style="flex:1;height:7px"></div></div>
+          <div style="display:flex;gap:8px;align-items:center;background:#FFFFFF;border-radius:8px;padding:6px"><span style="width:16px;height:16px;border-radius:999px;border:1.5px solid #AD9559"></span><div class="b" style="width:34%;aspect-ratio:16/9"></div><div class="b" style="flex:1;height:7px"></div></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <p class="lbl" style="color:#0C7765">Strengths</p>
+        <div class="row"><span class="plus">+</span><span>Best for following the series in order.</span></div>
+        <div class="row"><span class="plus">+</span><span>Scales calmly; great for SEO.</span></div>
+        <p class="lbl" style="color:#9A3A1A;margin-top:6px">Drawbacks</p>
+        <div class="row"><span class="minus">–</span><span>Fewer videos on the first screen; hides the mixed videos.</span></div>
+      </div>
+    </section>
+  </div>
+
+  <section style="display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:24px">
+    <div class="zl" style="background-color:#0E4A3F;border-radius:24px;padding:44px;color:#FFFFFF;display:flex;flex-direction:column;gap:18px">
+      <span class="tag" style="background:rgba(255,255,255,.12);color:#F4EBD6;align-self:flex-start">Recommended — and built on the Home board</span>
+      <h2 style="margin:0;font-family:'Inter',sans-serif;font-size:36px;font-weight:400;line-height:1.2">A + C, with B’s freshness: the series is the hero, the library sits beneath</h2>
+      <p style="margin:0;font-size:16px;line-height:1.65;color:#CFE3DD">The hero shows the latest <span lang="ar" dir="rtl" style="font-family:'Amiri',serif;color:#E4D5AE;font-size:18px">دلائل النبوّة</span> episode in the arch, with “start from episode 1”. Below: the numbered episode path, then the latest mixed videos with a language filter, shorts, and playlists. Each module appears only when its data exists.</p>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:6px">
+        <div style="background:rgba(255,255,255,.08);border-radius:14px;padding:16px"><p style="margin:0 0 6px;font-size:13px;color:#E4D5AE;font-weight:600">Day-one safe</p><p style="margin:0;font-size:14px;line-height:1.5;color:#E8F2EF">Works with titles, dates, durations and episode numbers.</p></div>
+        <div style="background:rgba(255,255,255,.08);border-radius:14px;padding:16px"><p style="margin:0 0 6px;font-size:13px;color:#E4D5AE;font-weight:600">Order respected</p><p style="margin:0;font-size:14px;line-height:1.5;color:#E8F2EF">The series is always one tap from episode 1.</p></div>
+        <div style="background:rgba(255,255,255,.08);border-radius:14px;padding:16px"><p style="margin:0 0 6px;font-size:13px;color:#E4D5AE;font-weight:600">No popularity needed</p><p style="margin:0;font-size:14px;line-height:1.5;color:#E8F2EF">“Most watched” waits for analytics.</p></div>
+      </div>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #E3DACA;border-radius:24px;padding:32px;display:flex;flex-direction:column;gap:16px">
+      <span class="tag t-open" style="align-self:flex-start">To validate with the team</span>
+      <div class="row"><span class="plus">?</span><span>Is the hero always the newest episode, or does someone choose it?</span></div>
+      <div class="row"><span class="plus">?</span><span>Are the short clips cut from the series? If so, each should link to its episode.</span></div>
+      <div class="row"><span class="plus">?</span><span>How many videos exist today, and how many belong to <bdi lang="ar" style="font-family:'Amiri',serif;font-size:17px">دلائل النبوّة</bdi>?</span></div>
+      <div class="row"><span class="plus">?</span><span>Will other playlists exist at launch, or only the main series + “all videos”?</span></div>
+      <div class="row"><span class="plus">?</span><span>The Figma tagline is kept as a quote band — confirm the wording and its source line.</span></div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1710}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

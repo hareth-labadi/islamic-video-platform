@@ -1,0 +1,141 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#FBF8F2}
+.kick{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#7A6532}
+.card{background:#FFFFFF;border:1px solid #E3DACA;border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:14px}
+.sk{height:190px;border-radius:14px;overflow:hidden;position:relative;background:#F5EFE3}
+.src{font-size:12px;color:#5B635F}
+.h3{margin:0;font-family:'Inter',sans-serif;font-size:24px;font-weight:500;color:#0B3D34;line-height:1.15}
+.p{margin:0;font-size:14.5px;line-height:1.6;color:#5B635F}
+.took{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:#E1EEE8;font-size:14px;line-height:1.5;color:#0B3D34}
+.zg{background-image:url(assets/zellige-gold.svg);background-size:64px 64px}
+.zl{background-image:url(assets/zellige-light.svg);background-size:64px 64px}
+.no{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.55;color:#1D2522}
+</style>
+<style>*{animation-play-state:paused!important;animation-delay:-10s!important}</style><script>const STATE={};</script>
+<script>
+class DCLogic { constructor(p){ this.props = p || {}; this.state = {}; } setState(s){ Object.assign(this.state, typeof s === 'function' ? s(this.state) : s); } forceUpdate(){} }
+function look(scope, path){ path = path.trim(); if (path === 'true') return true; if (path === 'false') return false; if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+  let v = scope; for (const k of path.split('.')) { if (v == null) return undefined; v = v[k]; } return v; }
+function interp(str, scope){ const m = str.match(/^\s*\{\{([^}]+)\}\}\s*$/); if (m) return look(scope, m[1]);
+  return str.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = look(scope, p); return v == null ? '' : String(v); }); }
+function render(node, scope, out){
+  if (node.nodeType === 3) { out.appendChild(document.createTextNode(interp(node.textContent, scope))); return; }
+  if (node.nodeType !== 1) return;
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'sc-for') { const list = interp(node.getAttribute('list'), scope) || []; const as = node.getAttribute('as');
+    list.forEach((item, i) => { const s = Object.assign(Object.create(scope), { [as]: item, $index: i }); node.childNodes.forEach(c => render(c, s, out)); }); return; }
+  if (tag === 'sc-if') { if (interp(node.getAttribute('value'), scope)) node.childNodes.forEach(c => render(c, scope, out)); return; }
+  const el = document.createElementNS(node.namespaceURI, node.localName);
+  for (const a of node.attributes) { if (/^on[A-Z]/.test(a.name) || a.name.startsWith('hint-')) continue; const v = interp(a.value, scope); if (v === false || v == null) continue; el.setAttribute(a.name, typeof v === 'function' ? '' : v); }
+  const src = tag === 'template' ? node.content : node;
+  src.childNodes.forEach(c => render(c, scope, el));
+  out.appendChild(el);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const C = new Function('DCLogic', document.getElementById('logic').textContent + '; return Component;')(DCLogic);
+  const inst = new C({}); Object.assign(inst.state, STATE);
+  const vals = inst.renderVals();
+  const tpl = document.getElementById('tpl').content;
+  const host = document.getElementById('host');
+  tpl.childNodes.forEach(c => render(c, vals, host));
+});
+</script>
+</head><body><template id="tpl">
+
+<div style="width:1440px;min-height:1830px;box-sizing:border-box;padding:80px 80px 96px;font-family:'Inter',system-ui,sans-serif;color:#1D2522;background:#FBF8F2;display:flex;flex-direction:column;gap:40px">
+  <header style="display:flex;justify-content:space-between;align-items:flex-end;gap:40px">
+    <div style="display:flex;flex-direction:column;gap:14px;max-width:900px">
+      <span class="kick">Research · Dribbble, Behance, Awwwards, live sites</span>
+      <h1 style="margin:0;font-family:'Inter',sans-serif;font-size:56px;line-height:1.06;font-weight:800;letter-spacing:-.035em;color:#0B3D34">What strong Islamic sites do — and what we took from each</h1>
+      <p class="p" style="font-size:17px">Sketches below are my own abstractions of each idea in our palette, not copies of the original work. Visit the sources for the real designs.</p>
+    </div>
+  </header>
+
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px">
+    <article class="card">
+      <div class="sk" aria-hidden="true" style="display:flex">
+        <div style="flex:1;background:#0E4A3F;padding:22px;display:flex;flex-direction:column;gap:8px;justify-content:center"><div style="height:12px;width:80%;background:#FBF8F2;border-radius:3px"></div><div style="height:12px;width:60%;background:#FBF8F2;border-radius:3px"></div><div style="height:16px;width:40%;background:#C9AE6A;border-radius:999px;margin-top:8px"></div></div>
+        <div style="flex:1;background:#E3D8C2"></div>
+      </div>
+      <span class="src">Dribbble · “Baituna — Mosque &amp; Islamic Center Website” by MAH Studios</span>
+      <h2 class="h3">Paper, forest green, mustard, editorial serif</h2>
+      <p class="p">A cream page with one deep green block holding a large serif headline; gold used for small accents and buttons.</p>
+      <div class="took"><span>→</span><span>Warm paper ground, a single dark signature element per screen, editorial headlines.</span></div>
+    </article>
+    <article class="card">
+      <div class="sk zg" aria-hidden="true" style="display:flex;align-items:flex-end;justify-content:center">
+        <div style="position:absolute;top:22px;left:0;right:0;text-align:center;font-family:'Amiri',serif;font-size:30px;color:#0B3D34" lang="ar" dir="rtl">عنوان عريض</div>
+        <div class="zl" style="width:110px;height:120px;border-radius:55px 55px 0 0;background-color:#0E4A3F"></div>
+      </div>
+      <span class="src">Dribbble · “Landing page Hero Section: Dariya” by Mubeen Ahmed Sher</span>
+      <h2 class="h3">The arch as a window</h2>
+      <p class="p">A centred Arabic headline above an arch-shaped image window, on a faint tile pattern — calm and unmistakably Islamic without domes or stock photos.</p>
+      <div class="took"><span>→</span><span>The arch frames the featured video, playlist covers and the sheikh’s portrait; zellige stays faint and masked.</span></div>
+    </article>
+    <article class="card">
+      <div class="sk" aria-hidden="true" style="display:flex;align-items:center;justify-content:center;gap:18px">
+        <span style="font-family:'Amiri',serif;font-size:58px;font-weight:700;color:#0B3D34" lang="ar" dir="rtl">قصر</span>
+        <svg width="60" height="60" viewBox="0 0 100 100" fill="#AD9559"><rect x="22" y="22" width="56" height="56"></rect><rect x="22" y="22" width="56" height="56" transform="rotate(45 50 50)"></rect></svg>
+      </div>
+      <span class="src">Behance · “Museum of Islamic Ceramics Website — UI/UX Case Study”</span>
+      <h2 class="h3">One big Arabic word</h2>
+      <p class="p">A single bold Arabic display word carries the identity; eight-point stars mark people and sections.</p>
+      <div class="took"><span>→</span><span>دلائل النبوّة in large Amiri is the hero; the logo’s eight-point star becomes the site’s motif and motion.</span></div>
+    </article>
+    <article class="card">
+      <div class="sk" aria-hidden="true" style="background:#1D2522;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+        <span style="font-family:'Amiri',serif;font-size:34px;color:#8A8F8C" lang="ar" dir="rtl">عنوان</span>
+        <div style="width:70%;height:30px;border-radius:999px;background:#2E3633"></div>
+        <div style="display:flex;gap:8px"><div style="width:60px;height:14px;border-radius:999px;background:#C9AE6A"></div><div style="width:60px;height:14px;border-radius:999px;background:#2E3633"></div></div>
+      </div>
+      <span class="src">Live site · Quran.com (Arabic)</span>
+      <h2 class="h3">Search is the front door</h2>
+      <p class="p">A calligraphic title, one search field, and a “continue reading” card — almost nothing else above the fold.</p>
+      <div class="took"><span>→</span><span>Search bridges the hero and the content; “continue where you stopped” is stored on the device, no account.</span></div>
+    </article>
+    <article class="card">
+      <div class="sk" aria-hidden="true" style="background:#FFFFFF;border:1px solid #E3DACA;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="height:10px;width:30%;background:#0B3D34;border-radius:3px;align-self:center"></div>
+        <div style="display:flex;gap:8px"><div style="flex:1;aspect-ratio:3/4;background:#DCE7E0;border-radius:6px"></div><div style="flex:1;aspect-ratio:3/4;background:#EADFCB;border-radius:6px"></div><div style="flex:1;aspect-ratio:3/4;background:#D9E3E4;border-radius:6px"></div><div style="flex:1;aspect-ratio:3/4;background:#E9DAD0;border-radius:6px"></div><div style="flex:1;aspect-ratio:3/4;background:#E3E8D6;border-radius:6px"></div></div>
+      </div>
+      <span class="src">Live site · Yaqeen Institute</span>
+      <h2 class="h3">Rails per content type</h2>
+      <p class="p">Each content type gets a centred heading and a horizontal rail; cards carry little metadata and lots of whitespace.</p>
+      <div class="took"><span>→</span><span>Rails for episodes, shorts and playlists; grids only where comparing many videos matters.</span></div>
+    </article>
+    <article class="card" style="background:#F5EFE3;border-color:#E3DACA">
+      <span class="kick" style="margin-top:4px">Deliberately avoided</span>
+      <h2 class="h3">What most “Islamic website” shots get wrong for us</h2>
+      <div class="no"><span style="color:#9A3A1A;font-weight:700">✕</span><span>Stock mosque photos and gold domes as the hero — say nothing about this sheikh.</span></div>
+      <div class="no"><span style="color:#9A3A1A;font-weight:700">✕</span><span>Bright blue SaaS gradients and stat counters (“10k students”).</span></div>
+      <div class="no"><span style="color:#9A3A1A;font-weight:700">✕</span><span>Donation-first or course-marketplace layouts.</span></div>
+      <div class="no"><span style="color:#9A3A1A;font-weight:700">✕</span><span>Gulf-centric visual clichés; this audience is Algerian and Kabyle, so the Maghrebi arch and zellige fit better. <em>To confirm with the team.</em></span></div>
+    </article>
+  </div>
+
+  <section style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px">
+    <div class="card" style="gap:12px">
+      <span class="kick">Typography research</span>
+      <h2 class="h3">I rendered 20 Arabic display fonts side by side</h2>
+      <p class="p">Amiri, Reem Kufi, Aref Ruqaa, El Messiri, Noto Naskh Arabic, Noto Kufi Arabic, Kufam, Scheherazade New, Lalezar, Rakkas, Mirza, Lemonada, Katibeh, Alexandria, Markazi Text and others. Amiri gave the best mix of scholarly character and legibility at headline sizes; Markazi looked too close to the body sans.</p>
+      <div style="display:flex;gap:18px;align-items:baseline;flex-wrap:wrap" lang="ar" dir="rtl">
+        <span style="font-family:'Amiri',serif;font-size:40px;font-weight:700;color:#0B3D34">دلائل النبوّة</span>
+      </div>
+    </div>
+    <div class="card" style="gap:12px">
+      <span class="kick">Language research</span>
+      <h2 class="h3">Most fonts cannot write Taqbaylit</h2>
+      <p class="p">Of 72 fonts tested for the 20 Kabyle letters (ɛ ɣ ḍ ḥ ṛ ṣ ṭ ẓ č ǧ and capitals), only a handful pass — Inter, Noto Sans, Noto Serif Display, Source Sans 3, Fira Sans, EB Garamond, Charis SIL, Gentium. Every Arabic family fails, so fonts must switch by language. Details on the System board.</p>
+      <span style="font-family:'Inter',sans-serif;font-size:26px;color:#0B3D34;letter-spacing:.04em" lang="kab">ɛ ɣ ḍ ḥ ṛ ṣ ṭ ẓ č ǧ</span>
+    </div>
+  </section>
+</div>
+</template><div id="host"></div><script type="text/plain" id="logic">
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script></body></html>

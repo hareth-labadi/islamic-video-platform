@@ -1,0 +1,135 @@
+<!doctype html><html lang="ar"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0;background:#F4F1EA}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid #F2B035;outline-offset:3px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px;box-sizing:border-box}
+.lat{font-family:'Inter',sans-serif}
+.nav a{font-size:15px;color:#4B4B47;padding:6px 0;border-bottom:2px solid transparent;white-space:nowrap}
+.nav a.on{color:#111111;font-weight:700;border-bottom-color:#111111}
+.pill{display:inline-flex;align-items:center;gap:10px;height:50px;padding:0 8px 0 22px;border-radius:999px;font-size:15.5px;font-weight:700}
+.pill .d{font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;padding:5px 10px;border-radius:999px}
+.cv{position:relative;overflow:hidden;aspect-ratio:16/9;border-radius:12px;background:#0B5D45;flex:none}
+.cv .num{position:absolute;top:-22px;left:-4px;font-family:'Inter',sans-serif;font-size:110px;font-weight:800;line-height:1;letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1.3px rgba(255,255,255,.38)}
+.cv .dur{position:absolute;bottom:8px;right:8px;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(0,0,0,.3);color:#FFFFFF}
+.tab{border:0;background:transparent;padding:10px 0;font-size:15px;color:#4B4B47;border-bottom:2px solid transparent}
+.tab.on{color:#111111;font-weight:700;border-bottom-color:#111111}
+.trk{display:grid;grid-template-columns:78px 200px minmax(0,1fr) 80px 120px;align-items:center;gap:20px;padding:16px 14px;border-top:1px solid #DDD8CC;color:#111111}
+.trk:hover{background:#FFFFFF}
+.trk .n{font-family:'Inter',sans-serif;font-size:46px;font-weight:800;letter-spacing:-.04em;line-height:1;color:transparent;-webkit-text-stroke:1.2px #111111;text-align:center}
+.kab{font-family:'Inter',sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:#C2512F;color:#FFFFFF}
+.axh{display:flex;align-items:baseline;gap:14px;padding:44px 14px 14px}
+</style>
+<style>*{animation-play-state:paused!important;animation-delay:-10s!important}</style><script>const STATE={};</script>
+<script>
+class DCLogic { constructor(p){ this.props = p || {}; this.state = {}; } setState(s){ Object.assign(this.state, typeof s === 'function' ? s(this.state) : s); } forceUpdate(){} }
+function look(scope, path){ path = path.trim(); if (path === 'true') return true; if (path === 'false') return false; if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+  let v = scope; for (const k of path.split('.')) { if (v == null) return undefined; v = v[k]; } return v; }
+function interp(str, scope){ const m = str.match(/^\s*\{\{([^}]+)\}\}\s*$/); if (m) return look(scope, m[1]);
+  return str.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = look(scope, p); return v == null ? '' : String(v); }); }
+function render(node, scope, out){
+  if (node.nodeType === 3) { out.appendChild(document.createTextNode(interp(node.textContent, scope))); return; }
+  if (node.nodeType !== 1) return;
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'sc-for') { const list = interp(node.getAttribute('list'), scope) || []; const as = node.getAttribute('as');
+    list.forEach((item, i) => { const s = Object.assign(Object.create(scope), { [as]: item, $index: i }); node.childNodes.forEach(c => render(c, s, out)); }); return; }
+  if (tag === 'sc-if') { if (interp(node.getAttribute('value'), scope)) node.childNodes.forEach(c => render(c, scope, out)); return; }
+  const el = document.createElementNS(node.namespaceURI, node.localName);
+  for (const a of node.attributes) { if (/^on[A-Z]/.test(a.name) || a.name.startsWith('hint-')) continue; const v = interp(a.value, scope); if (v === false || v == null) continue; el.setAttribute(a.name, typeof v === 'function' ? '' : v); }
+  const src = tag === 'template' ? node.content : node;
+  src.childNodes.forEach(c => render(c, scope, el));
+  out.appendChild(el);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const C = new Function('DCLogic', document.getElementById('logic').textContent + '; return Component;')(DCLogic);
+  const inst = new C({}); Object.assign(inst.state, STATE);
+  const vals = inst.renderVals();
+  const tpl = document.getElementById('tpl').content;
+  const host = document.getElementById('host');
+  tpl.childNodes.forEach(c => render(c, vals, host));
+});
+</script>
+</head><body><template id="tpl">
+
+<div style="width:100%;min-height:100vh;background:#F4F1EA;color:#111111;font-family:'IBM Plex Sans Arabic',system-ui,sans-serif" dir="rtl" lang="ar">
+
+  <header class="wrap" style="display:flex;align-items:center;gap:14px 32px;min-height:84px;flex-wrap:wrap">
+    <a href="Home.dc.html" style="display:flex;align-items:center;gap:10px;flex:none" aria-label="علم نافع — الرئيسية"><img src="assets/mark.png" alt="" style="height:38px;width:auto"><span style="font-size:24px;font-weight:700">علم نافع</span></a>
+    <nav class="nav" aria-label="القائمة الرئيسية" style="display:flex;gap:26px;overflow-x:auto"><a href="Home.dc.html">الرئيسية</a><a class="on" href="#" aria-current="page">دلائل النبوّة</a><a href="Search.dc.html">كل المقاطع</a><a href="#">قوائم التشغيل</a><a href="#">عن الشيخ</a></nav>
+    <div style="display:flex;align-items:center;gap:8px;margin-inline-start:auto">
+      <a href="SearchPalette.dc.html" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 16px;border-radius:999px;background:#FFFFFF;font-size:14px;color:#6A6862"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>بحث<kbd class="lat" style="font-size:11px;padding:1px 6px;border-radius:6px;background:#F4F1EA">/</kbd></a>
+      <a href="HomeKabyle.dc.html" lang="kab" class="lat" style="display:flex;align-items:center;height:44px;padding:0 16px;border-radius:999px;border:1.5px solid #111111;font-size:14px;font-weight:600">Taqbaylit</a>
+    </div>
+  </header>
+
+  <main class="wrap" style="padding-bottom:80px">
+    <section style="position:relative;overflow:hidden;border-radius:28px;background:#0B5D45;color:#FFFFFF;padding:44px 48px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:40px;align-items:end;min-height:420px;box-sizing:border-box">
+      <span aria-hidden="true" class="lat" style="position:absolute;top:-110px;left:-30px;font-size:520px;font-weight:800;line-height:1;letter-spacing:-.07em;color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.18)">24</span>
+      <div style="position:relative;display:flex;flex-direction:column;gap:16px">
+        <nav aria-label="مسار التنقل" style="font-size:13px;opacity:.8"><a href="Home.dc.html">الرئيسية</a> ‹ <a href="#">قوائم التشغيل</a></nav>
+        <span style="font-size:13px;font-weight:600;color:#F2B035">السلسلة الرئيسية · <span class="lat">24</span> حلقة · <span class="lat">3</span> محاور</span>
+        <h1 style="margin:0;font-size:76px;font-weight:700;line-height:1.1;letter-spacing:-.015em">دلائل النبوّة</h1>
+        <p style="margin:0;font-size:17px;line-height:1.85;opacity:.88;max-width:560px">[وصف السلسلة كما يكتبه فريق الموقع: ما المقصود بدلائل النبوّة، ولماذا رُتّبت الحلقات بهذا الترتيب، ولمن هي.]</p>
+      </div>
+      <div style="position:relative;display:flex;flex-direction:column;gap:16px;align-items:stretch">
+        <div style="display:flex;align-items:center;gap:12px;font-size:13px"><div style="flex:1;height:5px;border-radius:999px;background:rgba(255,255,255,.2)"><div style="width:17%;height:100%;border-radius:999px;background:#F2B035"></div></div><span>شاهدتَ <span class="lat">4/24</span></span></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a class="pill" href="Watch.dc.html" style="background:#F2B035;color:#161616"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16l13-8z" fill="currentColor"></path></svg>تابِع الحلقة <span class="lat">5</span><span class="d" style="background:#161616;color:#F2B035">بقي 12 د</span></a>
+          <a class="pill" href="Watch.dc.html" style="border:1.5px solid rgba(255,255,255,.5);padding:0 22px">من البداية</a>
+        </div>
+        <span style="font-size:12.5px;opacity:.75">بالعربية · ترجمة <span class="lat">Taqbaylit</span> لـ<span class="lat">8</span> حلقات · نحو <span class="lat">8</span> ساعات</span>
+      </div>
+    </section>
+
+    <div style="position:sticky;top:0;z-index:3;background:#F4F1EA;display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;justify-content:space-between;padding:20px 14px 0;border-bottom:1px solid #DDD8CC;margin-top:28px">
+      <div role="tablist" aria-label="محاور السلسلة" style="display:flex;gap:28px;flex-wrap:wrap">
+        <button type="button" role="tab" class="tab on" aria-selected="true">كل الحلقات <span class="lat" style="color:#6A6862">24</span></button>
+        <button type="button" role="tab" class="tab" aria-selected="false">[المحور الأول] <span class="lat" style="color:#6A6862">3</span></button>
+        <button type="button" role="tab" class="tab" aria-selected="false">[المحور الثاني] <span class="lat" style="color:#6A6862">3</span></button>
+        <button type="button" role="tab" class="tab" aria-selected="false">[المحور الثالث] <span class="lat" style="color:#6A6862">18</span></button>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:999px;background:#FFFFFF;font-size:14px;color:#6A6862;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><input type="search" aria-label="ابحث في السلسلة" placeholder="ابحث في السلسلة" style="border:0;background:transparent;font:inherit;font-size:14px;outline:none;width:160px"></label>
+    </div>
+
+    <sc-for list="{{axes}}" as="ax" hint-placeholder-count="2">
+      <section>
+        <div class="axh"><span class="lat" style="font-size:14px;font-weight:700;padding:4px 10px;border-radius:999px;background:#111111;color:#F2B035">{{ax.no}}</span><h2 style="margin:0;font-size:24px;font-weight:700">{{ax.name}}</h2><span style="margin-inline-start:auto;font-size:13px;color:#6A6862">{{ax.count}}</span></div>
+        <ol style="list-style:none;margin:0;padding:0">
+          <sc-for list="{{ax.eps}}" as="e" hint-placeholder-count="3">
+            <li><a class="trk" href="Watch.dc.html" style="background:{{e.bg}}">
+              <span class="n" style="-webkit-text-stroke-color:{{e.nc}};color:{{e.fill}}">{{e.n}}</span>
+              <div class="cv"><span class="num">{{e.n}}</span><span class="dur">{{e.dur}}</span></div>
+              <div style="display:flex;flex-direction:column;gap:6px;min-width:0"><h3 style="margin:0;font-size:18px;font-weight:700;line-height:1.5">{{e.title}}</h3><p style="margin:0;font-size:14px;line-height:1.7;color:#6A6862;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">سطر واحد يلخّص موضوع الحلقة قبل مشاهدتها.</p><div style="display:flex;gap:8px;align-items:center;font-size:12.5px;color:#6A6862"><span>{{e.date}}</span><sc-if value="{{e.kab}}" hint-placeholder-val="{{ false }}"><span class="kab">CC · Taqbaylit</span></sc-if></div></div>
+              <span class="lat" style="font-size:13px;color:#6A6862">{{e.dur}}</span>
+              <span style="justify-self:end;font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:999px;background:{{e.sbg}};color:#161616">{{e.state}}</span>
+            </a></li>
+          </sc-for>
+        </ol>
+      </section>
+    </sc-for>
+    <div style="display:flex;justify-content:center;margin-top:30px"><button type="button" style="height:48px;padding:0 26px;border-radius:999px;border:1.5px solid #111111;background:transparent;font-size:15px;font-weight:700">عرض <span class="lat">15</span> حلقة أخرى</button></div>
+  </main>
+</div>
+</template><div id="host"></div><script type="text/plain" id="logic">
+class Component extends DCLogic {
+  renderVals() {
+    const titles = ['مقدّمة: لماذا ندرس دلائل النبوّة؟', 'عنوان الحلقة الثانية يظهر هنا', 'عنوان أطول للحلقة الثالثة يلتفّ على سطرين كحدٍّ أقصى', 'عنوان الحلقة الرابعة', 'عنوان الحلقة الخامسة يظهر هنا', 'عنوان الحلقة السادسة', 'عنوان الحلقة السابعة', 'عنوان الحلقة الثامنة', 'عنوان الحلقة التاسعة'];
+    const durs = ['14:20', '22:05', '19:48', '25:10', '17:33', '21:02', '23:40', '18:15', '20:44'];
+    const dates = ['2 سبتمبر', '6 سبتمبر', '9 سبتمبر', '13 سبتمبر', '16 سبتمبر', '20 سبتمبر', '23 سبتمبر', '27 سبتمبر', '30 سبتمبر'];
+    const ep = (i) => {
+      const cur = i === 4, seen = i < 4;
+      return { n: String(i + 1).padStart(2, '0'), title: titles[i], dur: durs[i], date: dates[i] + ' 2026', kab: i % 3 === 0,
+        bg: cur ? '#FFFFFF' : 'transparent', nc: cur ? '#0B5D45' : '#111111', fill: cur ? '#0B5D45' : 'transparent',
+        state: cur ? '▶ تابِع 05:26' : (seen ? '✓ شوهدت' : 'لم تُشاهَد'), sbg: cur ? '#F2B035' : (seen ? '#E7E3D9' : '#CFE5D6') };
+    };
+    const axes = [
+      { no: '01', name: '[عنوان المحور الأول]', count: '3 حلقات', eps: [0, 1, 2].map(ep) },
+      { no: '02', name: '[عنوان المحور الثاني]', count: '3 حلقات', eps: [3, 4, 5].map(ep) },
+      { no: '03', name: '[عنوان المحور الثالث]', count: '3 من 18', eps: [6, 7, 8].map(ep) }
+    ];
+    return { axes };
+  }
+}
+</script></body></html>

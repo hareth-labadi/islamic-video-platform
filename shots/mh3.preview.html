@@ -1,0 +1,166 @@
+<!doctype html><html lang="ar"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Noto+Naskh+Arabic:wght@500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F3EE}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+.ui{font-family:'Thmanyah Sans','IBM Plex Sans Arabic',system-ui,sans-serif}
+.disp{font-family:'Thmanyah Serif Display','Noto Naskh Arabic',serif;font-weight:700}
+.lat{font-family:'Inter',sans-serif}
+.thumb{position:relative;overflow:hidden;aspect-ratio:16/9;border-radius:12px;background:#DAD5CA;flex:none}
+.dur{position:absolute;bottom:6px;left:6px;direction:ltr;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:#FFFFFF;background:rgba(17,22,20,.82);padding:1px 6px;border-radius:5px}
+.prog{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(17,22,20,.15)}
+.prog span{position:absolute;top:0;bottom:0;right:0;background:#C9A24A}
+.sh{display:flex;justify-content:space-between;align-items:baseline;padding:0 16px;margin-bottom:12px}
+.sh h2{margin:0;font-size:19px;font-weight:700}
+.more{font-size:13.5px;font-weight:600;color:#065A4C}
+.row{display:flex;gap:12px;align-items:flex-start;padding:10px 16px}
+.t{margin:0;font-size:14.5px;font-weight:700;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.m{font-size:12px;color:#6B706C}
+.sec{padding:22px 0;border-top:1px solid #E4E0D6}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:#6B706C;padding-top:8px;min-height:54px}
+.tab.on{color:#111614;font-weight:700}
+.kab{font-size:10.5px;font-weight:600;padding:1px 7px;border-radius:999px;background:#F1E7CF;color:#5E4D22;font-family:'Inter',sans-serif}
+.zl{background-image:url(assets/zellige-light.svg);background-size:56px 56px}
+</style>
+<style>*{animation-play-state:paused!important;animation-delay:-10s!important}</style><script>const STATE={};</script>
+<script>
+class DCLogic { constructor(p){ this.props = p || {}; this.state = {}; } setState(s){ Object.assign(this.state, typeof s === 'function' ? s(this.state) : s); } forceUpdate(){} }
+function look(scope, path){ path = path.trim(); if (path === 'true') return true; if (path === 'false') return false; if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+  let v = scope; for (const k of path.split('.')) { if (v == null) return undefined; v = v[k]; } return v; }
+function interp(str, scope){ const m = str.match(/^\s*\{\{([^}]+)\}\}\s*$/); if (m) return look(scope, m[1]);
+  return str.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = look(scope, p); return v == null ? '' : String(v); }); }
+function render(node, scope, out){
+  if (node.nodeType === 3) { out.appendChild(document.createTextNode(interp(node.textContent, scope))); return; }
+  if (node.nodeType !== 1) return;
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'sc-for') { const list = interp(node.getAttribute('list'), scope) || []; const as = node.getAttribute('as');
+    list.forEach((item, i) => { const s = Object.assign(Object.create(scope), { [as]: item, $index: i }); node.childNodes.forEach(c => render(c, s, out)); }); return; }
+  if (tag === 'sc-if') { if (interp(node.getAttribute('value'), scope)) node.childNodes.forEach(c => render(c, scope, out)); return; }
+  const el = document.createElementNS(node.namespaceURI, node.localName);
+  for (const a of node.attributes) { if (/^on[A-Z]/.test(a.name) || a.name.startsWith('hint-')) continue; const v = interp(a.value, scope); if (v === false || v == null) continue; el.setAttribute(a.name, typeof v === 'function' ? '' : v); }
+  const src = tag === 'template' ? node.content : node;
+  src.childNodes.forEach(c => render(c, scope, el));
+  out.appendChild(el);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const C = new Function('DCLogic', document.getElementById('logic').textContent + '; return Component;')(DCLogic);
+  const inst = new C({}); Object.assign(inst.state, STATE);
+  const vals = inst.renderVals();
+  const tpl = document.getElementById('tpl').content;
+  const host = document.getElementById('host');
+  tpl.childNodes.forEach(c => render(c, vals, host));
+});
+</script>
+</head><body><template id="tpl">
+
+<div class="ui" style="position:relative;width:390px;height:2240px;overflow:hidden;background:#F5F3EE;color:#111614" dir="rtl" lang="ar">
+
+  <header style="display:flex;align-items:center;gap:6px;height:58px;padding:0 10px 0 6px;border-bottom:1px solid #E4E0D6">
+    <a href="#" style="display:flex;align-items:center;gap:8px" aria-label="علم نافع — الرئيسية"><img src="assets/mark.png" alt="" style="height:30px;width:auto"><span class="disp" style="font-size:21px;line-height:1">علم نافع</span></a>
+    <span style="flex:1"></span>
+    <a href="HomeKabyle.dc.html" lang="kab" class="lat" style="height:44px;display:flex;align-items:center;padding:0 8px;font-size:13px;font-weight:500">Taqbaylit</a>
+    <a href="MobileSearch.dc.html" aria-label="بحث" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></a>
+  </header>
+
+  <a href="MobileWatch.dc.html" style="display:flex;gap:12px;align-items:center;margin:14px 16px 0;padding:10px;border-radius:14px;background:#111614;color:#FFFFFF">
+    <div class="thumb" style="width:104px;border-radius:9px;background:#3B4440"><span class="prog" style="background:rgba(255,255,255,.2)"><span style="width:31%"></span></span></div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font-size:11.5px;color:#C9A24A;font-weight:600">تابِع المشاهدة</span><span style="font-size:14px;font-weight:600">دلائل النبوّة · الحلقة <span class="lat">5</span></span><span style="font-size:12px;color:#B9BFBB">بقي <span class="lat">12</span> دقيقة</span></div>
+    <span style="width:40px;height:40px;border-radius:999px;background:#F5F3EE;display:flex;align-items:center;justify-content:center;flex:none"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16l13-8z" fill="#111614"></path></svg></span>
+  </a>
+
+  <section style="padding:20px 16px 24px;display:flex;flex-direction:column;gap:10px">
+    <a href="MobileWatch.dc.html" class="thumb" style="display:block;border-radius:16px;background:#CFD8D2" aria-label="شاehد أحدث حلقة">
+      <span style="position:absolute;top:50%;left:50%;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:999px;background:rgba(255,255,255,.94);display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16l13-8z" fill="#065A4C"></path></svg></span>
+      <span style="position:absolute;top:10px;right:10px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:#111614;color:#FFFFFF">جديد</span>
+      <span class="dur">18:42</span>
+    </a>
+    <span style="font-size:12.5px;font-weight:600;color:#065A4C">حلقة جديدة · دلائل النبوّة <span class="lat">12</span></span>
+    <h1 class="disp" style="margin:0;font-size:26px;line-height:1.45">عنوان أحدث حلقة من سلسلة دلائل النبوّة</h1>
+    <span class="m"><span class="lat">28</span> أكتوبر · <span class="lat">18:42</span></span>
+  </section>
+
+  <section class="sec">
+    <div class="sh"><h2>أحدث المقاطع</h2><a class="more" href="#">المزيد</a></div>
+    <sc-for list="{{rows}}" as="v" hint-placeholder-count="4">
+      <a class="row" href="MobileWatch.dc.html">
+        <div class="thumb" style="width:140px;background:{{v.tone}}"><span class="dur">{{v.dur}}</span></div>
+        <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1" dir="{{v.dir}}" lang="{{v.lc}}"><h3 class="t" style="font-family:{{v.ff}}">{{v.title}}</h3><span class="m" dir="rtl" style="align-self:flex-start">{{v.meta}}</span></div>
+      </a>
+    </sc-for>
+  </section>
+
+  <section class="sec" style="padding-left:16px;padding-right:16px">
+    <div style="border-radius:18px;background:#FFFFFF;padding:14px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="zl" style="width:72px;height:72px;border-radius:12px;background-color:#0E4A3F;flex:none;display:flex;align-items:center;justify-content:center"><svg width="30" height="30" viewBox="0 0 100 100" fill="none" stroke="#C9A24A" stroke-width="5" aria-hidden="true"><rect x="22" y="22" width="56" height="56"></rect><rect x="22" y="22" width="56" height="56" transform="rotate(45 50 50)"></rect></svg></div>
+        <div style="display:flex;flex-direction:column;gap:4px;flex:1"><span class="disp" style="font-size:22px">دلائل النبوّة</span><span class="m"><span class="lat">24</span> حلقة · شاهدتَ <span class="lat">4</span></span><div style="height:4px;border-radius:999px;background:#ECE8DF;overflow:hidden"><div style="width:17%;height:100%;background:#C9A24A"></div></div></div>
+      </div>
+      <sc-for list="{{eps}}" as="e" hint-placeholder-count="3">
+        <a href="MobileWatch.dc.html" style="display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px;background:{{e.bg}}"><span class="disp" style="width:26px;text-align:center;font-size:18px;color:{{e.nc}}">{{e.n}}</span><span style="flex:1;font-size:14px;font-weight:600">{{e.title}}</span><span style="font-size:11.5px;color:{{e.sc}};font-weight:600">{{e.state}}</span></a>
+      </sc-for>
+      <a href="MobileWatch.dc.html" style="display:flex;align-items:center;justify-content:center;height:46px;border-radius:12px;background:#065A4C;color:#FFFFFF;font-size:15px;font-weight:600">تابِع الحلقة <span class="lat" style="margin-inline-start:5px">5</span></a>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sh"><h2>بالقبائلية</h2><a class="more" href="#">المزيد</a></div>
+    <div style="display:flex;gap:12px;overflow-x:auto;padding:0 16px">
+      <sc-for list="{{kab}}" as="k" hint-placeholder-count="3">
+        <a href="MobileWatch.dc.html" dir="ltr" lang="kab" style="flex:none;width:220px;display:flex;flex-direction:column;gap:6px"><div class="thumb" style="background:{{k.tone}}"><span class="dur" style="left:auto;right:6px">{{k.dur}}</span></div><h3 class="t lat" style="font-size:14px">{{k.title}}</h3></a>
+      </sc-for>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sh"><h2>مقاطع قصيرة</h2><a class="more" href="#">المزيد</a></div>
+    <div style="display:flex;gap:10px;overflow-x:auto;padding:0 16px">
+      <sc-for list="{{shorts}}" as="s" hint-placeholder-count="3">
+        <a href="#" style="flex:none;width:130px;display:flex;flex-direction:column;gap:6px"><div class="thumb" style="aspect-ratio:9/16;border-radius:14px;background:{{s.tone}}"><span class="dur" style="top:6px;bottom:auto">{{s.dur}}</span></div><span style="font-size:13px;font-weight:600;line-height:1.45">{{s.title}}</span></a>
+      </sc-for>
+    </div>
+  </section>
+
+  <div style="position:absolute;left:8px;right:8px;bottom:70px;display:flex;align-items:center;gap:10px;padding:8px;border-radius:14px;background:#111614;color:#FFFFFF;box-shadow:0 14px 30px -14px rgba(17,22,20,.6)">
+    <div class="thumb" style="width:72px;border-radius:8px;background:#3B4440"></div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px"><span style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">الحلقة <span class="lat">5</span> · عنوان الحلقة الخامسة</span><div style="height:3px;border-radius:999px;background:#3B4440"><div style="width:31%;height:100%;border-radius:999px;background:#C9A24A"></div></div></div>
+    <button type="button" aria-label="إيقاف مؤقت" style="width:40px;height:40px;border:0;border-radius:999px;background:#F5F3EE;color:#111614;display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg></button>
+  </div>
+
+  <nav aria-label="التنقل السفلي" style="position:absolute;left:0;right:0;bottom:0;display:flex;background:#FFFFFF;border-top:1px solid #E4E0D6;padding-bottom:6px">
+    <a class="tab on" href="#" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 11 12 4l9 7v9h-6v-6H9v6H3z"></path></svg>الرئيسية</a>
+    <a class="tab" href="Playlist.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="5" width="14" height="14"></rect><rect x="5" y="5" width="14" height="14" transform="rotate(45 12 12)"></rect></svg>السلسلة</a>
+    <a class="tab" href="MobileSearch.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>بحث</a>
+    <a class="tab" href="#"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path></svg>القوائم</a>
+  </nav>
+</div>
+</template><div id="host"></div><script type="text/plain" id="logic">
+class Component extends DCLogic {
+  renderVals() {
+    const UI = "'Thmanyah Sans', 'IBM Plex Sans Arabic', system-ui, sans-serif";
+    const LA = "'Inter', system-ui, sans-serif";
+    const tones = ['#DAD5CA', '#CFD8D2', '#D8D2C4', '#D3D9DB', '#E0D6CB'];
+    const rows = [
+      { title: 'عنوان مقطع متنوّع أطول قليلًا يلتفّ على سطرين كحدٍّ أقصى', meta: 'مقاطع متنوعة · منذ 5 أيام', dur: '09:37', tone: tones[3], dir: 'rtl', lc: 'ar', ff: UI },
+      { title: 'Azwel n tvidyut s teqbaylit', meta: 'Taqbaylit · منذ 3 أيام', dur: '11:05', tone: tones[0], dir: 'ltr', lc: 'kab', ff: LA },
+      { title: 'عنوان الحلقة الحادية عشرة', meta: 'دلائل النبوّة · منذ أسبوع', dur: '21:16', tone: tones[2], dir: 'rtl', lc: 'ar', ff: UI },
+      { title: 'عنوان جواب عن سؤال', meta: 'أسئلة وأجوبة · 9 أكتوبر', dur: '06:12', tone: tones[4], dir: 'rtl', lc: 'ar', ff: UI }
+    ];
+    const eps = ['عنوان الحلقة الرابعة', 'عنوان الحلقة الخامسة', 'عنوان الحلقة السادسة'].map((title, i) => {
+      const cur = i === 1;
+      return { n: String(i + 4).padStart(2, '0'), title, bg: cur ? '#EEF4F1' : 'transparent', nc: cur ? '#065A4C' : '#B79A57', state: cur ? 'تابِع' : (i === 0 ? '✓' : ''), sc: cur ? '#065A4C' : '#8A8F8C' };
+    });
+    const kab = [
+      { title: 'Azwel n tvidyut s teqbaylit', dur: '11:05', tone: tones[0] },
+      { title: 'Azwel n tvidyut nniḍen', dur: '13:20', tone: tones[3] },
+      { title: 'Tikti deg yiwet n tesdat', dur: '0:44', tone: tones[2] }
+    ];
+    const shorts = [
+      { title: 'فكرة في أقل من دقيقة', dur: '0:58', tone: tones[1] },
+      { title: 'جواب مختصر', dur: '1:12', tone: tones[2] },
+      { title: 'تذكير قصير', dur: '0:29', tone: tones[4] }
+    ];
+    return { rows, eps, kab, shorts };
+  }
+}
+</script></body></html>

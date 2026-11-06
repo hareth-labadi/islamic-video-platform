@@ -1,0 +1,143 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0;background:#F5F3EE}
+.kick{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#7A6532}
+.card{background:#FFFFFF;border-radius:20px;padding:30px}
+.h2{margin:0;font-size:32px;font-weight:700;letter-spacing:-.02em;color:#111614;line-height:1.15}
+.h3{margin:0;font-size:17px;font-weight:600;color:#111614}
+.p{margin:0;font-size:15px;line-height:1.6;color:#5B635F}
+.bad{display:flex;gap:12px;align-items:flex-start;font-size:15px;line-height:1.55;color:#111614;padding:14px 0;border-bottom:1px solid #EDEAE3}
+.x{flex:none;width:24px;height:24px;border-radius:8px;background:#F6E2DA;color:#7A2E14;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.ok{flex:none;width:24px;height:24px;border-radius:8px;background:#E1EEE8;color:#0B3D34;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.step{display:flex;flex-direction:column;gap:6px;padding:16px;border-radius:14px;background:#F5F3EE;flex:1;min-width:0}
+.step b{font-size:12px;color:#7A6532;font-weight:600}
+.step span{font-size:14px;line-height:1.45;color:#111614}
+.arrow{flex:none;align-self:center;color:#B8B1A2;font-size:18px}
+.wf{direction:rtl;border-radius:14px;background:#F5F3EE;padding:12px;display:flex;flex-direction:column;gap:8px}
+.b{background:#E2DED4;border-radius:5px}
+.g{background:#065A4C;border-radius:5px}
+.ar{font-family:'IBM Plex Sans Arabic',sans-serif}
+.lat{font-family:'Inter',sans-serif}
+.ard{font-family:'IBM Plex Sans Arabic',sans-serif}
+</style>
+<style>*{animation-play-state:paused!important;animation-delay:-10s!important}</style><script>const STATE={};</script>
+<script>
+class DCLogic { constructor(p){ this.props = p || {}; this.state = {}; } setState(s){ Object.assign(this.state, typeof s === 'function' ? s(this.state) : s); } forceUpdate(){} }
+function look(scope, path){ path = path.trim(); if (path === 'true') return true; if (path === 'false') return false; if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+  let v = scope; for (const k of path.split('.')) { if (v == null) return undefined; v = v[k]; } return v; }
+function interp(str, scope){ const m = str.match(/^\s*\{\{([^}]+)\}\}\s*$/); if (m) return look(scope, m[1]);
+  return str.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = look(scope, p); return v == null ? '' : String(v); }); }
+function render(node, scope, out){
+  if (node.nodeType === 3) { out.appendChild(document.createTextNode(interp(node.textContent, scope))); return; }
+  if (node.nodeType !== 1) return;
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'sc-for') { const list = interp(node.getAttribute('list'), scope) || []; const as = node.getAttribute('as');
+    list.forEach((item, i) => { const s = Object.assign(Object.create(scope), { [as]: item, $index: i }); node.childNodes.forEach(c => render(c, s, out)); }); return; }
+  if (tag === 'sc-if') { if (interp(node.getAttribute('value'), scope)) node.childNodes.forEach(c => render(c, scope, out)); return; }
+  const el = document.createElementNS(node.namespaceURI, node.localName);
+  for (const a of node.attributes) { if (/^on[A-Z]/.test(a.name) || a.name.startsWith('hint-')) continue; const v = interp(a.value, scope); if (v === false || v == null) continue; el.setAttribute(a.name, typeof v === 'function' ? '' : v); }
+  const src = tag === 'template' ? node.content : node;
+  src.childNodes.forEach(c => render(c, scope, el));
+  out.appendChild(el);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const C = new Function('DCLogic', document.getElementById('logic').textContent + '; return Component;')(DCLogic);
+  const inst = new C({}); Object.assign(inst.state, STATE);
+  const vals = inst.renderVals();
+  const tpl = document.getElementById('tpl').content;
+  const host = document.getElementById('host');
+  tpl.childNodes.forEach(c => render(c, vals, host));
+});
+</script>
+</head><body><template id="tpl">
+
+<div style="width:1440px;min-height:2570px;box-sizing:border-box;padding:80px 80px 96px;font-family:'Inter',system-ui,sans-serif;color:#111614;background:#F5F3EE;display:flex;flex-direction:column;gap:36px">
+
+  <header style="display:flex;flex-direction:column;gap:16px;max-width:980px">
+    <span class="kick">UX rethink · v3 · 30 Oct 2026</span>
+    <h1 style="margin:0;font-size:60px;line-height:1.02;font-weight:800;letter-spacing:-.035em">Less landing page, more video app</h1>
+    <p class="p" style="font-size:18px">You said the UX still wasn’t right. Looking again, v2 was built like a marketing page: it sold the site instead of letting people watch. v3 borrows the content-first patterns of Arabic media platforms like Thmanyah and organises everything around three actions — <strong style="color:#111614">continue</strong>, <strong style="color:#111614">follow the series</strong>, <strong style="color:#111614">find a video</strong>.</p>
+  </header>
+
+  <section style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px">
+    <div class="card">
+      <span class="kick" style="color:#9A3A1A">What was wrong with v2</span>
+      <div style="margin-top:10px">
+        <div class="bad"><span class="x">1</span><span><strong>A hero that sells, not plays.</strong> Tagline, arch and floating cards took the whole first screen; the actual video was a small decorated window.</span></div>
+        <div class="bad"><span class="x">2</span><span><strong>Too much scrolling.</strong> 50 px section titles, 100 px gaps and decorative bands pushed content down — the home page was 5,000 px tall.</span></div>
+        <div class="bad"><span class="x">3</span><span><strong>No “continue watching”.</strong> Returning visitors — the main audience of a series — had to find their place again.</span></div>
+        <div class="bad"><span class="x">4</span><span><strong>Playback stops when you leave.</strong> Long talks need to keep playing while you browse the next episode.</span></div>
+        <div class="bad"><span class="x">5</span><span><strong>Search buried in the hero.</strong> Out of reach once you scroll; a separate page for every query.</span></div>
+        <div class="bad" style="border-bottom:0"><span class="x">6</span><span><strong>Ornament everywhere.</strong> Zellige, arches and gold lines competed with thumbnails, which are the real visual content.</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="kick" style="color:#065A4C">What v3 does instead</span>
+      <div style="margin-top:10px">
+        <div class="bad"><span class="ok">1</span><span><strong>The newest episode is the hero</strong> — a big playable thumbnail beside its title. No tagline block.</span></div>
+        <div class="bad"><span class="ok">2</span><span><strong>Compact, scannable home</strong> — about a third shorter; quiet 24 px section titles, hairline dividers, everything in a predictable grid.</span></div>
+        <div class="bad"><span class="ok">3</span><span><strong>Continue watching</strong> at the top and in the header, saved on the device — no account.</span></div>
+        <div class="bad"><span class="ok">4</span><span><strong>A persistent mini-player</strong> keeps the talk playing (or audio-only) across pages.</span></div>
+        <div class="bad"><span class="ok">5</span><span><strong>Search everywhere</strong> — one key (/) or tap opens instant results grouped by episode, video and playlist.</span></div>
+        <div class="bad" style="border-bottom:0"><span class="ok">6</span><span><strong>Calm, typographic UI</strong> in IBM Plex Sans Arabic; brand green for actions only; ornament only on the series cover.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:22px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px"><div style="display:flex;flex-direction:column;gap:8px"><span class="kick">The app shell</span><h2 class="h2">Same frame on every page</h2></div><p class="p" style="max-width:520px">A visitor always knows where search is, which language they’re in, and what is playing.</p></div>
+    <div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:28px;align-items:start">
+      <div class="wf" aria-hidden="true" style="height:330px;position:relative;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:10px;background:#FFFFFF;border-radius:10px;padding:10px"><div class="g" style="width:26px;height:20px"></div><div class="b" style="width:60px;height:9px"></div><div class="b" style="width:40px;height:9px"></div><div class="b" style="width:40px;height:9px"></div><div style="flex:1"></div><div style="width:120px;height:22px;border-radius:999px;background:#F5F3EE;border:1px solid #E2DED4"></div><div style="width:56px;height:22px;border-radius:999px;background:#111614"></div></div>
+        <div style="display:flex;gap:10px;flex:1"><div style="flex:1;display:flex;flex-direction:column;gap:8px"><div class="b" style="height:12px;width:40%"></div><div style="display:flex;gap:10px"><div style="flex:1;display:flex;flex-direction:column;gap:6px"><div style="height:14px;width:90%;background:#111614;border-radius:4px"></div><div class="b" style="height:8px"></div><div class="g" style="height:18px;width:40%;border-radius:999px;margin-top:6px"></div></div><div class="b" style="width:56%;aspect-ratio:16/9"></div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px"><div class="b" style="aspect-ratio:16/9"></div><div class="b" style="aspect-ratio:16/9"></div><div class="b" style="aspect-ratio:16/9"></div></div></div></div>
+        <div style="position:absolute;left:24px;bottom:16px;width:220px;height:40px;border-radius:12px;background:#111614;display:flex;align-items:center;gap:8px;padding:0 8px"><div style="width:42px;height:26px;border-radius:5px;background:#3B4440"></div><div style="flex:1;height:7px;border-radius:3px;background:#3B4440"></div><div style="width:20px;height:20px;border-radius:999px;background:#F5F3EE"></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="bad" style="padding:10px 0"><span class="ok">A</span><span><strong>Top bar</strong> — logo · Home · <span class="ar">دلائل النبوّة</span> · All videos · Playlists · About · search field · language · “continue ep. 5” chip.</span></div>
+        <div class="bad" style="padding:10px 0"><span class="ok">B</span><span><strong>Content</strong> — one column of modules in a 1,240 px grid; every card plays on click.</span></div>
+        <div class="bad" style="padding:10px 0"><span class="ok">C</span><span><strong>Mini-player</strong> — docks bottom-start when you leave a playing video; expand, pause, audio-only, close.</span></div>
+        <div class="bad" style="padding:10px 0;border-bottom:0"><span class="ok">D</span><span><strong>Phone</strong> — the same pieces become a top bar, a mini-player above a 4-tab bottom bar (Home · Series · Search · Playlists).</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="kick">Key journeys</span><h2 class="h2">Four people, four paths — each in three steps or fewer</h2></div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;gap:10px;align-items:stretch"><div class="step" style="flex:0 0 200px;background:#111614"><b style="color:#C9AE6A">New visitor</b><span style="color:#FFFFFF">Arrives from a TikTok or WhatsApp link</span></div><span class="arrow">→</span><div class="step"><b>1</b><span>Lands on the video page; it plays immediately</span></div><span class="arrow">→</span><div class="step"><b>2</b><span>Sees “episode 5 of 24” and the list beside the player</span></div><span class="arrow">→</span><div class="step"><b>3</b><span>“Start from episode 1” or keeps going with “next”</span></div></div>
+      <div style="display:flex;gap:10px;align-items:stretch"><div class="step" style="flex:0 0 200px;background:#111614"><b style="color:#C9AE6A">Returning follower</b><span style="color:#FFFFFF">Comes back a week later</span></div><span class="arrow">→</span><div class="step"><b>1</b><span>Home opens with “continue: episode 5, 12 min left”</span></div><span class="arrow">→</span><div class="step"><b>2</b><span>One tap resumes at the exact second</span></div><span class="arrow">→</span><div class="step"><b>3</b><span>New episodes since last visit are marked “new”</span></div></div>
+      <div style="display:flex;gap:10px;align-items:stretch"><div class="step" style="flex:0 0 200px;background:#111614"><b style="color:#C9AE6A">Searcher</b><span style="color:#FFFFFF">Remembers a topic, not a title</span></div><span class="arrow">→</span><div class="step"><b>1</b><span>Presses / or taps search anywhere</span></div><span class="arrow">→</span><div class="step"><b>2</b><span>Instant results while typing, grouped, spelling-tolerant</span></div><span class="arrow">→</span><div class="step"><b>3</b><span>Opens the video at the matching chapter</span></div></div>
+      <div style="display:flex;gap:10px;align-items:stretch"><div class="step" style="flex:0 0 200px;background:#111614"><b style="color:#C9AE6A">Taqbaylit speaker</b><span style="color:#FFFFFF">Prefers Kabyle</span></div><span class="arrow">→</span><div class="step"><b>1</b><span>Switches language once; the choice is remembered</span></div><span class="arrow">→</span><div class="step"><b>2</b><span>Home shows Taqbaylit videos first, Arabic ones labelled</span></div><span class="arrow">→</span><div class="step"><b>3</b><span>Turns on Taqbaylit captions where they exist</span></div></div>
+    </div>
+  </section>
+
+  <section style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px">
+    <div class="card" style="display:flex;flex-direction:column;gap:14px">
+      <span class="kick">Typeface · decided</span>
+      <h2 class="h2" style="font-size:26px">IBM Plex Sans Arabic</h2>
+      <div dir="rtl" lang="ar" style="display:flex;flex-direction:column;gap:6px">
+        <span class="ard" style="font-size:52px;font-weight:700;line-height:1.35;color:#111614">دلائل النبوّة</span>
+        <span class="ar" style="font-size:16px;line-height:1.9;color:#5B635F">خطّ واحد للعناوين والنصوص: عريض للعناوين، وعادي للقراءة.</span>
+      </div>
+      <p class="p" style="font-size:14px">We first tried Thmanyah’s typeface; its licence forbids re-hosting the files, so it could not be shown here. After comparing 14 Arabic sans families against Thmanyah’s headline style, <strong style="color:#111614">IBM Plex Sans Arabic</strong> was the closest — and you chose to keep it. It is open-licence (SIL OFL) and free to self-host.</p>
+      <p class="p" style="font-size:14px">Taqbaylit text uses Inter, which contains every Kabyle letter (ɛ ɣ ḍ ḥ ṛ ṣ ṭ ẓ č ǧ).</p>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:14px">
+      <span class="kick">Reference · credited</span>
+      <h2 class="h2" style="font-size:26px">Patterns taken from thmanyah.com</h2>
+      <div class="bad" style="padding:8px 0"><span class="ok">✓</span><span>Lead story: big image beside a bold title and one-line summary.</span></div>
+      <div class="bad" style="padding:8px 0"><span class="ok">✓</span><span>Meta line “in [programme] · date” under every title.</span></div>
+      <div class="bad" style="padding:8px 0"><span class="ok">✓</span><span>Three-column grids with hairline dividers; small video icon on thumbnails.</span></div>
+      <div class="bad" style="padding:8px 0"><span class="ok">✓</span><span>Square programme covers in a row; pill-shaped active nav; warm grey ground.</span></div>
+      <div class="bad" style="padding:8px 0;border-bottom:0"><span class="x">✕</span><span>Not taken: their brand colours, imagery or subscription model.</span></div>
+    </div>
+  </section>
+</div>
+</template><div id="host"></div><script type="text/plain" id="logic">
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script></body></html>

@@ -1,0 +1,164 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#FBF8F2}
+a{color:#065A4C}
+.tag{display:inline-flex;align-items:center;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px;border-radius:999px}
+.t-conf{background:#E1EEE8;color:#0B3D34}
+.t-rec{background:#F4EBD6;color:#5E4D22}
+.t-ass{background:#E7E7F0;color:#33335C}
+.t-open{background:#F6E2DA;color:#7A2E14}
+.card{background:#FFFFFF;border:1px solid #E3DACA;border-radius:22px;padding:32px}
+.kick{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#7A6532}
+.h2{margin:0;font-family:'Inter',sans-serif;font-size:38px;font-weight:800;letter-spacing:-.02em;color:#0B3D34;line-height:1.1}
+.h3{margin:0;font-size:17px;font-weight:600;color:#1D2522}
+.p{margin:0;font-size:15px;line-height:1.65;color:#5B635F}
+.li{display:flex;gap:14px;align-items:flex-start}
+.num{flex:none;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.keep{background:#E1EEE8;color:#0B3D34}
+.fix{background:#F6E2DA;color:#7A2E14}
+.shot{display:block;width:100%;border-radius:12px;border:1px solid #E3DACA}
+.cap{margin:10px 0 0;font-size:13px;line-height:1.5;color:#5B635F}
+.fb{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);gap:24px;padding:18px 0;border-bottom:1px solid #EFE8DA;align-items:start}
+.said{font-family:'Inter',sans-serif;font-size:21px;line-height:1.35;color:#7A6532;font-style:italic}
+.zg{background-image:url(assets/zellige-gold.svg);background-size:96px 96px}
+.zl{background-image:url(assets/zellige-light.svg);background-size:96px 96px}
+</style>
+<style>*{animation-play-state:paused!important;animation-delay:-10s!important}</style><script>const STATE={};</script>
+<script>
+class DCLogic { constructor(p){ this.props = p || {}; this.state = {}; } setState(s){ Object.assign(this.state, typeof s === 'function' ? s(this.state) : s); } forceUpdate(){} }
+function look(scope, path){ path = path.trim(); if (path === 'true') return true; if (path === 'false') return false; if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+  let v = scope; for (const k of path.split('.')) { if (v == null) return undefined; v = v[k]; } return v; }
+function interp(str, scope){ const m = str.match(/^\s*\{\{([^}]+)\}\}\s*$/); if (m) return look(scope, m[1]);
+  return str.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = look(scope, p); return v == null ? '' : String(v); }); }
+function render(node, scope, out){
+  if (node.nodeType === 3) { out.appendChild(document.createTextNode(interp(node.textContent, scope))); return; }
+  if (node.nodeType !== 1) return;
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'sc-for') { const list = interp(node.getAttribute('list'), scope) || []; const as = node.getAttribute('as');
+    list.forEach((item, i) => { const s = Object.assign(Object.create(scope), { [as]: item, $index: i }); node.childNodes.forEach(c => render(c, s, out)); }); return; }
+  if (tag === 'sc-if') { if (interp(node.getAttribute('value'), scope)) node.childNodes.forEach(c => render(c, scope, out)); return; }
+  const el = document.createElementNS(node.namespaceURI, node.localName);
+  for (const a of node.attributes) { if (/^on[A-Z]/.test(a.name) || a.name.startsWith('hint-')) continue; const v = interp(a.value, scope); if (v === false || v == null) continue; el.setAttribute(a.name, typeof v === 'function' ? '' : v); }
+  const src = tag === 'template' ? node.content : node;
+  src.childNodes.forEach(c => render(c, scope, el));
+  out.appendChild(el);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const C = new Function('DCLogic', document.getElementById('logic').textContent + '; return Component;')(DCLogic);
+  const inst = new C({}); Object.assign(inst.state, STATE);
+  const vals = inst.renderVals();
+  const tpl = document.getElementById('tpl').content;
+  const host = document.getElementById('host');
+  tpl.childNodes.forEach(c => render(c, vals, host));
+});
+</script>
+</head><body><template id="tpl">
+
+<div style="width:1440px;min-height:4330px;box-sizing:border-box;padding:80px 80px 96px;font-family:'Inter',system-ui,sans-serif;color:#1D2522;background:#FBF8F2;display:flex;flex-direction:column;gap:48px">
+
+  <header style="position:relative;overflow:hidden;border-radius:28px;background:#F5EFE3;padding:56px;display:flex;justify-content:space-between;align-items:flex-end;gap:40px">
+    <div class="zg" aria-hidden="true" style="position:absolute;inset:0;opacity:.55;-webkit-mask-image:radial-gradient(circle at 92% 30%,#000 0,transparent 55%);mask-image:radial-gradient(circle at 92% 30%,#000 0,transparent 55%)"></div>
+    <div style="position:relative;display:flex;flex-direction:column;gap:18px;max-width:880px">
+      <div style="display:flex;align-items:center;gap:14px"><img src="assets/mark.png" alt="Ilm Nafi' logo" style="height:48px;width:auto"><span class="kick">Audit &amp; vision · v2 · 30 Oct 2026</span></div>
+      <h1 style="margin:0;font-family:'Inter',sans-serif;font-size:62px;line-height:1.04;font-weight:800;letter-spacing:-.035em;color:#0B3D34">From an Islamic landing page to the sheikh’s video home</h1>
+      <p class="p" style="font-size:18px">A product and design exploration for the team to react to — not an implementation plan. Version 3 answers your second review with an app-style layout built for watching and the Thmanyah typefaces. Version 2’s changes — lighter, and videos and playlists instead of “lessons” — still apply.</p>
+    </div>
+    <div style="position:relative;display:flex;flex-direction:column;gap:8px;align-items:flex-start;flex:none">
+      <span style="font-size:12px;color:#5B635F;font-weight:500">How to read these boards</span>
+      <span class="tag t-conf">Confirmed input</span><span class="tag t-rec">Recommendation</span><span class="tag t-ass">Assumption</span><span class="tag t-open">Open question</span>
+    </div>
+  </header>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:8px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-bottom:12px"><div style="display:flex;flex-direction:column;gap:8px"><span class="kick">Your reviews</span><h2 class="h2">What you said, and what changed</h2></div><span class="tag t-conf">Confirmed input</span></div>
+    <div class="fb" style="background:#F5EFE3;margin:0 -14px;padding:18px 14px;border-radius:14px"><span class="said">Round 2 — “The UX still isn’t good; think about a better layout.”</span><p class="p"><strong style="color:#1D2522">v3:</strong> the landing-page pattern is gone. The newest episode is the hero; “continue watching” sits in the header and on the home page; a mini-player keeps playing across pages; instant search opens anywhere (press /); the series panel shows your progress; the home page is about a third shorter. Reasoning on the UX rethink board.</p></div>
+    <div class="fb" style="background:#F5EFE3;margin:0 -14px;padding:18px 14px;border-radius:14px"><span class="said">Round 2 — “Change the font to Thmanyah.”</span><p class="p"><strong style="color:#1D2522">v3:</strong> Thmanyah Sans everywhere, bold for titles — as on thmanyah.com. Its licence forbids re-hosting the files, so the boards use it from your computer once installed. Round 3 (“the heading font is ugly”): the serif fallback is gone; until Thmanyah is installed you see IBM Plex Sans Arabic, the closest open match of 14 tested.</p></div>
+    <div class="fb"><span class="said">Round 1 — “Overall I don’t like it.”</span><p class="p">New direction built from research (see the References board): warm paper grounds, a Maghrebi arch and zellige signature, editorial headline type, and generous spacing. The Figma logo, green and gold are kept.</p></div>
+    <div class="fb"><span class="said">“Try something better in the hero.”</span><p class="p">The hero now leads with the series title <span lang="ar" dir="rtl" style="font-family:'Amiri',serif;font-size:19px">دلائل النبوّة</span> in large Amiri, an arch-framed latest episode you can play directly, two floating cards (newest Taqbaylit video, playlist progress), and a search bar that overlaps the hero’s edge.</p></div>
+    <div class="fb"><span class="said">“It’s not lessons or courses.”</span><p class="p">All copy now speaks of videos (مقاطع), episodes (حلقات) and playlists (قوائم التشغيل). The site is organised around the <em>Dala’il an-Nubuwwa</em> playlist plus the sheikh’s other videos in Arabic and Taqbaylit. A new playlist page replaces the old “series” idea.</p></div>
+    <div class="fb"><span class="said">“I don’t like the font.”</span><p class="p">Readex Pro is gone. Headlines use <strong>Amiri</strong> (classical Naskh), interface text uses <strong>IBM Plex Sans Arabic</strong>, and Taqbaylit uses <strong>Noto Serif Display + Inter</strong> — the only families I found that contain every Kabyle letter. Four pairings are compared on the System board.</p></div>
+    <div class="fb"><span class="said">“The colours were good, but dark.”</span><p class="p">Same palette, new balance: warm off-white and sand dominate; deep green appears once per screen (the arch, the player) as the signature, gold only for lines and numbers.</p></div>
+    <div class="fb" style="border-bottom:0"><span class="said">“Maybe add some animations.”</span><p class="p">Quiet motion only: staggered rise-in on load, a slowly turning eight-point star inside the arch, floating cards, a soft pulse on the play button, and hover lifts on cards. Everything stops with the reduced-motion setting.</p></div>
+  </section>
+
+  <section style="display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:40px">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <span class="tag t-conf" style="align-self:flex-start">What I actually inspected</span>
+      <h2 class="h2">The Figma file, as rendered</h2>
+      <p class="p">One page holding about fifteen frames. I reviewed high-resolution renders of every frame and sampled colours from the pixels.</p>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:15px;line-height:1.55">
+        <div class="li"><span style="color:#0C7765">●</span><span>Desktop home (RTL): tagline hero with search → Articles carousel → Videos 2×2 → Books carousel → footer</span></div>
+        <div class="li"><span style="color:#0C7765">●</span><span>List pages for Articles, Videos (3×3 + pagination) and Books (4×3)</span></div>
+        <div class="li"><span style="color:#0C7765">●</span><span>Article detail and Book detail (PDF download) — no video page</span></div>
+        <div class="li"><span style="color:#0C7765">●</span><span>Search bar with four filter-panel states</span></div>
+        <div class="li"><span style="color:#0C7765">●</span><span>One mobile frame (hero only), logo variants, “علم نافع” wordmark, four Pantone swatches, two arabesque motifs</span></div>
+      </div>
+      <div style="padding:20px;border-radius:16px;background:#F5EFE3"><p class="p" style="font-size:14px"><strong style="color:#1D2522">Not inspected:</strong> layer names, font names, components and variables — the file’s structure data was too large to retrieve through my Figma connection. Typography was identified by eye, colours by pixel sampling.</p></div>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:20px;align-items:start">
+      <figure style="margin:0"><img class="shot" src="assets/fig-home.jpg" alt="Current Figma home page, full length"><figcaption class="cap">Current home — videos are the second of three equal sections.</figcaption></figure>
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <figure style="margin:0"><img class="shot" src="assets/fig-videos.jpg" alt="Current Figma videos list page"><figcaption class="cap">Videos list — title + repeated author only; no duration, date, playlist or language.</figcaption></figure>
+        <div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px;align-items:start">
+          <figure style="margin:0"><img class="shot" src="assets/fig-search.jpg" alt="Current Figma search and filter states"><figcaption class="cap">Search + filter states — a good start; no results page yet.</figcaption></figure>
+          <figure style="margin:0"><img class="shot" src="assets/fig-mobile.jpg" alt="Current Figma mobile hero"><figcaption class="cap">Mobile: the first screen is all tagline — no video.</figcaption></figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px">
+    <div class="card" style="display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;align-items:center;justify-content:space-between"><h2 class="h2" style="font-size:30px">Worth keeping</h2><span class="tag t-rec">Recommendation</span></div>
+      <div class="li"><span class="num keep">1</span><div><h3 class="h3">The green-and-gold brand</h3><p class="p">#0C7765 → #055245 with muted gold #AD9559 is distinctive and calm. Kept as the accent system in v2.</p></div></div>
+      <div class="li"><span class="num keep">2</span><div><h3 class="h3">The logo and “علم نافع” wordmark</h3><p class="p">Book and pen inside an eight-point frame. Its eight-point star now drives the zellige pattern and the motion.</p></div></div>
+      <div class="li"><span class="num keep">3</span><div><h3 class="h3">Arabic-first, consistent RTL</h3><p class="p">Nav, cards and pagination mirror correctly — a solid base.</p></div></div>
+      <div class="li"><span class="num keep">4</span><div><h3 class="h3">Restrained ornament</h3><p class="p">The arabesque sits at low opacity; gold hairlines frame sections. v2 keeps the restraint.</p></div></div>
+      <div class="li"><span class="num keep">5</span><div><h3 class="h3">Search in the hero</h3><p class="p">Right instinct. v2 makes it the bridge between hero and content, and designs the results.</p></div></div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;align-items:center;justify-content:space-between"><h2 class="h2" style="font-size:30px">Worth reconsidering</h2><span class="tag t-rec">Recommendation</span></div>
+      <div class="li"><span class="num fix">1</span><div><h3 class="h3">Three equal silos, video second</h3><p class="p">Articles → Videos → Books gives video a third of the page; the goal is video-first.</p></div></div>
+      <div class="li"><span class="num fix">2</span><div><h3 class="h3">A hero with no video</h3><p class="p">On mobile the whole first screen is tagline and search.</p></div></div>
+      <div class="li"><span class="num fix">3</span><div><h3 class="h3">Thin cards, repeated author</h3><p class="p">With one sheikh, the avatar slot should carry duration, episode number, date and language.</p></div></div>
+      <div class="li"><span class="num fix">4</span><div><h3 class="h3">Carousels hide the library</h3><p class="p">Prefer grids and scrollable rails that show many videos at once.</p></div></div>
+      <div class="li"><span class="num fix">5</span><div><h3 class="h3">No video page</h3><p class="p">The most important page — watching — is not designed.</p></div></div>
+      <div class="li"><span class="num fix">6</span><div><h3 class="h3">Contrast failures</h3><p class="p">White on sage ≈ 2.5:1, gold text on white ≈ 2.9:1. v2 adds a text-safe gold (#7A6532).</p></div></div>
+      <div class="li"><span class="num fix">7</span><div><h3 class="h3">No language switcher</h3><p class="p">Taqbaylit needs a first-class, left-to-right version.</p></div></div>
+    </div>
+  </section>
+
+  <section style="display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:28px;align-items:stretch">
+    <div class="zl" style="background-color:#0E4A3F;border-radius:24px;padding:52px;color:#FFFFFF;display:flex;flex-direction:column;gap:22px">
+      <span class="tag" style="background:rgba(255,255,255,.12);color:#F4EBD6;align-self:flex-start">Product vision · Recommendation</span>
+      <p style="margin:0;font-family:'Inter',sans-serif;font-size:36px;line-height:1.3;font-weight:400">A calm, searchable home for the sheikh’s videos — the <span lang="ar" dir="rtl" style="font-family:'Amiri',serif;color:#E4D5AE">دلائل النبوّة</span> playlist in order, and his other videos in Arabic and Taqbaylit — watched here, without distraction.</p>
+      <p style="margin:0;font-size:16px;line-height:1.65;color:#CFE3DD">Why: today the videos live in feeds designed for endless scrolling. A first-party home keeps the series in order, makes every video findable, presents it with dignity, and reduces dependence on platforms the project does not control.</p>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:18px">
+      <h2 class="h3" style="font-size:20px">Four principles for every screen</h2>
+      <div class="li"><span class="num keep">1</span><p class="p"><strong style="color:#1D2522">Video first.</strong> A playable video is on the first screen of every device.</p></div>
+      <div class="li"><span class="num keep">2</span><p class="p"><strong style="color:#1D2522">In order, then in reach.</strong> The series is followed episode by episode; everything else is one search away.</p></div>
+      <div class="li"><span class="num keep">3</span><p class="p"><strong style="color:#1D2522">Two languages, two directions, one product.</strong> Missing translations are labelled, never hidden.</p></div>
+      <div class="li"><span class="num keep">4</span><p class="p"><strong style="color:#1D2522">Quiet dignity.</strong> No ads, autoplay feeds, counters or social mechanics.</p></div>
+    </div>
+  </section>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:center;justify-content:space-between"><h2 class="h2" style="font-size:30px">The five decisions that shape everything else</h2><span class="tag t-open">Open questions</span></div>
+    <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:22px">
+      <div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'Inter',sans-serif;font-size:42px;color:#AD9559">01</span><h3 class="h3" style="font-size:16px">Video rights &amp; masters</h3><p class="p" style="font-size:14px">Does the project own the original files, or only the platform uploads?</p></div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'Inter',sans-serif;font-size:42px;color:#AD9559">02</span><h3 class="h3" style="font-size:16px">Hosting path</h3><p class="p" style="font-size:14px">Privacy-enhanced embeds first, a managed video service, or self-hosted?</p></div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'Inter',sans-serif;font-size:42px;color:#AD9559">03</span><h3 class="h3" style="font-size:16px">Series structure</h3><p class="p" style="font-size:14px">Is دلائل النبوّة one ordered list, or grouped into sections (محاور)?</p></div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'Inter',sans-serif;font-size:42px;color:#AD9559">04</span><h3 class="h3" style="font-size:16px">Language model</h3><p class="p" style="font-size:14px">Separate Taqbaylit videos, or Taqbaylit captions on Arabic ones — or both?</p></div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'Inter',sans-serif;font-size:42px;color:#AD9559">05</span><h3 class="h3" style="font-size:16px">Transcripts</h3><p class="p" style="font-size:14px">Will captions exist? They unlock search inside videos, accessibility and SEO.</p></div>
+    </div>
+  </section>
+</div>
+</template><div id="host"></div><script type="text/plain" id="logic">
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script></body></html>

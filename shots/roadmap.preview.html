@@ -1,0 +1,213 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=IBM+Plex+Sans+Arabic:wght@400;500;600&amp;family=Inter:wght@400;500;600;700&amp;family=Noto+Serif+Display:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#FBF8F2}
+.tag{display:inline-flex;align-items:center;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px;border-radius:999px}
+.t-rec{background:#F4EBD6;color:#5E4D22}
+.t-ass{background:#E7E7F0;color:#33335C}
+.t-open{background:#F6E2DA;color:#7A2E14}
+.card{background:#FFFFFF;border:1px solid #E3DACA;border-radius:22px;padding:32px}
+.kick{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#7A6532}
+.h2{margin:0;font-family:'Noto Serif Display',serif;font-size:34px;font-weight:500;letter-spacing:-.01em;color:#0B3D34;line-height:1.12}
+.h3{margin:0;font-size:16px;font-weight:600;color:#1D2522}
+.p{margin:0;font-size:14.5px;line-height:1.6;color:#5B635F}
+.node{background:#FFFFFF;border:1.5px solid #CDBF9F;border-radius:14px;padding:10px 14px;font-size:14px;font-weight:600;color:#1D2522;text-align:center}
+.node small{display:block;font-size:12px;font-weight:400;color:#5B635F;margin-top:3px}
+.fut{border-style:dashed;background:#FBF8F2}
+.vl{width:1.5px;background:#CDBF9F;margin:0 auto}
+.li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55;color:#1D2522}
+.dot{flex:none;width:7px;height:7px;border-radius:999px;background:#0C7765;margin-top:8px}
+.stage{display:flex;flex-direction:column;gap:10px;padding:22px;border-radius:18px;border:1px solid #E3DACA;background:#FFFFFF}
+.meter{display:flex;gap:4px}
+.meter span{width:18px;height:6px;border-radius:3px;background:#ECE3D1}
+.meter span.on{background:#0C7765}
+.mlab{font-size:12px;color:#5B635F;width:92px;flex:none}
+table{border-collapse:collapse;width:100%}
+th{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#5B635F;text-align:left;padding:10px 12px;border-bottom:1.5px solid #E3DACA}
+td{font-size:14px;line-height:1.5;color:#1D2522;padding:12px;border-bottom:1px solid #EFE8DA;vertical-align:top}
+td.n{font-family:'Noto Serif Display',serif;font-size:22px;color:#AD9559;width:36px}
+.ar{font-family:'IBM Plex Sans Arabic',sans-serif}
+.zl{background-image:url(assets/zellige-light.svg);background-size:96px 96px}
+</style>
+<style>*{animation-play-state:paused!important;animation-delay:-10s!important}</style><script>const STATE={};</script>
+<script>
+class DCLogic { constructor(p){ this.props = p || {}; this.state = {}; } setState(s){ Object.assign(this.state, typeof s === 'function' ? s(this.state) : s); } forceUpdate(){} }
+function look(scope, path){ path = path.trim(); if (path === 'true') return true; if (path === 'false') return false; if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+  let v = scope; for (const k of path.split('.')) { if (v == null) return undefined; v = v[k]; } return v; }
+function interp(str, scope){ const m = str.match(/^\s*\{\{([^}]+)\}\}\s*$/); if (m) return look(scope, m[1]);
+  return str.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = look(scope, p); return v == null ? '' : String(v); }); }
+function render(node, scope, out){
+  if (node.nodeType === 3) { out.appendChild(document.createTextNode(interp(node.textContent, scope))); return; }
+  if (node.nodeType !== 1) return;
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'sc-for') { const list = interp(node.getAttribute('list'), scope) || []; const as = node.getAttribute('as');
+    list.forEach((item, i) => { const s = Object.assign(Object.create(scope), { [as]: item, $index: i }); node.childNodes.forEach(c => render(c, s, out)); }); return; }
+  if (tag === 'sc-if') { if (interp(node.getAttribute('value'), scope)) node.childNodes.forEach(c => render(c, scope, out)); return; }
+  const el = document.createElementNS(node.namespaceURI, node.localName);
+  for (const a of node.attributes) { if (/^on[A-Z]/.test(a.name) || a.name.startsWith('hint-')) continue; const v = interp(a.value, scope); if (v === false || v == null) continue; el.setAttribute(a.name, typeof v === 'function' ? '' : v); }
+  const src = tag === 'template' ? node.content : node;
+  src.childNodes.forEach(c => render(c, scope, el));
+  out.appendChild(el);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const C = new Function('DCLogic', document.getElementById('logic').textContent + '; return Component;')(DCLogic);
+  const inst = new C({}); Object.assign(inst.state, STATE);
+  const vals = inst.renderVals();
+  const tpl = document.getElementById('tpl').content;
+  const host = document.getElementById('host');
+  tpl.childNodes.forEach(c => render(c, vals, host));
+});
+</script>
+</head><body><template id="tpl">
+
+<div style="width:1440px;min-height:3300px;box-sizing:border-box;padding:80px 80px 96px;font-family:'Inter',system-ui,sans-serif;color:#1D2522;background:#FBF8F2;display:flex;flex-direction:column;gap:36px">
+
+  <header style="display:flex;flex-direction:column;gap:14px;max-width:920px">
+    <span class="kick">Structure &amp; plan · v2 · for discussion</span>
+    <h1 style="margin:0;font-family:'Noto Serif Display',serif;font-size:56px;line-height:1.06;font-weight:500;letter-spacing:-.02em;color:#0B3D34">What to build first, what to decide first</h1>
+  </header>
+
+  <section style="display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:24px">
+    <div class="card" style="display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><h2 class="h2">Proposed site map</h2><span class="tag t-rec">Proposal</span></div>
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div class="node zl" style="background-color:#0E4A3F;color:#FFFFFF;border-color:#0E4A3F;min-width:260px">Home · الرئيسية <small style="color:#CFE3DD">series hero · latest · shorts · playlists</small></div>
+        <div class="vl" style="height:22px"></div>
+        <div style="height:1.5px;background:#CDBF9F;width:86%"></div>
+        <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;width:100%">
+          <div><div class="vl" style="height:16px"></div><div class="node"><span class="ar">دلائل النبوّة</span><small>playlist page, ordered</small></div></div>
+          <div><div class="vl" style="height:16px"></div><div class="node">All videos<small>filter by language, type</small></div></div>
+          <div><div class="vl" style="height:16px"></div><div class="node">Playlists<small>index → playlist page</small></div></div>
+          <div><div class="vl" style="height:16px"></div><div class="node">Shorts<small>vertical viewer</small></div></div>
+          <div><div class="vl" style="height:16px"></div><div class="node">About the sheikh<small>+ YouTube, TikTok</small></div></div>
+        </div>
+        <div class="vl" style="height:20px"></div>
+        <div class="node" style="border-color:#065A4C;border-width:2px;min-width:340px">Video page — the heart of the site<small>player · episode n of N · chapters · transcript · next · related</small></div>
+        <div class="vl" style="height:14px"></div>
+        <div class="node" style="min-width:240px">Search<small>header on every page · results · no-results</small></div>
+        <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;justify-content:center">
+          <div class="node fut">Articles <small>later</small></div>
+          <div class="node fut">Books / PDFs <small>from Figma, later</small></div>
+          <div class="node fut">Audio feed <small>optional</small></div>
+          <div class="node" style="font-weight:500">Contact · Privacy · 404</div>
+        </div>
+      </div>
+      <p class="p">Every page exists in Arabic (/ar/…, RTL) and Taqbaylit (/kab/…, LTR). Videos keep one stable ID, so the language switch lands on the same video.</p>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><h2 class="h2" style="font-size:26px">One video, catalogued</h2><span class="tag t-rec">Proposal</span></div>
+      <p class="p">What the CMS should hold per video. Bold = needed at launch.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px 18px;font-size:14px;line-height:1.5">
+        <span><strong>Title</strong> (per language)</span><span><strong>Spoken language</strong></span>
+        <span><strong>Duration</strong></span><span><strong>Publish date</strong></span>
+        <span><strong>Type</strong>: episode / video / short</span><span><strong>Thumbnail</strong></span>
+        <span><strong>Playlist + position</strong></span><span><strong>Original source URL</strong></span>
+        <span>Section (محور)</span><span>Description</span>
+        <span>Chapters</span><span>Caption languages</span>
+        <span>Transcript</span><span>Source episode (shorts)</span>
+      </div>
+      <div style="margin-top:6px;padding:14px 16px;border-radius:14px;background:#F6E2DA;color:#5C2410;font-size:13.5px;line-height:1.55"><strong>Open:</strong> one Taqbaylit video vs. Arabic videos with Taqbaylit captions — the design shows both; the data model must support whichever is true.</div>
+    </div>
+  </section>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:22px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:20px"><h2 class="h2">Video independence is a path, not a switch</h2><span class="tag t-open">Discuss with developers</span></div>
+    <p class="p" style="max-width:980px">Leaving YouTube and TikTok depends on rights, original files and running costs — not on design. These screens work at every stage; only the player’s source changes. Vendor names are examples to compare, not recommendations.</p>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px">
+      <div class="stage" style="background:#F5EFE3"><span style="font-size:12px;font-weight:600;color:#5B635F">STAGE 0 · TODAY</span><h3 class="h3">Platform-only</h3><p class="p" style="font-size:13.5px">Videos live on YouTube and TikTok; the site links out.</p><div style="display:flex;align-items:center;gap:8px"><span class="mlab">Independence</span><div class="meter"><span></span><span></span><span></span><span></span></div></div><div style="display:flex;align-items:center;gap:8px"><span class="mlab">Cost / effort</span><div class="meter"><span></span><span></span><span></span><span></span></div></div></div>
+      <div class="stage" style="border:2px solid #0C7765"><span style="font-size:12px;font-weight:600;color:#065A4C">STAGE 1 · LIKELY LAUNCH</span><h3 class="h3">Own pages, embedded player</h3><p class="p" style="font-size:13.5px">First-party pages, playlists and search; playback via privacy-enhanced YouTube embeds. TikTok embeds are weak — shorts may need YouTube copies.</p><div style="display:flex;align-items:center;gap:8px"><span class="mlab">Independence</span><div class="meter"><span class="on"></span><span></span><span></span><span></span></div></div><div style="display:flex;align-items:center;gap:8px"><span class="mlab">Cost / effort</span><div class="meter"><span class="on"></span><span></span><span></span><span></span></div></div></div>
+      <div class="stage"><span style="font-size:12px;font-weight:600;color:#5B635F">STAGE 2</span><h3 class="h3">Managed video hosting</h3><p class="p" style="font-size:13.5px">Masters uploaded to a video service (e.g. Mux, Cloudflare Stream, Bunny Stream, Vimeo). Own player, no outside recommendations. Pay per minute stored and watched.</p><div style="display:flex;align-items:center;gap:8px"><span class="mlab">Independence</span><div class="meter"><span class="on"></span><span class="on"></span><span class="on"></span><span></span></div></div><div style="display:flex;align-items:center;gap:8px"><span class="mlab">Cost / effort</span><div class="meter"><span class="on"></span><span class="on"></span><span></span><span></span></div></div></div>
+      <div class="stage"><span style="font-size:12px;font-weight:600;color:#5B635F">STAGE 3</span><h3 class="h3">Self-managed streaming</h3><p class="p" style="font-size:13.5px">Own storage, transcoding to adaptive streams (HLS) and a CDN. Most control, most operations work.</p><div style="display:flex;align-items:center;gap:8px"><span class="mlab">Independence</span><div class="meter"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div></div><div style="display:flex;align-items:center;gap:8px"><span class="mlab">Cost / effort</span><div class="meter"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div></div></div>
+    </div>
+  </section>
+
+  <section style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px">
+    <div class="card" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><h2 class="h2" style="font-size:26px">Search — design decides</h2><span class="tag t-rec">Design</span></div>
+      <div class="li"><span class="dot"></span><span>A search field on every page; a large one bridging the home hero; a tab on mobile.</span></div>
+      <div class="li"><span class="dot"></span><span>Suggestions grouped by type: query, section, episode, short.</span></div>
+      <div class="li"><span class="dot"></span><span>Results say <em>why</em> they matched (title, description, transcript at 06:14, across languages).</span></div>
+      <div class="li"><span class="dot"></span><span>The page says what it searched (“also included النبوّة، النبي، nnbi”) and offers exact-only.</span></div>
+      <div class="li"><span class="dot"></span><span>Filters only for data that exists: type, language, captions, duration, date.</span></div>
+      <div class="li"><span class="dot"></span><span>No-results always offers a spelling fix, fewer filters, and the series.</span></div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><h2 class="h2" style="font-size:26px">Search — for the search expert</h2><span class="tag t-open">Technical</span></div>
+      <div class="li"><span class="dot" style="background:#AD9559"></span><span><strong>Arabic normalisation:</strong> أ إ آ → ا · ة ↔ ه · ى ↔ ي · strip tashkeel and tatweel · handle ال and attached و/ب/ل.</span></div>
+      <div class="li"><span class="dot" style="background:#AD9559"></span><span><strong>Taqbaylit variants:</strong> people may type 3 for ɛ, gh for ɣ, and drop dots (ḥ → h). <em>Assumption — verify with real queries.</em></span></div>
+      <div class="li"><span class="dot" style="background:#AD9559"></span><span><strong>Cross-language glossary:</strong> curated pairs (النبي ↔ nnbi) — editorial work, not an algorithm.</span></div>
+      <div class="li"><span class="dot" style="background:#AD9559"></span><span><strong>Engine, ranking, transcript indexing:</strong> choose after knowing catalogue size, budget and hosting stage.</span></div>
+      <div class="li"><span class="dot" style="background:#AD9559"></span><span><strong>SEO:</strong> server-rendered video pages, video structured data, per-language sitemaps.</span></div>
+    </div>
+  </section>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><h2 class="h2">Phased scope</h2><span class="tag t-rec">Recommendation</span></div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px">
+      <div class="zl" style="display:flex;flex-direction:column;gap:10px;padding:24px;border-radius:18px;background-color:#0E4A3F;color:#FFFFFF">
+        <span style="font-size:12px;font-weight:600;color:#E4D5AE;letter-spacing:.06em">PHASE 1 · VIDEO-FIRST LAUNCH</span>
+        <div class="li" style="color:#FFFFFF"><span class="dot" style="background:#E4D5AE"></span><span>Home, <span class="ar">دلائل النبوّة</span> playlist page, video page, all videos, about</span></div>
+        <div class="li" style="color:#FFFFFF"><span class="dot" style="background:#E4D5AE"></span><span>Search with filters and recovery states</span></div>
+        <div class="li" style="color:#FFFFFF"><span class="dot" style="background:#E4D5AE"></span><span>Arabic RTL + Taqbaylit LTR, honest fallbacks</span></div>
+        <div class="li" style="color:#FFFFFF"><span class="dot" style="background:#E4D5AE"></span><span>Stage 1 playback, mobile-first, accessible player</span></div>
+        <div class="li" style="color:#FFFFFF"><span class="dot" style="background:#E4D5AE"></span><span>“Continue watching” stored on the device</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;padding:24px;border-radius:18px;background:#E1EEE8">
+        <span style="font-size:12px;font-weight:600;color:#065A4C;letter-spacing:.06em">PHASE 2 · DEPTH</span>
+        <div class="li"><span class="dot"></span><span>Shorts viewer linked to source episodes</span></div>
+        <div class="li"><span class="dot"></span><span>Chapters, captions, transcripts + transcript search</span></div>
+        <div class="li"><span class="dot"></span><span>Audio-only and lighter-quality modes</span></div>
+        <div class="li"><span class="dot"></span><span>More playlists; Stage 2 hosting if rights allow</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;padding:24px;border-radius:18px;background:#FBF8F2;border:1.5px dashed #CDBF9F">
+        <span style="font-size:12px;font-weight:600;color:#7A6532;letter-spacing:.06em">LATER · ONLY IF JUSTIFIED</span>
+        <div class="li"><span class="dot" style="background:#AD9559"></span><span>Articles and books/PDFs (designed in Figma)</span></div>
+        <div class="li"><span class="dot" style="background:#AD9559"></span><span>Podcast-style audio feed</span></div>
+        <div class="li"><span class="dot" style="background:#AD9559"></span><span>Accounts, saved lists, notifications</span></div>
+        <div class="li"><span class="dot" style="background:#AD9559"></span><span>Not recommended now: comments, social feeds, AI recommendations</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><h2 class="h2">Decisions to validate, in priority order</h2><span class="tag t-open">Open questions</span></div>
+    <table>
+      <thead><tr><th></th><th>Decision</th><th>Why it matters</th><th>Who decides</th></tr></thead>
+      <tbody>
+        <tr><td class="n">1</td><td><strong>Video rights and master files</strong></td><td>Decides whether Stage 2–3 hosting is possible at all</td><td>Sheikh / owner</td></tr>
+        <tr><td class="n">2</td><td><strong>Launch hosting stage</strong></td><td>Sets cost, effort and how independent launch feels</td><td>Owner + developers</td></tr>
+        <tr><td class="n">3</td><td><strong>Structure of <span class="ar">دلائل النبوّة</span></strong></td><td>One ordered list, or sections (محاور)? Drives the playlist page and hero</td><td>Sheikh + content team</td></tr>
+        <tr><td class="n">4</td><td><strong>Catalogue size and who tags it</strong></td><td>Playlists, filters and search depend on metadata</td><td>Content team</td></tr>
+        <tr><td class="n">5</td><td><strong>Language model</strong></td><td>Taqbaylit videos vs Taqbaylit captions on Arabic videos</td><td>Owner + developers</td></tr>
+        <tr><td class="n">6</td><td><strong>Captions and transcripts</strong></td><td>Accessibility, in-video search and SEO; needs a review process</td><td>Content team</td></tr>
+        <tr><td class="n">7</td><td><strong>Search approach</strong></td><td>Normalisation, glossary, engine choice</td><td>Search expert + developers</td></tr>
+        <tr><td class="n">8</td><td><strong>Shorts source</strong></td><td>TikTok clips may need re-uploading to play on-site</td><td>Owner</td></tr>
+        <tr><td class="n">9</td><td><strong>Visual direction sign-off</strong></td><td>Amiri vs alternatives; Maghrebi arch/zellige cultural fit</td><td>Owner + designer</td></tr>
+        <tr><td class="n">10</td><td><strong>Site name and identity</strong></td><td>“علم نافع” vs the sheikh’s name in the domain and header</td><td>Owner</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section style="display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px">
+    <div class="zl" style="background-color:#0E4A3F;border-radius:22px;padding:34px;color:#FFFFFF;display:flex;flex-direction:column;gap:12px">
+      <span style="font-size:12px;font-weight:600;color:#E4D5AE;letter-spacing:.06em">RECOMMENDED NEXT STEPS</span>
+      <h2 style="margin:0;font-family:'Noto Serif Display',serif;font-size:30px;font-weight:400;line-height:1.25">The smallest artefacts that de-risk this before any build</h2>
+      <p style="margin:0;font-size:14.5px;line-height:1.6;color:#CFE3DD">Each answers a decision above with real content instead of placeholders.</p>
+    </div>
+    <div class="card" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 24px">
+      <div class="li"><span style="font-family:'Noto Serif Display',serif;font-size:24px;color:#AD9559;width:28px;flex:none">1</span><span><strong>Content inventory</strong> — every published video (title, date, duration, URL, language); mark which belong to <span class="ar">دلائل النبوّة</span> and in what order.</span></div>
+      <div class="li"><span style="font-family:'Noto Serif Display',serif;font-size:24px;color:#AD9559;width:28px;flex:none">2</span><span><strong>Real-content pass</strong> — drop 20 real thumbnails and titles into these boards to test lengths and tone.</span></div>
+      <div class="li"><span style="font-family:'Noto Serif Display',serif;font-size:24px;color:#AD9559;width:28px;flex:none">3</span><span><strong>Taqbaylit review</strong> of every interface string with a native speaker; start the search glossary.</span></div>
+      <div class="li"><span style="font-family:'Noto Serif Display',serif;font-size:24px;color:#AD9559;width:28px;flex:none">4</span><span><strong>Mobile prototype</strong> home → playlist → video → search; watch five people use it.</span></div>
+      <div class="li"><span style="font-family:'Noto Serif Display',serif;font-size:24px;color:#AD9559;width:28px;flex:none">5</span><span><strong>Thumbnail template</strong> — episode number, series mark, arch crop; test on ten videos.</span></div>
+      <div class="li"><span style="font-family:'Noto Serif Display',serif;font-size:24px;color:#AD9559;width:28px;flex:none">6</span><span><strong>Hosting cost sheet</strong> — hours of video × expected views for Stages 1–3.</span></div>
+    </div>
+  </section>
+</div>
+</template><div id="host"></div><script type="text/plain" id="logic">
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script></body></html>

@@ -1,0 +1,301 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=Noto+Naskh+Arabic:wght@400..700&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;family=Noto+Serif+Display:wght@400;500;600&amp;family=Reem+Kufi:wght@400..700&amp;display=swap">
+<style>
+body{margin:0;background:#FBF8F2}
+.tag{display:inline-flex;align-items:center;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:999px}
+.fig{background:#E1EEE8;color:#0B3D34}
+.new{background:#F4EBD6;color:#5E4D22}
+.card{background:#FFFFFF;border:1px solid #E3DACA;border-radius:22px;padding:32px}
+.h2{margin:0;font-family:'Noto Serif Display',serif;font-size:36px;font-weight:500;letter-spacing:-.01em;color:#0B3D34}
+.h3{margin:0;font-size:16px;font-weight:600;color:#1D2522}
+.p{margin:0;font-size:15px;line-height:1.6;color:#5B635F}
+.kick{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#7A6532}
+.sw{display:flex;flex-direction:column;gap:6px}
+.sw .c{height:92px;border-radius:14px;border:1px solid rgba(0,0,0,.06)}
+.sw .n{font-size:14px;font-weight:600;color:#1D2522;margin-top:4px}
+.sw .h{font-size:12px;color:#5B635F;font-variant-numeric:tabular-nums}
+.sw .u{font-size:12px;line-height:1.45;color:#5B635F}
+.rule{display:flex;gap:12px;align-items:flex-start;font-size:14.5px;line-height:1.55;color:#1D2522}
+.ok{flex:none;width:22px;height:22px;border-radius:7px;background:#E1EEE8;color:#0B3D34;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.no{flex:none;width:22px;height:22px;border-radius:7px;background:#F6E2DA;color:#7A2E14;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.zg{background-image:url(assets/zellige-gold.svg);background-size:96px 96px}
+.zl{background-image:url(assets/zellige-light.svg);background-size:96px 96px}
+.zgr{background-image:url(assets/zellige-green.svg);background-size:72px 72px}
+.opt{display:flex;flex-direction:column;gap:14px;padding:26px;border-radius:18px;border:1px solid #E3DACA;background:#FBF8F2}
+.opt.rec{border:2px solid #0C7765;background:#FFFFFF}
+.thumb{position:relative;overflow:hidden;aspect-ratio:16/9;border-radius:14px;background-color:#DCE7E0;display:flex;align-items:center;justify-content:center}
+.thumb .pt{position:absolute;inset:0;background-image:url(assets/zellige-green.svg);background-size:64px 64px}
+.dur{position:absolute;bottom:8px;left:8px;direction:ltr;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;color:#FFFFFF;background:rgba(20,28,25,.82);padding:3px 7px;border-radius:6px}
+code{font-family:'Inter',monospace;font-size:12.5px;background:#F5EFE3;padding:1px 6px;border-radius:5px;color:#0B3D34}
+table{border-collapse:collapse;width:100%}
+th{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#5B635F;text-align:left;padding:8px 10px;border-bottom:1.5px solid #E3DACA}
+td{font-size:13.5px;color:#1D2522;padding:9px 10px;border-bottom:1px solid #EFE8DA}
+.yes{color:#0B6B4F;font-weight:600}
+.part{color:#8A5A12;font-weight:600}
+.nope{color:#9A3A1A;font-weight:600}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes rise{0%,15%{opacity:0;transform:translateY(22px)}45%,100%{opacity:1;transform:none}}
+@keyframes shimmer{0%{background-position:-240px 0}100%{background-position:240px 0}}
+.m-spin{animation:spin 40s linear infinite}
+.m-float{animation:float 6s ease-in-out infinite}
+.m-rise{animation:rise 3.2s cubic-bezier(.2,.7,.2,1) infinite}
+.m-lift{transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
+.m-lift:hover{transform:translateY(-6px);box-shadow:0 18px 30px -18px rgba(11,61,52,.45)}
+.m-skel{background:linear-gradient(90deg,#EFE8DA 0,#F8F3EA 50%,#EFE8DA 100%);background-size:480px 100%;animation:shimmer 1.6s linear infinite}
+@media (prefers-reduced-motion:reduce){.m-spin,.m-float,.m-rise,.m-skel{animation:none}}
+</style>
+<style>*{animation-play-state:paused!important;animation-delay:-10s!important}</style><script>const STATE={};</script>
+<script>
+class DCLogic { constructor(p){ this.props = p || {}; this.state = {}; } setState(s){ Object.assign(this.state, typeof s === 'function' ? s(this.state) : s); } forceUpdate(){} }
+function look(scope, path){ path = path.trim(); if (path === 'true') return true; if (path === 'false') return false; if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+  let v = scope; for (const k of path.split('.')) { if (v == null) return undefined; v = v[k]; } return v; }
+function interp(str, scope){ const m = str.match(/^\s*\{\{([^}]+)\}\}\s*$/); if (m) return look(scope, m[1]);
+  return str.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = look(scope, p); return v == null ? '' : String(v); }); }
+function render(node, scope, out){
+  if (node.nodeType === 3) { out.appendChild(document.createTextNode(interp(node.textContent, scope))); return; }
+  if (node.nodeType !== 1) return;
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'sc-for') { const list = interp(node.getAttribute('list'), scope) || []; const as = node.getAttribute('as');
+    list.forEach((item, i) => { const s = Object.assign(Object.create(scope), { [as]: item, $index: i }); node.childNodes.forEach(c => render(c, s, out)); }); return; }
+  if (tag === 'sc-if') { if (interp(node.getAttribute('value'), scope)) node.childNodes.forEach(c => render(c, scope, out)); return; }
+  const el = document.createElementNS(node.namespaceURI, node.localName);
+  for (const a of node.attributes) { if (/^on[A-Z]/.test(a.name) || a.name.startsWith('hint-')) continue; const v = interp(a.value, scope); if (v === false || v == null) continue; el.setAttribute(a.name, typeof v === 'function' ? '' : v); }
+  const src = tag === 'template' ? node.content : node;
+  src.childNodes.forEach(c => render(c, scope, el));
+  out.appendChild(el);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const C = new Function('DCLogic', document.getElementById('logic').textContent + '; return Component;')(DCLogic);
+  const inst = new C({}); Object.assign(inst.state, STATE);
+  const vals = inst.renderVals();
+  const tpl = document.getElementById('tpl').content;
+  const host = document.getElementById('host');
+  tpl.childNodes.forEach(c => render(c, vals, host));
+});
+</script>
+</head><body><template id="tpl">
+
+<div style="width:1440px;min-height:4300px;box-sizing:border-box;padding:80px 80px 96px;font-family:'Inter',system-ui,sans-serif;color:#1D2522;background:#FBF8F2;display:flex;flex-direction:column;gap:40px">
+
+  <header style="position:relative;overflow:hidden;border-radius:28px;background:#F5EFE3;padding:56px 56px 52px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:48px;align-items:center">
+    <div class="zg" style="position:absolute;inset:0;opacity:.55;-webkit-mask-image:radial-gradient(circle at 85% 40%,#000 0,transparent 60%);mask-image:radial-gradient(circle at 85% 40%,#000 0,transparent 60%)" aria-hidden="true"></div>
+    <div style="position:relative;display:flex;flex-direction:column;gap:18px">
+      <span class="kick">Design system · v2 · 30 Oct 2026</span>
+      <h1 style="margin:0;font-family:'Noto Serif Display',serif;font-size:60px;line-height:1.04;font-weight:500;letter-spacing:-.02em;color:#0B3D34">Lighter, warmer, and rooted in the Maghreb</h1>
+      <p class="p" style="font-size:18px;max-width:620px">Version 1 felt dark and generic. Version 2 keeps the Figma brand — the logo, the green, the gold — but moves the whole site onto warm paper, uses arches and zellige as its signature, replaces the typeface, and adds quiet motion.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px">
+        <span class="tag new">Warm paper ground</span><span class="tag new">New Arabic type</span><span class="tag new">Arch + zellige</span><span class="tag new">Subtle motion</span><span class="tag fig">Logo, green &amp; gold kept</span>
+      </div>
+    </div>
+    <div style="position:relative;display:flex;justify-content:center;align-items:flex-end;height:330px" aria-hidden="true">
+      <div style="position:absolute;bottom:0;width:250px;height:320px;border-radius:125px 125px 20px 20px;border:1.5px solid #AD9559;transform:translate(-18px,-14px)"></div>
+      <div class="zl" style="position:relative;width:250px;height:320px;border-radius:125px 125px 20px 20px;background-color:#0E4A3F;overflow:hidden;display:flex;align-items:center;justify-content:center">
+        <svg class="m-spin" width="230" height="230" viewBox="0 0 100 100" fill="none" stroke="#C9AE6A" stroke-width=".6" stroke-opacity=".7" style="position:absolute;top:30px"><rect x="20" y="20" width="60" height="60"></rect><rect x="20" y="20" width="60" height="60" transform="rotate(45 50 50)"></rect><circle cx="50" cy="50" r="22"></circle></svg>
+        <img src="assets/mark-light.png" alt="" style="position:relative;width:110px;height:auto">
+      </div>
+    </div>
+  </header>
+
+  <section style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px">
+    <div class="card" style="padding:24px;display:flex;flex-direction:column;gap:8px"><span style="font-family:'Noto Serif Display',serif;font-size:30px;color:#AD9559">01</span><h3 class="h3">Paper, not screen</h3><p class="p" style="font-size:14px">Warm off-white grounds. Deep green only for one signature element per screen.</p></div>
+    <div class="card" style="padding:24px;display:flex;flex-direction:column;gap:8px"><span style="font-family:'Noto Serif Display',serif;font-size:30px;color:#AD9559">02</span><h3 class="h3">The arch frames what matters</h3><p class="p" style="font-size:14px">The featured video, the sheikh’s portrait, playlist covers. Never decoration on its own.</p></div>
+    <div class="card" style="padding:24px;display:flex;flex-direction:column;gap:8px"><span style="font-family:'Noto Serif Display',serif;font-size:30px;color:#AD9559">03</span><h3 class="h3">Pattern is texture</h3><p class="p" style="font-size:14px">An eight-point zellige lattice, always faint and masked, never behind reading text.</p></div>
+    <div class="card" style="padding:24px;display:flex;flex-direction:column;gap:8px"><span style="font-family:'Noto Serif Display',serif;font-size:30px;color:#AD9559">04</span><h3 class="h3">Motion that breathes</h3><p class="p" style="font-size:14px">Slow, small and optional. Nothing loops near reading text; reduced-motion turns it all off.</p></div>
+  </section>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:26px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px">
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="kick">Typography</span><h2 class="h2">Four pairings — A is recommended</h2></div>
+      <p class="p" style="max-width:460px;font-size:14px">Readex Pro is gone. Every option uses IBM Plex Sans Arabic for interface text: calm, very legible on phones, and comfortable in long Arabic titles.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+      <div class="opt rec">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span class="h3">A · Classical Naskh</span><span class="tag fig">Recommended</span></div>
+        <div dir="rtl" lang="ar" style="font-family:'Amiri',serif;font-size:58px;line-height:1.35;font-weight:700;color:#0B3D34">دلائل النبوّة</div>
+        <div dir="rtl" lang="ar" style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:15px;line-height:1.85;color:#5B635F">مقاطع مرئية يشرح فيها الشيخ دلائل النبوّة، بخطٍّ مريح للقراءة.</div>
+        <p class="p" style="font-size:13px"><strong style="color:#1D2522">Amiri</strong> headlines + <strong style="color:#1D2522">IBM Plex Sans Arabic</strong> text. The calligraphic contrast of a printed book against a crisp modern sans — an editorial pairing.</p>
+      </div>
+      <div class="opt">
+        <span class="h3">B · Modern Naskh</span>
+        <div dir="rtl" lang="ar" style="font-family:'Noto Naskh Arabic',serif;font-size:52px;line-height:1.4;font-weight:600;color:#0B3D34">دلائل النبوّة</div>
+        <div dir="rtl" lang="ar" style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:15px;line-height:1.85;color:#5B635F">مقاطع مرئية يشرح فيها الشيخ دلائل النبوّة، بخطٍّ مريح للقراءة.</div>
+        <p class="p" style="font-size:13px"><strong style="color:#1D2522">Noto Naskh Arabic</strong> + Plex. Calmer and more contemporary than Amiri; same family as the Latin headline face.</p>
+      </div>
+      <div class="opt">
+        <span class="h3">C · Geometric Kufi</span>
+        <div dir="rtl" lang="ar" style="font-family:'Reem Kufi',sans-serif;font-size:52px;line-height:1.3;font-weight:500;color:#0B3D34">دلائل النبوّة</div>
+        <div dir="rtl" lang="ar" style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:15px;line-height:1.85;color:#5B635F">مقاطع مرئية يشرح فيها الشيخ دلائل النبوّة، بخطٍّ مريح للقراءة.</div>
+        <p class="p" style="font-size:13px"><strong style="color:#1D2522">Reem Kufi</strong> + Plex. Architectural, closest to the logo’s angles; less suited to long titles.</p>
+      </div>
+      <div class="opt">
+        <span class="h3">D · One family</span>
+        <div dir="rtl" lang="ar" style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:48px;line-height:1.3;font-weight:600;color:#0B3D34">دلائل النبوّة</div>
+        <div dir="rtl" lang="ar" style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:15px;line-height:1.85;color:#5B635F">مقاطع مرئية يشرح فيها الشيخ دلائل النبوّة، بخطٍّ مريح للقراءة.</div>
+        <p class="p" style="font-size:13px">Plex only. Cleanest and fastest to load; least character.</p>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;align-items:start;padding-top:8px;border-top:1px solid #EFE8DA">
+      <div style="display:flex;flex-direction:column;gap:16px;padding-top:18px">
+        <span class="h3">Scale (option A)</span>
+        <div dir="rtl" style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:baseline;gap:16px"><span dir="ltr" style="width:170px;flex:none;font-size:12px;color:#7A6532">Hero · Amiri 104/1.25</span><span style="font-family:'Amiri',serif;font-size:80px;line-height:1.3;font-weight:700;color:#0B3D34">دلائل النبوّة</span></div>
+          <div style="display:flex;align-items:baseline;gap:16px"><span dir="ltr" style="width:170px;flex:none;font-size:12px;color:#7A6532">Section · Amiri 50/1.35</span><span style="font-family:'Amiri',serif;font-size:46px;line-height:1.35;font-weight:700;color:#0B3D34">أحدث المقاطع</span></div>
+          <div style="display:flex;align-items:baseline;gap:16px"><span dir="ltr" style="width:170px;flex:none;font-size:12px;color:#7A6532">Subtitle · Amiri 34 regular</span><span style="font-family:'Amiri',serif;font-size:32px;line-height:1.5;font-weight:400;color:#7A6532">شرحٌ مرئيّ، ومقاطع متنوعة</span></div>
+          <div style="display:flex;align-items:baseline;gap:16px"><span dir="ltr" style="width:170px;flex:none;font-size:12px;color:#7A6532">Video title · Plex 17/1.6</span><span style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:17px;line-height:1.6;font-weight:600">عنوان المقطع يظهر هنا في سطرين كحدٍّ أقصى</span></div>
+          <div style="display:flex;align-items:baseline;gap:16px"><span dir="ltr" style="width:170px;flex:none;font-size:12px;color:#7A6532">Body · Plex 16/1.85</span><span style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:16px;line-height:1.85;color:#5B635F">وصف موجز للمقطع بخطٍّ مريح للقراءة الطويلة.</span></div>
+          <div style="display:flex;align-items:baseline;gap:16px"><span dir="ltr" style="width:170px;flex:none;font-size:12px;color:#7A6532">Meta · Plex 13 + Inter digits</span><span style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;color:#5B635F">دلائل النبوّة · الحلقة <span style="font-family:'Inter',sans-serif">12</span> · منذ يومين</span></div>
+        </div>
+        <div lang="kab" style="display:flex;flex-direction:column;gap:10px;padding-top:14px;border-top:1px solid #EFE8DA">
+          <div style="display:flex;align-items:baseline;gap:16px"><span style="width:170px;flex:none;font-size:12px;color:#7A6532">Taqbaylit hero · Noto Serif Display</span><span style="font-family:'Noto Serif Display',serif;font-size:44px;font-weight:500;color:#0B3D34">Tividyutin timaynutin</span></div>
+          <div style="display:flex;align-items:baseline;gap:16px"><span style="width:170px;flex:none;font-size:12px;color:#7A6532">Taqbaylit text · Inter</span><span style="font-family:'Inter',sans-serif;font-size:17px">ɛ ɣ ḍ ḥ ṛ ṣ ṭ ẓ č ǧ — Ɛ Ɣ Ḍ Ḥ Ṛ Ṣ Ṭ Ẓ Č Ǧ</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;padding-top:18px">
+        <span class="h3">Tested: which fonts can actually write Taqbaylit?</span>
+        <p class="p" style="font-size:13.5px">I downloaded 70+ Google Fonts and checked each for the 20 Kabyle letters (ɛ ɣ ḍ ḥ ṛ ṣ ṭ ẓ č ǧ + capitals). Most fonts — including every Arabic family — miss ɛ and ɣ, so Latin text must switch font by <code>lang</code>.</p>
+        <table>
+          <thead><tr><th>Font</th><th>Role</th><th>Kabyle letters</th></tr></thead>
+          <tbody>
+            <tr><td>Inter</td><td>Latin text</td><td class="yes">20 / 20</td></tr>
+            <tr><td>Noto Serif Display</td><td>Latin headlines</td><td class="yes">20 / 20</td></tr>
+            <tr><td>Noto Sans · Source Sans 3 · Fira Sans</td><td>Alternatives</td><td class="yes">20 / 20</td></tr>
+            <tr><td>EB Garamond · Charis SIL · Gentium</td><td>Alternatives</td><td class="yes">20 / 20</td></tr>
+            <tr><td>Amiri</td><td>Arabic headlines</td><td class="part">14 / 20 — no ɛ ɣ ṛ</td></tr>
+            <tr><td>Markazi Text · Readex Pro · Alexandria</td><td>Arabic families</td><td class="part">16 / 20 — no ɛ ɣ</td></tr>
+            <tr><td>IBM Plex Sans Arabic · Tajawal · Cairo</td><td>Arabic families</td><td class="nope">0–2 / 20</td></tr>
+            <tr><td>Playfair · DM Sans · Manrope · Open Sans</td><td>Popular Latin</td><td class="nope">2–4 / 20</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end"><div style="display:flex;flex-direction:column;gap:8px"><span class="kick">Colour</span><h2 class="h2">Warm paper, green accent, gold detail</h2></div><div style="display:flex;gap:8px"><span class="tag fig">From Figma</span><span class="tag new">New</span></div></div>
+    <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:16px">
+      <div class="sw"><div class="c" style="background:#FBF8F2"></div><span class="tag new" style="align-self:flex-start">New</span><span class="n">Paper</span><span class="h">#FBF8F2</span><span class="u">Page ground</span></div>
+      <div class="sw"><div class="c" style="background:#F5EFE3"></div><span class="tag new" style="align-self:flex-start">New</span><span class="n">Sand 100</span><span class="h">#F5EFE3</span><span class="u">Hero, alternating bands</span></div>
+      <div class="sw"><div class="c" style="background:#ECE3D1"></div><span class="tag new" style="align-self:flex-start">New</span><span class="n">Sand 200</span><span class="h">#ECE3D1</span><span class="u">Footer, strong dividers</span></div>
+      <div class="sw"><div class="c" style="background:#FFFFFF"></div><span class="tag new" style="align-self:flex-start">New</span><span class="n">Surface</span><span class="h">#FFFFFF</span><span class="u">Cards, search, player frame</span></div>
+      <div class="sw"><div class="c" style="background:#E3DACA"></div><span class="tag new" style="align-self:flex-start">New</span><span class="n">Line</span><span class="h">#E3DACA</span><span class="u">Borders, hairlines</span></div>
+      <div class="sw"><div class="c" style="background:#1D2522"></div><span class="tag new" style="align-self:flex-start">New</span><span class="n">Ink</span><span class="h">#1D2522</span><span class="u">Text · 14.8:1 on paper</span></div>
+      <div class="sw"><div class="c" style="background:#5B635F"></div><span class="tag new" style="align-self:flex-start">New</span><span class="n">Ink 2</span><span class="h">#5B635F</span><span class="u">Meta · 5.8:1 on paper</span></div>
+      <div class="sw"><div class="c" style="background:#0B3D34"></div><span class="tag new" style="align-self:flex-start">New</span><span class="n">Green 900</span><span class="h">#0B3D34</span><span class="u">Headlines · 11.4:1</span></div>
+      <div class="sw"><div class="c" style="background:#0E4A3F"></div><span class="tag new" style="align-self:flex-start">New</span><span class="n">Green 800</span><span class="h">#0E4A3F</span><span class="u">The one dark arch per screen</span></div>
+      <div class="sw"><div class="c" style="background:#065A4C"></div><span class="tag fig" style="align-self:flex-start">Figma</span><span class="n">Green 700</span><span class="h">#065A4C</span><span class="u">Buttons, links · 7.7:1</span></div>
+      <div class="sw"><div class="c" style="background:#0C7765"></div><span class="tag fig" style="align-self:flex-start">Figma</span><span class="n">Green 600</span><span class="h">#0C7765</span><span class="u">Icons, active states</span></div>
+      <div class="sw"><div class="c" style="background:#E1EEE8"></div><span class="tag new" style="align-self:flex-start">New</span><span class="n">Green 100</span><span class="h">#E1EEE8</span><span class="u">Chips, selected rows</span></div>
+      <div class="sw"><div class="c" style="background:#AD9559"></div><span class="tag fig" style="align-self:flex-start">Figma</span><span class="n">Gold 500</span><span class="h">#AD9559</span><span class="u">Lines, numbers, stars — not text</span></div>
+      <div class="sw"><div class="c" style="background:#7A6532"></div><span class="tag new" style="align-self:flex-start">New</span><span class="n">Gold 700</span><span class="h">#7A6532</span><span class="u">Gold as text · 5.3:1</span></div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;padding-top:6px;border-top:1px solid #EFE8DA">
+      <span class="h3" style="margin-inline-end:8px">Thumbnail tints (placeholders only)</span>
+      <div style="width:64px;height:36px;border-radius:8px;background:#DCE7E0"></div><div style="width:64px;height:36px;border-radius:8px;background:#EADFCB"></div><div style="width:64px;height:36px;border-radius:8px;background:#D9E3E4"></div><div style="width:64px;height:36px;border-radius:8px;background:#E9DAD0"></div>
+      <p class="p" style="font-size:13.5px;margin-inline-start:12px">Light tints stand in for real thumbnails on these boards so the overall weight reads as it will in production.</p>
+    </div>
+  </section>
+
+  <section style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px">
+    <div class="card" style="display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="kick">Ornament</span><h2 class="h2">Zellige lattice and the arch</h2></div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px">
+        <div style="display:flex;flex-direction:column;gap:8px"><div class="zg" style="height:150px;border-radius:16px;background-color:#F5EFE3"></div><span class="h3" style="font-size:14px">Gold on sand</span><span class="p" style="font-size:12.5px">Hero and quote bands, masked to fade out.</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><div class="zl" style="height:150px;border-radius:16px;background-color:#0E4A3F"></div><span class="h3" style="font-size:14px">Light on green</span><span class="p" style="font-size:12.5px">Inside the dark arch only.</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><div class="zgr" style="height:150px;border-radius:16px;background-color:#DCE7E0"></div><span class="h3" style="font-size:14px">Green on tint</span><span class="p" style="font-size:12.5px">Placeholder thumbnails, empty states.</span></div>
+      </div>
+      <div style="display:flex;gap:28px;align-items:flex-end;padding-top:6px">
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><div style="width:120px;height:150px;border-radius:60px 60px 12px 12px;background:#0E4A3F"></div><span class="p" style="font-size:12px">Round arch · hero</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><div style="position:relative;width:120px;height:150px"><div style="position:absolute;inset:0;border-radius:60px 60px 12px 12px;border:1.5px solid #AD9559;transform:translate(-10px,-8px)"></div><div style="position:absolute;inset:0;border-radius:60px 60px 12px 12px;background:#EADFCB"></div></div><span class="p" style="font-size:12px">Offset gold outline</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><div style="width:120px;height:120px;border-radius:999px;border:1.5px solid #AD9559;display:flex;align-items:center;justify-content:center"><div style="width:96px;height:96px;border-radius:999px;background:#DCE7E0"></div></div><span class="p" style="font-size:12px">Ring · portrait</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><svg width="110" height="110" viewBox="0 0 100 100" fill="none" stroke="#AD9559" stroke-width="1.2" aria-hidden="true"><rect x="20" y="20" width="60" height="60"></rect><rect x="20" y="20" width="60" height="60" transform="rotate(45 50 50)"></rect><circle cx="50" cy="50" r="10"></circle></svg><span class="p" style="font-size:12px">Eight-point star</span></div>
+      </div>
+      <p class="p" style="font-size:13.5px">The Maghrebi zellige and arch are a deliberate nod to the sheikh’s Algerian, Kabyle audience — distinct from the Gulf-style gold domes common on Islamic sites. <em>Confirm the cultural fit with the team.</em></p>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="kick">Motion</span><h2 class="h2">Quiet, slow, optional</h2></div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center;padding:18px;border-radius:16px;background:#F5EFE3"><svg class="m-spin" width="70" height="70" viewBox="0 0 100 100" fill="none" stroke="#AD9559" stroke-width="1.6" aria-hidden="true"><rect x="20" y="20" width="60" height="60"></rect><rect x="20" y="20" width="60" height="60" transform="rotate(45 50 50)"></rect></svg><span class="h3" style="font-size:13px">Star turn · 40–90 s loop</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center;padding:18px;border-radius:16px;background:#F5EFE3"><div class="m-float" style="width:110px;height:54px;border-radius:12px;background:#FFFFFF;box-shadow:0 14px 24px -16px rgba(11,61,52,.5)"></div><span class="h3" style="font-size:13px">Float · 6 s, 10 px</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center;padding:18px;border-radius:16px;background:#F5EFE3"><div class="m-rise" style="width:110px;height:54px;border-radius:12px;background:#0C7765"></div><span class="h3" style="font-size:13px">Rise-in · 800 ms on load</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center;padding:18px;border-radius:16px;background:#F5EFE3"><div class="m-lift" style="width:110px;height:54px;border-radius:12px;background:#FFFFFF;border:1px solid #E3DACA;display:flex;align-items:center;justify-content:center;font-size:12px;color:#5B635F">hover me</div><span class="h3" style="font-size:13px">Lift · 350 ms hover</span></div>
+      </div>
+      <div class="m-skel" style="height:14px;border-radius:999px"></div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="rule"><span class="ok">✓</span><span>Ease <code>cubic-bezier(.2,.7,.2,1)</code>; 150 / 250 / 400 ms for UI, 800 ms for entrances.</span></div>
+        <div class="rule"><span class="ok">✓</span><span>Skeleton shimmer in sand tones while thumbnails load.</span></div>
+        <div class="rule"><span class="no">✕</span><span>No autoplaying video, parallax, or scroll-jacking. <code>prefers-reduced-motion</code> stops every loop.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:26px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end"><div style="display:flex;flex-direction:column;gap:8px"><span class="kick">Components</span><h2 class="h2">The video is always the hero of the card</h2></div><p class="p" style="max-width:440px;font-size:14px">“Lesson” and “course” language is gone. The site speaks of videos (مقاطع), episodes (حلقات) and playlists (قوائم).</p></div>
+    <div dir="rtl" style="display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1.15fr) minmax(0,.55fr) minmax(0,1.15fr);gap:28px;align-items:start;font-family:'IBM Plex Sans Arabic',sans-serif">
+      <div class="m-lift" style="display:flex;flex-direction:column;gap:10px;border-radius:16px">
+        <span dir="ltr" style="font-family:'Inter',sans-serif;font-size:12px;color:#7A6532;text-align:left">Video card</span>
+        <div class="thumb"><span class="pt"></span><span class="dur">18:42</span><span style="position:absolute;top:8px;right:8px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:#FFFFFF;color:#0B3D34">دلائل النبوّة · 12</span></div>
+        <span style="font-size:17px;font-weight:600;line-height:1.6">عنوان المقطع يظهر هنا في سطرين كحدٍّ أقصى</span>
+        <span style="font-size:13px;color:#5B635F">منذ يومين · العربية</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span dir="ltr" style="font-family:'Inter',sans-serif;font-size:12px;color:#7A6532;text-align:left">Episode row (numbered)</span>
+        <div style="display:flex;gap:14px;align-items:center;padding:12px;border-radius:16px;background:#FFFFFF;border:1px solid #E3DACA">
+          <span style="font-family:'Amiri',serif;font-size:40px;line-height:1;color:#AD9559;width:44px;text-align:center">07</span>
+          <div class="thumb" style="width:120px;flex:none;border-radius:10px;background-color:#EADFCB"><span class="pt"></span><span class="dur" style="font-size:11px">22:05</span></div>
+          <span style="font-size:14px;font-weight:600;line-height:1.55">عنوان الحلقة السابعة</span>
+        </div>
+        <div style="display:flex;gap:14px;align-items:center;padding:12px;border-radius:16px;background:#E1EEE8">
+          <span style="font-family:'Amiri',serif;font-size:40px;line-height:1;color:#0C7765;width:44px;text-align:center">08</span>
+          <div class="thumb" style="width:120px;flex:none;border-radius:10px;background-color:#D9E3E4"><span class="pt"></span><span class="dur" style="font-size:11px">19:30</span></div>
+          <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:600">عنوان الحلقة الثامنة</span><span style="font-size:12px;font-weight:600;color:#065A4C">تُعرض الآن</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span dir="ltr" style="font-family:'Inter',sans-serif;font-size:12px;color:#7A6532;text-align:left">Short</span>
+        <div class="thumb" style="aspect-ratio:9/16;border-radius:18px;background-color:#E9DAD0;align-items:flex-end"><span class="pt"></span><span class="dur" style="top:8px;bottom:auto">0:58</span><span style="position:relative;width:100%;padding:28px 10px 10px;background:linear-gradient(to top,rgba(20,28,25,.78),rgba(20,28,25,0));color:#FFFFFF;font-size:12.5px;font-weight:600">فكرة في دقيقة</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <span dir="ltr" style="font-family:'Inter',sans-serif;font-size:12px;color:#7A6532;text-align:left">Controls</span>
+        <span style="display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;border-radius:999px;background:#065A4C;color:#FFFFFF;font-size:15px;font-weight:600">شاهد من الحلقة الأولى</span>
+        <span style="display:inline-flex;align-items:center;justify-content:center;height:52px;border-radius:999px;border:1.5px solid #CDBF9F;color:#0B3D34;font-size:15px;font-weight:600;background:#FFFFFF">تصفّح كل المقاطع</span>
+        <div role="group" style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#F5EFE3;align-self:flex-start"><span style="padding:8px 16px;border-radius:999px;background:#FFFFFF;font-size:13px;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)">الكل</span><span style="padding:8px 16px;font-size:13px;color:#5B635F">العربية</span><span style="padding:8px 16px;font-size:13px;color:#5B635F;font-family:'Inter',sans-serif">Taqbaylit</span></div>
+        <div style="display:flex;align-items:center;height:56px;border-radius:999px;background:#FFFFFF;border:1px solid #E3DACA;padding:0 20px 0 6px;gap:10px;box-shadow:0 10px 30px -18px rgba(11,61,52,.35)"><span style="flex:1;font-size:14px;color:#5B635F">ابحث في كل المقاطع…</span><span style="width:44px;height:44px;border-radius:999px;background:#065A4C"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px">
+    <div class="card" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="kick">Bidirectional rules</span><h2 class="h2" style="font-size:28px">RTL ↔ LTR</h2></div>
+      <div class="rule"><span class="ok">✓</span><span>Fonts are chosen by each element’s <code>lang</code>: <code>ar</code> → Amiri / Plex Arabic, <code>kab</code> → Noto Serif Display / Inter. Never let a browser mix fonts inside one word.</span></div>
+      <div class="rule"><span class="ok">✓</span><span>Mirror layout, nav, chevrons, breadcrumbs, badge corners. Use logical CSS (<code>inline-start/end</code>) everywhere.</span></div>
+      <div class="rule"><span class="no">✕</span><span>Don’t mirror media: play glyphs, the timeline and timestamps stay left → right.</span></div>
+      <div class="rule"><span class="ok">✓</span><span>Each title carries its own <code>dir</code> from the catalogue, so Arabic titles sit right-aligned inside the Taqbaylit site and vice versa.</span></div>
+      <div class="rule"><span class="ok">✓</span><span>Western digits (0–9) everywhere, in Inter with tabular figures for durations.</span></div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="kick">Spacing &amp; shape</span><h2 class="h2" style="font-size:28px">Generous and soft</h2></div>
+      <div style="display:flex;align-items:flex-end;gap:12px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:4px;height:4px;background:#0C7765;border-radius:1px"></div><span style="font-size:11px;color:#7A6532">4</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:8px;height:8px;background:#0C7765;border-radius:2px"></div><span style="font-size:11px;color:#7A6532">8</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:16px;height:16px;background:#0C7765;border-radius:3px"></div><span style="font-size:11px;color:#7A6532">16</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:24px;height:24px;background:#0C7765;border-radius:4px"></div><span style="font-size:11px;color:#7A6532">24</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:40px;height:40px;background:#0C7765;border-radius:6px"></div><span style="font-size:11px;color:#7A6532">40</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:64px;height:64px;background:#0C7765;border-radius:8px"></div><span style="font-size:11px;color:#7A6532">64</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:96px;height:96px;background:#0C7765;border-radius:10px"></div><span style="font-size:11px;color:#7A6532">96</span></div>
+      </div>
+      <p class="p" style="font-size:14px">Sections breathe at 96 px on desktop, 56 px on phones. Radius: 8 badges · 14 thumbnails · 22 cards · pills full. Content max 1240 px.</p>
+      <div class="rule"><span class="ok">✓</span><span>Focus ring: 3 px Gold 500, 3 px offset — visible on paper and on green.</span></div>
+      <div class="rule"><span class="ok">✓</span><span>Touch targets ≥ 44 px; search field 56–64 px tall.</span></div>
+    </div>
+  </section>
+</div>
+</template><div id="host"></div><script type="text/plain" id="logic">
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script></body></html>
