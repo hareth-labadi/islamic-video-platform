@@ -1,0 +1,153 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0;background:#F4F1EA}
+.kick{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.card{background:#FFFFFF;border-radius:28px;padding:32px}
+.h2{margin:0;font-size:40px;font-weight:800;letter-spacing:-.035em;line-height:1.05}
+.p{margin:0;font-size:15px;line-height:1.6;color:#4B4B47}
+.ar{font-family:'IBM Plex Sans Arabic',sans-serif}
+.blk{position:relative;overflow:hidden;border-radius:22px;padding:20px;display:flex;flex-direction:column;justify-content:space-between;min-height:220px;box-sizing:border-box}
+.blk .big{position:absolute;top:-34px;left:-8px;font-size:170px;font-weight:800;line-height:1;letter-spacing:-.07em;color:transparent}
+.blk b{position:relative;font-size:18px}
+.blk span{position:relative;font-size:12.5px;line-height:1.5}
+.cv{position:relative;overflow:hidden;aspect-ratio:16/9;border-radius:14px;padding:12px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end;color:#FFFFFF}
+.cv .num{position:absolute;top:-24px;left:-5px;font-size:120px;font-weight:800;line-height:1;letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1.3px rgba(255,255,255,.38)}
+.cv .k{position:relative;font-size:11px;font-weight:600}
+.rule{display:flex;gap:12px;align-items:flex-start;font-size:15px;line-height:1.55;color:#161616;padding:10px 0;border-top:1px solid #EFEBE2}
+.ok{flex:none;width:24px;height:24px;border-radius:999px;background:#0B5D45;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+.no{flex:none;width:24px;height:24px;border-radius:999px;background:#C2512F;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+.lab{font-size:12px;font-weight:700;color:#6A6862;text-transform:uppercase;letter-spacing:.06em}
+</style>
+<style>*{animation-play-state:paused!important;animation-delay:-10s!important}</style><script>const STATE={};</script>
+<script>
+class DCLogic { constructor(p){ this.props = p || {}; this.state = {}; } setState(s){ Object.assign(this.state, typeof s === 'function' ? s(this.state) : s); } forceUpdate(){} }
+function look(scope, path){ path = path.trim(); if (path === 'true') return true; if (path === 'false') return false; if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+  let v = scope; for (const k of path.split('.')) { if (v == null) return undefined; v = v[k]; } return v; }
+function interp(str, scope){ const m = str.match(/^\s*\{\{([^}]+)\}\}\s*$/); if (m) return look(scope, m[1]);
+  return str.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = look(scope, p); return v == null ? '' : String(v); }); }
+function render(node, scope, out){
+  if (node.nodeType === 3) { out.appendChild(document.createTextNode(interp(node.textContent, scope))); return; }
+  if (node.nodeType !== 1) return;
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'sc-for') { const list = interp(node.getAttribute('list'), scope) || []; const as = node.getAttribute('as');
+    list.forEach((item, i) => { const s = Object.assign(Object.create(scope), { [as]: item, $index: i }); node.childNodes.forEach(c => render(c, s, out)); }); return; }
+  if (tag === 'sc-if') { if (interp(node.getAttribute('value'), scope)) node.childNodes.forEach(c => render(c, scope, out)); return; }
+  const el = document.createElementNS(node.namespaceURI, node.localName);
+  for (const a of node.attributes) { if (/^on[A-Z]/.test(a.name) || a.name.startsWith('hint-')) continue; const v = interp(a.value, scope); if (v === false || v == null) continue; el.setAttribute(a.name, typeof v === 'function' ? '' : v); }
+  const src = tag === 'template' ? node.content : node;
+  src.childNodes.forEach(c => render(c, scope, el));
+  out.appendChild(el);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const C = new Function('DCLogic', document.getElementById('logic').textContent + '; return Component;')(DCLogic);
+  const inst = new C({}); Object.assign(inst.state, STATE);
+  const vals = inst.renderVals();
+  const tpl = document.getElementById('tpl').content;
+  const host = document.getElementById('host');
+  tpl.childNodes.forEach(c => render(c, vals, host));
+});
+</script>
+</head><body><template id="tpl">
+
+<div style="width:1440px;min-height:3300px;box-sizing:border-box;padding:80px 80px 96px;font-family:'Inter',system-ui,sans-serif;color:#161616;background:#F4F1EA;display:flex;flex-direction:column;gap:28px">
+
+  <header style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px;align-items:stretch">
+    <div style="display:flex;flex-direction:column;gap:18px;justify-content:flex-end">
+      <span class="kick" style="color:#C2512F">Design system · v4 · 30 Oct 2026</span>
+      <h1 style="margin:0;font-size:78px;line-height:.95;font-weight:800;letter-spacing:-.05em">Ink, paper &amp; colour blocks</h1>
+      <p class="p" style="font-size:18px;max-width:640px">v3 was calm but generic — beige cards, a teal button, a gold line: the look of a thousand template sites. v4 takes its cue from modern editorial and podcast brands (Thmanyah, Paperpillar’s podcast work): a black-and-paper base, a few confident flat colours that each mean something, and oversized numerals as the signature graphic.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px">
+      <div class="blk" style="background:#0B5D45;color:#FFFFFF;grid-row:span 2"><span class="big" style="-webkit-text-stroke:2px rgba(255,255,255,.22);font-size:300px;top:-60px">12</span><b class="ar" dir="rtl">دلائل النبوّة</b></div>
+      <div class="blk" style="background:#F2B035;min-height:0"><span class="big" style="-webkit-text-stroke:1.5px rgba(22,22,22,.2);font-size:130px">“</span></div>
+      <div class="blk" style="background:#C2512F;color:#FFFFFF;min-height:0"><span class="big" style="-webkit-text-stroke:1.5px rgba(255,255,255,.25);font-size:130px">T</span></div>
+    </div>
+  </header>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px"><div style="display:flex;flex-direction:column;gap:8px"><span class="kick" style="color:#0B5D45">Colour</span><h2 class="h2">Every colour means a kind of content</h2></div><p class="p" style="max-width:460px">Visitors learn the code in seconds: green is the series, terracotta is Taqbaylit, cobalt is short clips, saffron is “you are here / act now”. All blocks are flat — no gradients, no glows.</p></div>
+    <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px">
+      <div class="blk" style="background:#0B5D45;color:#FFFFFF"><span class="big" style="-webkit-text-stroke:1.5px rgba(255,255,255,.22)">S</span><b>Emerald<br>#0B5D45</b><span>The series دلائل النبوّة · white text 7.9:1 · descends from the Figma green</span></div>
+      <div class="blk" style="background:#C2512F;color:#FFFFFF"><span class="big" style="-webkit-text-stroke:1.5px rgba(255,255,255,.25)">T</span><b>Terracotta<br>#C2512F</b><span>Taqbaylit content · from Kabyle pottery · white text 4.7:1</span></div>
+      <div class="blk" style="background:#2F4DC4;color:#FFFFFF"><span class="big" style="-webkit-text-stroke:1.5px rgba(255,255,255,.25)">1′</span><b>Cobalt<br>#2F4DC4</b><span>Short clips · from Kabyle enamel jewellery · white text 7.0:1</span></div>
+      <div class="blk" style="background:#F2B035"><span class="big" style="-webkit-text-stroke:1.5px rgba(22,22,22,.2)">!</span><b>Saffron<br>#F2B035</b><span>Primary action, progress, “continue”, Q&amp;A · ink text 9.9:1 · the logo’s gold, louder</span></div>
+      <div class="blk" style="background:#161616;color:#FFFFFF"><span class="big" style="-webkit-text-stroke:1.5px rgba(255,255,255,.2)">?</span><b>Ink<br>#161616</b><span>Text, footer, search, mixed videos · 16:1 on paper</span></div>
+      <div class="blk" style="background:#FFFFFF;border:1.5px solid #161616"><span class="big" style="-webkit-text-stroke:1.5px rgba(22,22,22,.12)">P</span><b>Paper<br>#F4F1EA</b><span>Page ground; white #FFFFFF for search and panels · secondary text #6A6862 (5:1)</span></div>
+    </div>
+  </section>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:22px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px"><div style="display:flex;flex-direction:column;gap:8px"><span class="kick" style="color:#2F4DC4">Signature</span><h2 class="h2">Branded covers with giant outlined numbers</h2></div><p class="p" style="max-width:480px">A proposal for the real thumbnails too: one template — content colour, a huge outlined episode number, a small label — makes 100 videos look like one library instead of 100 different YouTube thumbnails. A photo of the sheikh can sit on top when wanted.</p></div>
+    <div dir="rtl" class="ar" style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px">
+      <div class="cv" style="background:#0B5D45"><span class="num">12</span><span class="k">دلائل النبوّة · ح 12</span></div>
+      <div class="cv" style="background:#0B5D45"><span class="num">05</span><span class="k">دلائل النبوّة · ح 05</span></div>
+      <div class="cv" style="background:#C2512F" dir="ltr"><span class="num" style="font-family:Inter">T</span><span class="k" style="font-family:Inter">Taqbaylit</span></div>
+      <div class="cv" style="background:#2F4DC4"><span class="num">1′</span><span class="k">مقطع قصير</span></div>
+      <div class="cv" style="background:#F2B035;color:#161616"><span class="num" style="-webkit-text-stroke-color:rgba(22,22,22,.25)">؟</span><span class="k">أسئلة وأجوبة</span></div>
+      <div class="cv" style="background:#161616"><span class="num">?</span><span class="k">مقطع متنوّع</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;padding-top:4px">
+      <div class="rule"><span class="ok">✓</span><span>Numbers in Inter ExtraBold, 1–2 px outline at 20–40% opacity, always bleeding off the top edge.</span></div>
+      <div class="rule"><span class="ok">✓</span><span>The same device scales up: hero tiles (400 px), series header (520 px), track lists (40 px).</span></div>
+      <div class="rule"><span class="no">✕</span><span>Never behind body text; never more than one giant numeral per tile.</span></div>
+    </div>
+  </section>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:22px">
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="kick" style="color:#C2512F">Components</span><h2 class="h2">Built for watching, with some character</h2></div>
+    <div dir="rtl" class="ar" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span class="lab" dir="ltr" style="font-family:Inter;text-align:left">Bento hero tiles</span>
+        <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:90px 90px;gap:8px">
+          <div style="grid-row:span 2;border-radius:16px;background:#0B5D45;color:#FFFFFF;padding:12px;display:flex;align-items:flex-end;font-weight:700;font-size:14px">أحدث حلقة</div>
+          <div style="border-radius:16px;background:#161616;color:#F2B035;padding:12px;font-weight:700;font-size:13px">تابِع <span style="font-family:Inter">05</span></div>
+          <div style="border-radius:16px;background:#C2512F;color:#FFFFFF;padding:12px;font-family:Inter;font-weight:700;font-size:13px" dir="ltr">Taqbaylit</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span class="lab" dir="ltr" style="font-family:Inter;text-align:left">Track row (series)</span>
+        <div style="display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px;border-radius:14px;background:#F4F1EA"><span style="font-family:Inter;font-size:34px;font-weight:800;letter-spacing:-.04em;color:#0B5D45">05</span><span style="font-size:15px;font-weight:700">عنوان الحلقة الخامسة</span><span style="font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;background:#F2B035">▶ تابِع</span></div>
+        <div style="display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px"><span style="font-family:Inter;font-size:34px;font-weight:800;letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1.1px #161616">06</span><span style="font-size:15px;font-weight:700">عنوان الحلقة السادسة</span><span style="font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;background:#CFE5D6">جديدة</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <span class="lab" dir="ltr" style="font-family:Inter;text-align:left">Play pill · outline button · count heading</span>
+        <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 8px 0 20px;border-radius:999px;background:#F2B035;font-size:15px;font-weight:700">▶ شاهد الآن<span style="font-family:Inter;font-size:12.5px;padding:5px 10px;border-radius:999px;background:#161616;color:#F2B035">18:42</span></span>
+        <span style="align-self:flex-start;display:inline-flex;align-items:center;height:42px;padding:0 18px;border-radius:999px;border:1.5px solid #161616;font-size:14px;font-weight:700">كل المقاطع ←</span>
+        <span style="font-size:30px;font-weight:700">أحدث المقاطع<span style="font-family:Inter;font-weight:800;color:transparent;-webkit-text-stroke:1.1px #161616;margin-inline-start:8px">48</span></span>
+      </div>
+      <div style="grid-column:span 2;display:flex;flex-direction:column;gap:10px">
+        <span class="lab" dir="ltr" style="font-family:Inter;text-align:left">Mini-player pill</span>
+        <div style="display:flex;align-items:center;gap:12px;padding:8px 8px 8px 16px;border-radius:999px;background:#F2B035;max-width:460px"><span style="width:52px;height:52px;border-radius:999px;background:#0B5D45;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:Inter;font-weight:800">05</span><span style="flex:1;font-size:14px;font-weight:700">الحلقة <span style="font-family:Inter">5</span> · عنوان الحلقة الخامسة</span><span style="width:44px;height:44px;border-radius:999px;background:#161616"></span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span class="lab" dir="ltr" style="font-family:Inter;text-align:left">Filter chips</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><span style="height:36px;padding:0 14px;border-radius:999px;background:#161616;color:#FFFFFF;display:flex;align-items:center;font-size:13px;font-weight:700">الكل</span><span style="height:36px;padding:0 14px;border-radius:999px;border:1.5px solid #161616;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600"><span style="width:8px;height:8px;border-radius:2px;background:#0B5D45"></span>دلائل النبوّة</span><span style="height:36px;padding:0 14px;border-radius:999px;border:1.5px solid #161616;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;font-family:Inter"><span style="width:8px;height:8px;border-radius:2px;background:#C2512F"></span>Taqbaylit</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px">
+    <div class="card" style="display:flex;flex-direction:column;gap:2px">
+      <span class="kick" style="color:#0B5D45;margin-bottom:6px">Do</span>
+      <div class="rule"><span class="ok">✓</span><span>Paper and ink first; colour blocks are the accent, one dominant block per screen region.</span></div>
+      <div class="rule"><span class="ok">✓</span><span>Type does the work: IBM Plex Sans Arabic 700 for titles, Inter 800 for numerals and Taqbaylit.</span></div>
+      <div class="rule"><span class="ok">✓</span><span>Pills and outline buttons; 24 px radius tiles; 14–18 px gaps in bento grids.</span></div>
+      <div class="rule"><span class="ok">✓</span><span>Small, honest motion: tiles rise in once, covers tilt 0.4° on hover, the play button pulses.</span></div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:2px">
+      <span class="kick" style="color:#C2512F;margin-bottom:6px">Don’t</span>
+      <div class="rule"><span class="no">✕</span><span>No beige-on-beige cards, soft drop shadows everywhere, or gradient washes — the “AI template” look.</span></div>
+      <div class="rule"><span class="no">✕</span><span>No stock mosque photos, gold domes or decorative patterns behind content.</span></div>
+      <div class="rule"><span class="no">✕</span><span>Don’t use a content colour for something else (e.g. terracotta for an error) — it breaks the code.</span></div>
+      <div class="rule"><span class="no">✕</span><span>Don’t put white text on saffron (fails contrast) — saffron always carries ink.</span></div>
+    </div>
+  </section>
+</div>
+</template><div id="host"></div><script type="text/plain" id="logic">
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script></body></html>

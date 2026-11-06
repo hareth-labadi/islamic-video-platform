@@ -1,0 +1,146 @@
+<!doctype html><html lang="kab"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0;background:#F4F1EA}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid #F2B035;outline-offset:3px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px;box-sizing:border-box}
+.ar{font-family:'IBM Plex Sans Arabic',sans-serif}
+.nav a{font-size:15px;color:#4B4B47;padding:6px 0;border-bottom:2px solid transparent;white-space:nowrap}
+.nav a.on{color:#111111;font-weight:700;border-bottom-color:#111111}
+.tile{position:relative;overflow:hidden;border-radius:24px;padding:24px;box-sizing:border-box;display:flex;flex-direction:column}
+.big{position:absolute;font-weight:800;line-height:1;letter-spacing:-.07em;color:transparent}
+.cv{position:relative;overflow:hidden;aspect-ratio:16/9;border-radius:16px}
+.cv .num{position:absolute;top:-30px;right:-6px;font-size:150px;font-weight:800;line-height:1;letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.38)}
+.cv .dur{position:absolute;top:12px;left:12px;font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:999px;background:rgba(0,0,0,.28);color:#FFFFFF}
+.t{margin:0;font-size:16px;font-weight:700;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.m{font-size:13px;color:#6A6862;display:flex;gap:6px;align-items:center}
+.sh{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:24px}
+.sh h2{margin:0;font-size:36px;font-weight:800;letter-spacing:-.03em}
+.cnt{font-size:36px;font-weight:800;color:transparent;-webkit-text-stroke:1.2px #111111;margin-left:10px}
+.more{display:inline-flex;align-items:center;height:40px;padding:0 16px;border-radius:999px;border:1.5px solid #111111;font-size:14px;font-weight:700}
+.pill{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 20px 0 8px;border-radius:999px;font-size:15px;font-weight:700}
+.trk{display:grid;grid-template-columns:70px minmax(0,1fr) 90px;align-items:center;gap:16px;padding:14px 12px;border-top:1px solid rgba(255,255,255,.18)}
+.trk .n{font-size:38px;font-weight:800;letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1.2px rgba(255,255,255,.7);text-align:center}
+</style>
+<style>*{animation-play-state:paused!important;animation-delay:-10s!important}</style><script>const STATE={};</script>
+<script>
+class DCLogic { constructor(p){ this.props = p || {}; this.state = {}; } setState(s){ Object.assign(this.state, typeof s === 'function' ? s(this.state) : s); } forceUpdate(){} }
+function look(scope, path){ path = path.trim(); if (path === 'true') return true; if (path === 'false') return false; if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+  let v = scope; for (const k of path.split('.')) { if (v == null) return undefined; v = v[k]; } return v; }
+function interp(str, scope){ const m = str.match(/^\s*\{\{([^}]+)\}\}\s*$/); if (m) return look(scope, m[1]);
+  return str.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = look(scope, p); return v == null ? '' : String(v); }); }
+function render(node, scope, out){
+  if (node.nodeType === 3) { out.appendChild(document.createTextNode(interp(node.textContent, scope))); return; }
+  if (node.nodeType !== 1) return;
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'sc-for') { const list = interp(node.getAttribute('list'), scope) || []; const as = node.getAttribute('as');
+    list.forEach((item, i) => { const s = Object.assign(Object.create(scope), { [as]: item, $index: i }); node.childNodes.forEach(c => render(c, s, out)); }); return; }
+  if (tag === 'sc-if') { if (interp(node.getAttribute('value'), scope)) node.childNodes.forEach(c => render(c, scope, out)); return; }
+  const el = document.createElementNS(node.namespaceURI, node.localName);
+  for (const a of node.attributes) { if (/^on[A-Z]/.test(a.name) || a.name.startsWith('hint-')) continue; const v = interp(a.value, scope); if (v === false || v == null) continue; el.setAttribute(a.name, typeof v === 'function' ? '' : v); }
+  const src = tag === 'template' ? node.content : node;
+  src.childNodes.forEach(c => render(c, scope, el));
+  out.appendChild(el);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const C = new Function('DCLogic', document.getElementById('logic').textContent + '; return Component;')(DCLogic);
+  const inst = new C({}); Object.assign(inst.state, STATE);
+  const vals = inst.renderVals();
+  const tpl = document.getElementById('tpl').content;
+  const host = document.getElementById('host');
+  tpl.childNodes.forEach(c => render(c, vals, host));
+});
+</script>
+</head><body><template id="tpl">
+
+<div style="width:100%;min-height:100vh;background:#F4F1EA;color:#111111;font-family:'Inter',system-ui,sans-serif" dir="ltr" lang="kab">
+  <div lang="en" style="background:#161616;color:#F2B035;font-size:13px;text-align:center;padding:8px 16px">Concept · Taqbaylit strings are a first draft for native-speaker review</div>
+
+  <header class="wrap" style="display:flex;align-items:center;gap:14px 32px;min-height:84px;flex-wrap:wrap">
+    <a href="#" style="display:flex;align-items:center;gap:10px;flex:none" aria-label="Ilm Nafi' — agejdan"><img src="assets/mark.png" alt="" style="height:38px;width:auto"><span lang="ar" dir="rtl" class="ar" style="font-size:24px;font-weight:700">علم نافع</span></a>
+    <nav class="nav" aria-label="Umuɣ agejdan" style="display:flex;gap:26px;overflow-x:auto"><a class="on" href="#" aria-current="page">Agejdan</a><a href="Playlist.dc.html" lang="ar" dir="rtl" class="ar">دلائل النبوّة</a><a href="#">Tividyutin</a><a href="#">Tilisatin</a><a href="#">Ɣef ccix</a></nav>
+    <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
+      <a href="SearchPalette.dc.html" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 16px;border-radius:999px;background:#FFFFFF;font-size:14px;color:#6A6862"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>Nadi<kbd style="font-size:11px;padding:1px 6px;border-radius:6px;background:#F4F1EA">/</kbd></a>
+      <a href="Home.dc.html" lang="ar" dir="rtl" class="ar" style="display:flex;align-items:center;height:44px;padding:0 16px;border-radius:999px;border:1.5px solid #111111;font-size:14px;font-weight:600">العربية</a>
+    </div>
+  </header>
+
+  <main class="wrap" style="padding-bottom:64px">
+    <section style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:240px 240px;gap:14px;padding-top:8px">
+      <a href="Watch.dc.html" class="tile" style="grid-column:1 / span 2;grid-row:1 / span 2;background:#C2512F;color:#FFFFFF;justify-content:flex-end;gap:14px;padding:32px">
+        <span aria-hidden="true" class="big" style="top:-80px;right:-20px;font-size:420px;-webkit-text-stroke:2px rgba(255,255,255,.22)">T</span>
+        <span style="position:absolute;top:28px;left:32px;font-size:12.5px;font-weight:700;letter-spacing:.08em">TAMAYNUT · TAQBAYLIT</span>
+        <span style="position:relative;font-size:44px;font-weight:800;line-height:1.08;letter-spacing:-.03em;max-width:520px">Azwel n tvidyut tamaynut s teqbaylit</span>
+        <span style="position:relative;font-size:15px;line-height:1.6;opacity:.88">[Agzul wezzilen n tvidyut.]</span>
+        <span style="position:relative;display:flex;gap:10px"><span class="pill" style="background:#F2B035;color:#161616">▶ Wali tura<span style="font-size:12.5px;padding:5px 10px;border-radius:999px;background:#161616;color:#F2B035">11:05</span></span></span>
+      </a>
+      <a href="Watch.dc.html" class="tile" style="grid-column:3;grid-row:1;background:#161616;color:#FFFFFF;justify-content:space-between">
+        <span style="font-size:13px;font-weight:600;color:#F2B035">Kemmel seg wanda i tḥebseḍ</span>
+        <span style="display:flex;flex-direction:column;gap:8px"><span style="font-size:64px;font-weight:800;line-height:.9;letter-spacing:-.05em">05</span><span lang="ar" dir="rtl" class="ar" style="font-size:15px;font-weight:600;text-align:left">عنوان الحلقة الخامسة</span><span style="height:4px;border-radius:999px;background:#3A3A3A"><span style="display:block;width:31%;height:100%;border-radius:999px;background:#F2B035"></span></span></span>
+      </a>
+      <div class="tile" style="grid-column:4;grid-row:1;background:#FFFFFF;justify-content:space-between">
+        <span style="font-size:24px;font-weight:800;line-height:1.2;letter-spacing:-.02em">Nadi deg [120] n tvidyutin</span>
+        <a href="SearchPalette.dc.html" style="display:flex;align-items:center;gap:10px;height:52px;padding:0 16px;border-radius:16px;background:#F4F1EA;color:#6A6862;font-size:14px">s teqbaylit neɣ s taɛrabt…</a>
+      </div>
+      <a href="Playlist.dc.html" class="tile" style="grid-column:3;grid-row:2;background:#0B5D45;color:#FFFFFF;justify-content:space-between">
+        <span aria-hidden="true" class="big" style="bottom:-50px;right:-14px;font-size:200px;-webkit-text-stroke:1.5px rgba(255,255,255,.2)">24</span>
+        <span style="position:relative;font-size:12.5px;font-weight:700;color:#F2B035">Tasilsla tagejdant · s taɛrabt</span>
+        <span lang="ar" dir="rtl" class="ar" style="position:relative;font-size:30px;font-weight:700;text-align:left">دلائل النبوّة</span>
+      </a>
+      <div class="tile" style="grid-column:4;grid-row:2;background:#F2B035;color:#161616;justify-content:space-between">
+        <span style="font-size:72px;font-weight:800;line-height:.6;height:34px">“</span>
+        <p lang="ar" dir="rtl" class="ar" style="margin:0;font-size:19px;font-weight:700;line-height:1.6">يحمِلُ هذا العلمَ من كلِّ خلَفٍ عدولُه</p>
+      </div>
+    </section>
+
+    <section style="padding-top:72px">
+      <div class="sh"><h2>S teqbaylit<span class="cnt">16</span></h2><a class="more" href="#">Wali akk →</a></div>
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:30px 18px">
+        <sc-for list="{{kab}}" as="v" hint-placeholder-count="4">
+          <a href="Watch.dc.html" style="display:flex;flex-direction:column;gap:10px"><div class="cv" style="background:{{v.bg}}"><span class="num">{{v.num}}</span><span class="dur">{{v.dur}}</span></div><h3 class="t">{{v.title}}</h3><div class="m"><span style="width:8px;height:8px;border-radius:999px;background:{{v.bg}}"></span>{{v.date}}</div></a>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="padding-top:72px">
+      <div style="border-radius:28px;background:#0B5D45;color:#FFFFFF;padding:36px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:40px;align-items:start;position:relative;overflow:hidden">
+        <span aria-hidden="true" class="big" style="bottom:-70px;left:-20px;font-size:300px;-webkit-text-stroke:2px rgba(255,255,255,.14)">24</span>
+        <div style="position:relative;display:flex;flex-direction:column;gap:12px">
+          <span style="font-size:12.5px;font-weight:700;color:#F2B035">TASILSLA TAGEJDANT · S TAƐRABT</span>
+          <h2 lang="ar" dir="rtl" class="ar" style="margin:0;font-size:46px;font-weight:700;text-align:left">دلائل النبوّة</h2>
+          <p style="margin:0;font-size:15.5px;line-height:1.7;opacity:.88">Tasilsla s taɛrabt, s umizwer. Kra n tvidyutin sɛant asuqel (CC) s teqbaylit.</p>
+          <span style="display:flex;gap:10px;margin-top:6px"><a class="pill" href="Watch.dc.html" style="background:#F2B035;color:#161616">Kemmel<span style="font-size:12.5px;padding:5px 10px;border-radius:999px;background:#161616;color:#F2B035">05</span></a></span>
+        </div>
+        <ol style="position:relative;list-style:none;margin:0;padding:0">
+          <sc-for list="{{eps}}" as="e" hint-placeholder-count="4">
+            <li><a class="trk" href="Watch.dc.html"><span class="n">{{e.n}}</span><span lang="ar" dir="rtl" class="ar" style="font-size:16px;font-weight:700;text-align:left">{{e.title}}</span><span style="justify-self:end;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:{{e.ccbg}};color:#161616">{{e.cc}}</span></a></li>
+          </sc-for>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <footer style="background:#161616;color:#FFFFFF">
+    <div class="wrap" style="display:flex;flex-wrap:wrap;gap:20px 40px;align-items:center;justify-content:space-between;padding-top:40px;padding-bottom:40px;font-size:14.5px">
+      <div style="display:flex;align-items:center;gap:10px"><img src="assets/mark-light.png" alt="" style="height:36px;width:auto"><span lang="ar" dir="rtl" class="ar" style="font-size:22px;font-weight:700">علم نافع</span></div>
+      <nav style="display:flex;gap:22px" aria-label="Iseɣwan"><a href="#">Ɣef ccix</a><a href="#">Nermes-aɣ</a><a href="Home.dc.html" lang="ar" dir="rtl" class="ar">العربية</a></nav>
+      <span style="color:#A9A69E">© 2026 Ilm Nafi'</span>
+    </div>
+  </footer>
+</div>
+</template><div id="host"></div><script type="text/plain" id="logic">
+class Component extends DCLogic {
+  renderVals() {
+    const kab = [
+      { bg: '#C2512F', num: '01', title: 'Azwel n tvidyut s teqbaylit', date: '3 n wussan aya', dur: '11:05' },
+      { bg: '#161616', num: '02', title: 'Azwel aɣezfan n tvidyut i d-yesskanen akken yettuɣal ɣef sin yizirig', date: '12 Tubeṛ 2026', dur: '16:48' },
+      { bg: '#2F4DC4', num: '03', title: 'Azwel n tvidyut nniḍen', date: '1 Tubeṛ 2026', dur: '13:20' },
+      { bg: '#C2512F', num: '04', title: 'Tikti deg yiwet n tesdat', date: '20 Ctembeṛ 2026', dur: '0:44' }
+    ];
+    const eps = ['مقدّمة: لماذا ندرس دلائل النبوّة؟', 'عنوان الحلقة الثانية', 'عنوان الحلقة الثالثة', 'عنوان الحلقة الرابعة'].map((title, i) => ({ n: String(i + 1).padStart(2, '0'), title, cc: i % 3 === 0 ? 'CC · Taqbaylit' : 's taɛrabt', ccbg: i % 3 === 0 ? '#F2B035' : 'rgba(255,255,255,.75)' }));
+    return { kab, eps };
+  }
+}
+</script></body></html>

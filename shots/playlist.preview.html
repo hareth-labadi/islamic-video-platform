@@ -1,0 +1,225 @@
+<!doctype html><html lang="ar"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#FBF8F2}
+a{color:#065A4C;text-decoration:none}
+a:hover{color:#0B3D34}
+button{font:inherit}
+:focus-visible{outline:3px solid #AD9559;outline-offset:3px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 32px;box-sizing:border-box}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.disp{font-family:'Amiri',serif;font-weight:700}
+.lat{font-family:'Inter',sans-serif}
+.kick{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:#7A6532}
+.kick::before{content:"";width:22px;height:1.5px;background:#AD9559}
+.zg{background-image:url(assets/zellige-gold.svg);background-size:96px 96px}
+.zl{background-image:url(assets/zellige-light.svg);background-size:96px 96px}
+.thumb{position:relative;overflow:hidden;aspect-ratio:16/9;border-radius:12px;background-color:#DCE7E0;display:flex;align-items:center;justify-content:center;transition:transform .4s cubic-bezier(.2,.7,.2,1)}
+.thumb .pt{position:absolute;inset:0;background-image:url(assets/zellige-green.svg);background-size:56px 56px}
+.dur{position:absolute;bottom:6px;left:6px;direction:ltr;font-family:'Inter',sans-serif;font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums;color:#FFFFFF;background:rgba(20,28,25,.82);padding:2px 6px;border-radius:5px}
+.navlink{font-size:15px;color:#3E4743;padding:8px 2px;border-bottom:2px solid transparent;white-space:nowrap}
+.navlink.on{color:#0B3D34;font-weight:600;border-bottom-color:#AD9559}
+.btn{display:inline-flex;align-items:center;gap:10px;height:52px;padding:0 24px;border-radius:999px;font-size:15.5px;font-weight:600;box-sizing:border-box;transition:transform .25s,box-shadow .25s,background .25s}
+.btn-p{background:#065A4C;color:#FFFFFF}
+.btn-p:hover{background:#0B3D34;color:#FFFFFF;transform:translateY(-2px);box-shadow:0 14px 24px -14px rgba(6,90,76,.7)}
+.btn-g{background:#FFFFFF;color:#0B3D34;border:1.5px solid #D9CCAE}
+.btn-g:hover{border-color:#AD9559;transform:translateY(-2px)}
+.row{display:flex;gap:20px;align-items:center;padding:14px;border-radius:18px;color:inherit;transition:background .25s}
+.row:hover{background:#FFFFFF}
+.row:hover .thumb{transform:scale(1.03)}
+.n{flex:none;width:58px;text-align:center;font-family:'Amiri',serif;font-size:40px;line-height:1;color:#AD9559}
+.rt{margin:0;font-size:17px;font-weight:600;line-height:1.6;color:#1D2522}
+.rd{margin:0;font-size:14px;line-height:1.7;color:#5B635F;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.ltag{font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;background:#E1EEE8;color:#0B3D34}
+.ltag.k{background:#F4EBD6;color:#5E4D22;font-family:'Inter',sans-serif}
+.axh{display:flex;align-items:baseline;gap:14px;padding:0 14px 10px;margin-top:36px;border-bottom:1px solid #E3DACA}
+.side{background:#FFFFFF;border:1px solid #E3DACA;border-radius:22px;padding:24px}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rise{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+.d1{animation-delay:.08s}.d2{animation-delay:.18s}.d3{animation-delay:.28s}.d4{animation-delay:.38s}
+.spin{animation:spin 90s linear infinite}
+@media (prefers-reduced-motion:reduce){.rise,.spin{animation:none}}
+</style>
+<style>*{animation-play-state:paused!important;animation-delay:-10s!important}</style><script>const STATE={};</script>
+<script>
+class DCLogic { constructor(p){ this.props = p || {}; this.state = {}; } setState(s){ Object.assign(this.state, typeof s === 'function' ? s(this.state) : s); } forceUpdate(){} }
+function look(scope, path){ path = path.trim(); if (path === 'true') return true; if (path === 'false') return false; if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+  let v = scope; for (const k of path.split('.')) { if (v == null) return undefined; v = v[k]; } return v; }
+function interp(str, scope){ const m = str.match(/^\s*\{\{([^}]+)\}\}\s*$/); if (m) return look(scope, m[1]);
+  return str.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = look(scope, p); return v == null ? '' : String(v); }); }
+function render(node, scope, out){
+  if (node.nodeType === 3) { out.appendChild(document.createTextNode(interp(node.textContent, scope))); return; }
+  if (node.nodeType !== 1) return;
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'sc-for') { const list = interp(node.getAttribute('list'), scope) || []; const as = node.getAttribute('as');
+    list.forEach((item, i) => { const s = Object.assign(Object.create(scope), { [as]: item, $index: i }); node.childNodes.forEach(c => render(c, s, out)); }); return; }
+  if (tag === 'sc-if') { if (interp(node.getAttribute('value'), scope)) node.childNodes.forEach(c => render(c, scope, out)); return; }
+  const el = document.createElementNS(node.namespaceURI, node.localName);
+  for (const a of node.attributes) { if (/^on[A-Z]/.test(a.name) || a.name.startsWith('hint-')) continue; const v = interp(a.value, scope); if (v === false || v == null) continue; el.setAttribute(a.name, typeof v === 'function' ? '' : v); }
+  const src = tag === 'template' ? node.content : node;
+  src.childNodes.forEach(c => render(c, scope, el));
+  out.appendChild(el);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const C = new Function('DCLogic', document.getElementById('logic').textContent + '; return Component;')(DCLogic);
+  const inst = new C({}); Object.assign(inst.state, STATE);
+  const vals = inst.renderVals();
+  const tpl = document.getElementById('tpl').content;
+  const host = document.getElementById('host');
+  tpl.childNodes.forEach(c => render(c, vals, host));
+});
+</script>
+</head><body><template id="tpl">
+
+<div style="width:100%;min-height:100vh;background:#FBF8F2;font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;color:#1D2522" dir="rtl" lang="ar">
+
+  <header style="background:#FBF8F2;border-bottom:1px solid #E3DACA">
+    <div class="wrap" style="display:flex;align-items:center;gap:16px 36px;min-height:80px;flex-wrap:wrap">
+      <a href="Home.dc.html" style="display:flex;align-items:center;gap:12px;flex:none" aria-label="علم نافع — الرئيسية">
+        <img src="assets/mark.png" alt="" style="height:42px;width:auto">
+        <span class="disp" style="font-size:28px;color:#0B3D34;line-height:1">علم نافع</span>
+      </a>
+      <nav aria-label="القائمة الرئيسية" style="display:flex;gap:28px;overflow-x:auto;margin-inline-start:12px">
+        <a class="navlink" href="Home.dc.html">الرئيسية</a>
+        <a class="navlink on" href="#" aria-current="page">دلائل النبوّة</a>
+        <a class="navlink" href="Search.dc.html">كل المقاطع</a>
+        <a class="navlink" href="#">قوائم التشغيل</a>
+        <a class="navlink" href="#">مقاطع قصيرة</a>
+        <a class="navlink" href="#">عن الشيخ</a>
+      </nav>
+      <div style="display:flex;align-items:center;gap:10px;margin-inline-start:auto">
+        <a href="Search.dc.html" aria-label="بحث" style="width:44px;height:44px;border-radius:999px;background:#FFFFFF;border:1px solid #E3DACA;display:flex;align-items:center;justify-content:center;color:#0B3D34"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></a>
+        <a href="HomeKabyle.dc.html" lang="kab" class="lat" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 16px;border-radius:999px;background:#FFFFFF;border:1px solid #E3DACA;color:#0B3D34;font-size:14px;font-weight:500">Taqbaylit</a>
+      </div>
+    </div>
+  </header>
+
+  <section style="position:relative;overflow:hidden;background:#F5EFE3">
+    <div class="zg" aria-hidden="true" style="position:absolute;inset:0;opacity:.6;-webkit-mask-image:radial-gradient(ellipse 50% 80% at 15% 50%,#000 0,transparent 75%);mask-image:radial-gradient(ellipse 50% 80% at 15% 50%,#000 0,transparent 75%)"></div>
+    <div class="wrap" style="position:relative;display:flex;flex-wrap:wrap;gap:48px 80px;align-items:center;padding-top:56px;padding-bottom:64px">
+      <div style="flex:1 1 520px;display:flex;flex-direction:column;gap:18px">
+        <nav aria-label="مسار التنقل" class="rise d1" style="font-size:13px;color:#5B635F;display:flex;gap:8px"><a href="Home.dc.html">الرئيسية</a><span aria-hidden="true">‹</span><a href="#">قوائم التشغيل</a></nav>
+        <span class="kick rise d1">السلسلة الرئيسية · قائمة تشغيل</span>
+        <h1 class="disp rise d2" style="margin:0;font-size:84px;line-height:1.3;color:#0B3D34">دلائل النبوّة</h1>
+        <p class="rise d3" style="margin:0;font-size:17px;line-height:1.95;color:#4A534F;max-width:620px">[وصف السلسلة كما يكتبه فريق الموقع: ما المقصود بدلائل النبوّة، ولماذا رُتّبت الحلقات بهذا الترتيب، ولمن هي.]</p>
+        <div class="rise d3" style="display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14px;color:#5B635F;align-items:center">
+          <span><strong class="lat" style="color:#1D2522">[24]</strong> حلقة</span><span aria-hidden="true">·</span>
+          <span>نحو <strong class="lat" style="color:#1D2522">[8]</strong> ساعات</span><span aria-hidden="true">·</span>
+          <span>[3] محاور</span><span aria-hidden="true">·</span>
+          <span class="ltag">العربية</span><span class="ltag k">CC · Taqbaylit لبعض الحلقات</span>
+        </div>
+        <div class="rise d4" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px">
+          <a class="btn btn-p" href="Watch.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"></path></svg>ابدأ من الحلقة <span class="lat">1</span></a>
+          <a class="btn btn-g" href="Watch.dc.html">تابِع: الحلقة <span class="lat">05</span></a>
+          <button type="button" class="btn btn-g" aria-label="مشاركة القائمة" style="width:52px;padding:0;justify-content:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"></path></svg></button>
+        </div>
+      </div>
+      <div class="rise d2" style="flex:0 0 auto;position:relative;width:320px;height:400px;margin-inline-end:24px">
+        <div aria-hidden="true" style="position:absolute;inset:0;border-radius:160px 160px 24px 24px;border:1.5px solid #AD9559;transform:translate(-18px,-18px)"></div>
+        <div class="zl" style="position:absolute;inset:0;border-radius:160px 160px 24px 24px;background-color:#0E4A3F;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;box-shadow:0 40px 60px -40px rgba(11,61,52,.7)">
+          <svg class="spin" aria-hidden="true" width="330" height="330" viewBox="0 0 100 100" fill="none" stroke="#C9AE6A" stroke-width=".4" stroke-opacity=".7" style="position:absolute;top:20px"><rect x="18" y="18" width="64" height="64"></rect><rect x="18" y="18" width="64" height="64" transform="rotate(45 50 50)"></rect><circle cx="50" cy="50" r="27"></circle></svg>
+          <span class="disp" style="position:relative;font-size:52px;line-height:1.3;color:#E4D5AE;margin-top:40px">دلائل</span>
+          <span class="disp" style="position:relative;font-size:52px;line-height:1.1;color:#FBF8F2">النبوّة</span>
+          <span style="position:relative;font-size:12px;color:#CFE3DD;margin-top:14px">غلاف القائمة</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="wrap" style="padding-top:48px;padding-bottom:112px;display:flex;flex-wrap:wrap;gap:40px 48px;align-items:flex-start">
+    <section aria-label="حلقات السلسلة" style="flex:999 1 640px;min-width:0">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:0 14px">
+        <h2 class="disp" style="margin:0;font-size:40px;line-height:1.3;color:#0B3D34">الحلقات بالترتيب</h2>
+        <label style="display:flex;align-items:center;gap:8px;font-size:14px;color:#5B635F">عرض
+          <select style="height:42px;border:1px solid #E3DACA;border-radius:12px;padding:0 12px;font:inherit;font-size:14px;background:#FFFFFF;color:#1D2522"><option>بالترتيب</option><option>الأحدث أولًا</option></select>
+        </label>
+      </div>
+      <sc-for list="{{axes}}" as="ax" hint-placeholder-count="2">
+        <div>
+          <div class="axh">
+            <span class="disp" style="font-size:26px;color:#7A6532">{{ax.label}}</span>
+            <span style="font-size:17px;font-weight:600;color:#1D2522">{{ax.name}}</span>
+            <span style="margin-inline-start:auto;font-size:13px;color:#5B635F">{{ax.count}}</span>
+          </div>
+          <ol style="list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:2px">
+            <sc-for list="{{ax.eps}}" as="e" hint-placeholder-count="3">
+              <li>
+                <a class="row" href="Watch.dc.html" style="background:{{e.bg}}">
+                  <span class="n" style="color:{{e.nc}}">{{e.n}}</span>
+                  <div class="thumb" style="width:200px;flex:none;background-color:{{e.tone}}"><span class="pt"></span><span class="dur">{{e.dur}}</span><sc-if value="{{e.seen}}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:auto 0 0 0;height:4px;background:#AD9559"></span></sc-if></div>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+                    <h3 class="rt">{{e.title}}</h3>
+                    <p class="rd">{{e.desc}}</p>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:12.5px;color:#5B635F">
+                      <span class="ltag">العربية</span>
+                      <sc-if value="{{e.kab}}" hint-placeholder-val="{{ false }}"><span class="ltag k">CC · Taqbaylit</span></sc-if>
+                      <sc-if value="{{e.seen}}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:4px;color:#7A6532;font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7"></path></svg>شاهدتَها</span></sc-if>
+                      <sc-if value="{{e.next}}" hint-placeholder-val="{{ false }}"><span style="font-weight:600;color:#065A4C">تابِع من هنا</span></sc-if>
+                    </div>
+                  </div>
+                </a>
+              </li>
+            </sc-for>
+          </ol>
+        </div>
+      </sc-for>
+      <button type="button" class="btn btn-g" style="margin:28px auto 0;display:flex;cursor:pointer">عرض <span class="lat">15</span> حلقة أخرى</button>
+    </section>
+
+    <aside style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:20px">
+      <div class="side" style="display:flex;flex-direction:column;gap:16px">
+        <span style="font-size:15px;font-weight:600">تقدّمك على هذا الجهاز</span>
+        <div style="display:flex;align-items:center;gap:18px">
+          <div style="position:relative;width:86px;height:86px;border-radius:999px;background:conic-gradient(#0C7765 0 17%,#ECE3D1 17% 100%);display:flex;align-items:center;justify-content:center">
+            <div style="width:68px;height:68px;border-radius:999px;background:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-size:17px;font-weight:600;color:#0B3D34">4/24</div>
+          </div>
+          <p style="margin:0;font-size:14px;line-height:1.75;color:#5B635F">يُحفظ على جهازك فقط، دون حساب أو تسجيل.</p>
+        </div>
+        <a class="btn btn-p" href="Watch.dc.html" style="justify-content:center">تابِع الحلقة <span class="lat">05</span></a>
+      </div>
+      <div class="side" style="display:flex;flex-direction:column;gap:12px">
+        <label for="inlist" style="font-size:15px;font-weight:600">ابحث داخل السلسلة</label>
+        <div style="display:flex;align-items:center;gap:10px;height:50px;padding:0 16px;border-radius:14px;background:#FBF8F2;border:1px solid #E3DACA">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0C7765" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+          <input id="inlist" type="search" placeholder="مثال: المعجزات" style="flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:15px;outline:none">
+        </div>
+      </div>
+      <div class="side" style="display:flex;flex-direction:column;gap:12px">
+        <span style="font-size:15px;font-weight:600">اللغات في هذه السلسلة</span>
+        <div style="display:flex;justify-content:space-between;font-size:14px"><span>صوت عربي</span><span class="lat" style="font-weight:600">24 / 24</span></div>
+        <div style="height:6px;border-radius:999px;background:#0C7765"></div>
+        <div style="display:flex;justify-content:space-between;font-size:14px"><span>ترجمة نصية <span class="lat">Taqbaylit</span></span><span class="lat" style="font-weight:600">8 / 24</span></div>
+        <div style="height:6px;border-radius:999px;background:linear-gradient(to left,#AD9559 33%,#ECE3D1 33%)"></div>
+        <p style="margin:0;font-size:12.5px;color:#5B635F">أرقام تجريبية — تُحسب تلقائيًا من بيانات كل حلقة.</p>
+      </div>
+    </aside>
+  </main>
+</div>
+</template><div id="host"></div><script type="text/plain" id="logic">
+class Component extends DCLogic {
+  renderVals() {
+    const tones = ['#DCE7E0', '#EADFCB', '#D9E3E4', '#E9DAD0', '#E3E8D6'];
+    const titles = ['مقدّمة: لماذا ندرس دلائل النبوّة؟', 'عنوان الحلقة الثانية يظهر هنا', 'عنوان أطول للحلقة الثالثة يلتفّ على سطرين كحدٍّ أقصى في القائمة', 'عنوان الحلقة الرابعة', 'عنوان الحلقة الخامسة يظهر هنا', 'عنوان الحلقة السادسة', 'عنوان الحلقة السابعة', 'عنوان الحلقة الثامنة', 'عنوان الحلقة التاسعة'];
+    const durs = ['14:20', '22:05', '19:48', '25:10', '17:33', '21:02', '23:40', '18:15', '20:44'];
+    const ep = (i) => ({
+      n: String(i + 1).padStart(2, '0'),
+      title: titles[i],
+      desc: 'سطر واحد من وصف الحلقة يساعد على معرفة موضوعها قبل مشاهدتها.',
+      dur: durs[i],
+      tone: tones[i % tones.length],
+      kab: i % 3 === 0,
+      seen: i < 4,
+      next: i === 4,
+      bg: i === 4 ? '#E1EEE8' : 'transparent',
+      nc: i === 4 ? '#0C7765' : '#AD9559'
+    });
+    const axes = [
+      { label: 'المحور الأول', name: '[عنوان المحور]', count: '3 حلقات', eps: [0, 1, 2].map(ep) },
+      { label: 'المحور الثاني', name: '[عنوان المحور]', count: '3 حلقات', eps: [3, 4, 5].map(ep) },
+      { label: 'المحور الثالث', name: '[عنوان المحور]', count: '3 من 18 حلقة', eps: [6, 7, 8].map(ep) }
+    ];
+    return { axes };
+  }
+}
+</script></body></html>

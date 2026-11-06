@@ -41,3 +41,6 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# Local browser profile used by tools/*.py for screenshots: holds logins, cookies and history. Never commit.
+tools/edge-profile/

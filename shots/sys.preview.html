@@ -1,0 +1,135 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0;background:#F5F3EE}
+.kick{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#7A6532}
+.card{background:#FFFFFF;border-radius:20px;padding:30px}
+.h2{margin:0;font-size:30px;font-weight:800;letter-spacing:-.02em;color:#111614;line-height:1.15}
+.h3{margin:0;font-size:16px;font-weight:600;color:#111614}
+.p{margin:0;font-size:14.5px;line-height:1.6;color:#5B635F}
+.sw{display:flex;flex-direction:column;gap:6px}
+.sw .c{height:84px;border-radius:12px;border:1px solid rgba(0,0,0,.06)}
+.sw .n{font-size:14px;font-weight:600;color:#111614;margin-top:4px}
+.sw .h{font-size:12px;color:#5B635F;font-variant-numeric:tabular-nums}
+.sw .u{font-size:12px;line-height:1.45;color:#5B635F}
+.rule{display:flex;gap:12px;align-items:flex-start;font-size:14.5px;line-height:1.55;color:#111614;padding:9px 0;border-bottom:1px solid #EDEAE3}
+.ok{flex:none;width:22px;height:22px;border-radius:7px;background:#E1EEE8;color:#0B3D34;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.no{flex:none;width:22px;height:22px;border-radius:7px;background:#F6E2DA;color:#7A2E14;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.ar{font-family:'Thmanyah Sans','IBM Plex Sans Arabic',sans-serif}
+.ard{font-family:'Thmanyah Sans','IBM Plex Sans Arabic',sans-serif;font-weight:700}
+.art{font-family:'Thmanyah Sans','IBM Plex Sans Arabic',sans-serif}
+.lab{width:200px;flex:none;font-size:12px;color:#7A6532}
+code{font-size:12.5px;background:#F5F3EE;padding:1px 6px;border-radius:5px;color:#0B3D34}
+.thumb{position:relative;aspect-ratio:16/9;border-radius:12px;background:#DAD5CA}
+.dur{position:absolute;bottom:7px;left:7px;font-size:11px;font-weight:600;color:#FFFFFF;background:rgba(17,22,20,.82);padding:2px 6px;border-radius:5px}
+</style>
+<style>*{animation-play-state:paused!important;animation-delay:-10s!important}</style><script>const STATE={};</script>
+<script>
+class DCLogic { constructor(p){ this.props = p || {}; this.state = {}; } setState(s){ Object.assign(this.state, typeof s === 'function' ? s(this.state) : s); } forceUpdate(){} }
+function look(scope, path){ path = path.trim(); if (path === 'true') return true; if (path === 'false') return false; if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+  let v = scope; for (const k of path.split('.')) { if (v == null) return undefined; v = v[k]; } return v; }
+function interp(str, scope){ const m = str.match(/^\s*\{\{([^}]+)\}\}\s*$/); if (m) return look(scope, m[1]);
+  return str.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = look(scope, p); return v == null ? '' : String(v); }); }
+function render(node, scope, out){
+  if (node.nodeType === 3) { out.appendChild(document.createTextNode(interp(node.textContent, scope))); return; }
+  if (node.nodeType !== 1) return;
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'sc-for') { const list = interp(node.getAttribute('list'), scope) || []; const as = node.getAttribute('as');
+    list.forEach((item, i) => { const s = Object.assign(Object.create(scope), { [as]: item, $index: i }); node.childNodes.forEach(c => render(c, s, out)); }); return; }
+  if (tag === 'sc-if') { if (interp(node.getAttribute('value'), scope)) node.childNodes.forEach(c => render(c, scope, out)); return; }
+  const el = document.createElementNS(node.namespaceURI, node.localName);
+  for (const a of node.attributes) { if (/^on[A-Z]/.test(a.name) || a.name.startsWith('hint-')) continue; const v = interp(a.value, scope); if (v === false || v == null) continue; el.setAttribute(a.name, typeof v === 'function' ? '' : v); }
+  const src = tag === 'template' ? node.content : node;
+  src.childNodes.forEach(c => render(c, scope, el));
+  out.appendChild(el);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const C = new Function('DCLogic', document.getElementById('logic').textContent + '; return Component;')(DCLogic);
+  const inst = new C({}); Object.assign(inst.state, STATE);
+  const vals = inst.renderVals();
+  const tpl = document.getElementById('tpl').content;
+  const host = document.getElementById('host');
+  tpl.childNodes.forEach(c => render(c, vals, host));
+});
+</script>
+</head><body><template id="tpl">
+
+<div style="width:1440px;min-height:2570px;box-sizing:border-box;padding:80px 80px 96px;font-family:'Inter',system-ui,sans-serif;color:#111614;background:#F5F3EE;display:flex;flex-direction:column;gap:32px">
+
+  <header style="display:flex;flex-direction:column;gap:14px;max-width:980px">
+    <span class="kick">Design system · v3 · 30 Oct 2026</span>
+    <h1 style="margin:0;font-size:58px;line-height:1.04;font-weight:800;letter-spacing:-.035em">Typographic, calm, content first</h1>
+    <p class="p" style="font-size:17px">v3 drops the decorative system of v2 (arches, zellige everywhere, big serif headings) for an interface that gets out of the way of the videos. The logo, green and gold are still the brand.</p>
+  </header>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:22px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px"><div style="display:flex;flex-direction:column;gap:8px"><span class="kick">Typography</span><h2 class="h2">Thmanyah, by language</h2></div><p class="p" style="max-width:520px">Each element picks its font from its <code>lang</code>. Arabic uses the Thmanyah families; Taqbaylit uses Inter, which contains every Kabyle letter.</p></div>
+    <div dir="rtl" lang="ar" style="display:flex;flex-direction:column;gap:14px;border-top:1px solid #EDEAE3;padding-top:20px">
+      <div style="display:flex;align-items:baseline;gap:18px"><span class="lab" dir="ltr">Display · Thmanyah Sans 46/1.35 · 700</span><span class="ard" style="font-size:46px;line-height:1.35">عنوان أحدث حلقة من السلسلة</span></div>
+      <div style="display:flex;align-items:baseline;gap:18px"><span class="lab" dir="ltr">Page title · Sans 36/1.4 · 700</span><span class="ard" style="font-size:36px;line-height:1.4">دلائل النبوّة</span></div>
+      <div style="display:flex;align-items:baseline;gap:18px"><span class="lab" dir="ltr">Section · Thmanyah Sans 24 · 700</span><span class="ar" style="font-size:24px;font-weight:700">أحدث المقاطع</span></div>
+      <div style="display:flex;align-items:baseline;gap:18px"><span class="lab" dir="ltr">Card title · Sans 17/1.55 · 700</span><span class="ar" style="font-size:17px;font-weight:700;line-height:1.55">عنوان المقطع يظهر هنا في سطرين كحدٍّ أقصى</span></div>
+      <div style="display:flex;align-items:baseline;gap:18px"><span class="lab" dir="ltr">Description · Sans 16/1.9 · 400</span><span class="art" style="font-size:16px;line-height:1.9;color:#4A504D">وصف الحلقة كما يكتبه فريق الموقع، بخطٍّ مريح للقراءة الطويلة.</span></div>
+      <div style="display:flex;align-items:baseline;gap:18px"><span class="lab" dir="ltr">Meta · Sans 13 + Inter digits</span><span class="ar" style="font-size:13px;color:#6B706C">في <strong style="color:#111614">دلائل النبوّة</strong> · <span style="font-family:Inter">28</span> أكتوبر <span style="font-family:Inter">2026</span></span></div>
+      <div style="display:flex;align-items:baseline;gap:18px" dir="ltr" lang="kab"><span class="lab">Taqbaylit · Inter 17 · 700</span><span style="font-size:17px;font-weight:700">Azwel n tvidyut s teqbaylit — ɛ ɣ ḍ ḥ ṛ ṣ ṭ ẓ č ǧ</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;border-top:1px solid #EDEAE3;padding-top:20px">
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="h3">How the fonts load</span><p class="p">Like thmanyah.com, everything is set in <code>Thmanyah Sans</code> — headings bold, text regular; no serif. Until the font is installed, the boards fall back to <strong style="color:#111614">IBM Plex Sans Arabic</strong>, the closest open font I found after comparing 14 Arabic sans families against Thmanyah’s headlines. <strong style="color:#111614">If the Thmanyah fonts are installed on your computer, the canvas uses them.</strong> In production the website would embed the files under Thmanyah’s licence.</p></div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="h3">Licence notes (check before launch)</span><p class="p">Free, including commercial websites; downloaded by email from Thmanyah’s official page; no redistribution, re-hosting or modification of the files; don’t imply endorsement by Thmanyah. OTF only for now — a web build may need to be requested. Confirm that Latin glyphs include ɛ and ɣ before using it for Taqbaylit.</p></div>
+    </div>
+  </section>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:22px">
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="kick">Colour</span><h2 class="h2">Warm grey ground, ink text, green for action</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:14px">
+      <div class="sw"><div class="c" style="background:#F5F3EE"></div><span class="n">Ground</span><span class="h">#F5F3EE</span><span class="u">Page</span></div>
+      <div class="sw"><div class="c" style="background:#FFFFFF"></div><span class="n">Surface</span><span class="h">#FFFFFF</span><span class="u">Panels, search, modals</span></div>
+      <div class="sw"><div class="c" style="background:#E6E1D6"></div><span class="n">Fill</span><span class="h">#E6E1D6</span><span class="u">Secondary buttons, active nav</span></div>
+      <div class="sw"><div class="c" style="background:#E4E0D6"></div><span class="n">Line</span><span class="h">#E4E0D6</span><span class="u">Hairline dividers</span></div>
+      <div class="sw"><div class="c" style="background:#111614"></div><span class="n">Ink</span><span class="h">#111614</span><span class="u">Text, mini-player, “continue” chip</span></div>
+      <div class="sw"><div class="c" style="background:#6B706C"></div><span class="n">Ink 2</span><span class="h">#6B706C</span><span class="u">Meta · 4.5:1 on ground</span></div>
+      <div class="sw"><div class="c" style="background:#065A4C"></div><span class="n">Green</span><span class="h">#065A4C</span><span class="u">Primary action, links (Figma)</span></div>
+      <div class="sw"><div class="c" style="background:#C9A24A"></div><span class="n">Gold</span><span class="h">#C9A24A</span><span class="u">Progress, episode numbers, “new”</span></div>
+    </div>
+    <p class="p">One rule: <strong style="color:#111614">green means “do something”, gold means “where you are”.</strong> The deep green #0E4A3F with the zellige pattern is reserved for the series cover — the only ornament left.</p>
+  </section>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:22px">
+    <div style="display:flex;flex-direction:column;gap:8px"><span class="kick">Components</span><h2 class="h2">Eight pieces build every screen</h2></div>
+    <div dir="rtl" lang="ar" class="ar" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:26px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:8px"><span dir="ltr" style="font-family:Inter;font-size:12px;color:#7A6532;text-align:left">1 · Video card</span><div class="thumb"><span class="dur">18:42</span><span style="position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(17,22,20,.15)"><span style="position:absolute;top:0;bottom:0;right:0;width:40%;background:#C9A24A"></span></span></div><span style="font-size:16px;font-weight:700">عنوان المقطع في سطرين</span><span style="font-size:12.5px;color:#6B706C">في <strong style="color:#111614">دلائل النبوّة</strong> · منذ يومين</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span dir="ltr" style="font-family:Inter;font-size:12px;color:#7A6532;text-align:left">2 · Episode row</span><div style="display:flex;gap:12px;align-items:center;padding:10px;border-radius:12px;background:#EEF4F1"><span class="ard" style="font-size:22px;color:#065A4C">05</span><span style="flex:1;font-size:14.5px;font-weight:600">عنوان الحلقة الخامسة</span><span style="font-size:12px;color:#065A4C;font-weight:600">تابِع</span></div><div style="display:flex;gap:12px;align-items:center;padding:10px;border-radius:12px"><span class="ard" style="font-size:22px;color:#B79A57">06</span><span style="flex:1;font-size:14.5px;font-weight:600">عنوان الحلقة السادسة</span></div></div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span dir="ltr" style="font-family:Inter;font-size:12px;color:#7A6532;text-align:left">3 · Continue chip</span><span style="align-self:flex-start;display:flex;align-items:center;gap:8px;height:42px;padding:0 14px;border-radius:12px;background:#111614;color:#FFFFFF;font-size:14px;font-weight:600">▶ تابِع الحلقة <span style="font-family:Inter">5</span></span><span dir="ltr" style="font-family:Inter;font-size:12px;color:#7A6532;text-align:left;margin-top:8px">4 · Search field</span><span style="display:flex;align-items:center;gap:10px;height:42px;padding:0 14px;border-radius:12px;background:#F5F3EE;border:1px solid #E4E0D6;color:#6B706C;font-size:14px">ابحث في المقاطع <span style="margin-inline-start:auto;font-family:Inter;font-size:11px;border:1px solid #E4E0D6;border-radius:6px;padding:1px 6px">/</span></span></div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span dir="ltr" style="font-family:Inter;font-size:12px;color:#7A6532;text-align:left">5 · Buttons</span><span style="display:flex;align-items:center;justify-content:center;height:48px;border-radius:12px;background:#065A4C;color:#FFFFFF;font-size:15px;font-weight:600">شاهد الآن</span><span style="display:flex;align-items:center;justify-content:center;height:48px;border-radius:12px;background:#E6E1D6;font-size:15px;font-weight:600">كل الحلقات</span><span style="display:flex;gap:8px"><span style="height:36px;padding:0 14px;border-radius:999px;background:#111614;color:#FFFFFF;font-size:13px;display:flex;align-items:center">الكل</span><span style="height:36px;padding:0 14px;border-radius:999px;border:1px solid #E4E0D6;background:#FFFFFF;font-size:13px;display:flex;align-items:center">حلقات</span></span></div>
+      <div style="grid-column:span 2;display:flex;flex-direction:column;gap:8px"><span dir="ltr" style="font-family:Inter;font-size:12px;color:#7A6532;text-align:left">6 · Mini-player</span><div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:16px;background:#111614;color:#FFFFFF"><div style="width:96px;aspect-ratio:16/9;border-radius:9px;background:#3B4440"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px"><span style="font-size:13.5px;font-weight:600">الحلقة <span style="font-family:Inter">5</span> · عنوان الحلقة الخامسة</span><div style="height:3px;border-radius:999px;background:#3B4440"><div style="width:31%;height:100%;background:#C9A24A"></div></div></div><span style="width:40px;height:40px;border-radius:999px;background:#F5F3EE"></span></div></div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span dir="ltr" style="font-family:Inter;font-size:12px;color:#7A6532;text-align:left">7 · Playlist cover</span><div style="aspect-ratio:1;border-radius:14px;background:#111614;color:#FFFFFF;display:flex;flex-direction:column;justify-content:flex-end;padding:14px;box-sizing:border-box"><span style="font-size:11px;opacity:.8">[ن] مقطعًا</span><span class="ard" style="font-size:20px">أسئلة وأجوبة</span></div></div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span dir="ltr" style="font-family:Inter;font-size:12px;color:#7A6532;text-align:left">8 · Language tag (exceptions only)</span><span style="align-self:flex-start;font-family:Inter;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:#F1E7CF;color:#5E4D22">Taqbaylit</span><p class="p" dir="ltr" style="font-family:Inter;text-align:left;font-size:13px">Only the minority language is tagged on each page, so cards stay quiet.</p></div>
+    </div>
+  </section>
+
+  <section style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px">
+    <div class="card" style="display:flex;flex-direction:column;gap:6px">
+      <span class="kick">Layout &amp; motion</span>
+      <h2 class="h2" style="font-size:26px;margin-bottom:6px">Predictable and quick</h2>
+      <div class="rule"><span class="ok">✓</span><span>1,240 px content width; 4-column video grid; 72 px sticky header; 44 px between sections, hairline dividers.</span></div>
+      <div class="rule"><span class="ok">✓</span><span>Every card plays on click; the whole card is the target.</span></div>
+      <div class="rule"><span class="ok">✓</span><span>Motion: thumbnail scale 1.025 on hover, 0.7 s rise-in for the lead, 0.22 s pop for the search panel. Nothing loops.</span></div>
+      <div class="rule" style="border-bottom:0"><span class="ok">✓</span><span>Skeleton blocks in Fill colour while thumbnails load; reduced-motion disables all of it.</span></div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:6px">
+      <span class="kick">Bidirectional &amp; access</span>
+      <h2 class="h2" style="font-size:26px;margin-bottom:6px">Two directions, one product</h2>
+      <div class="rule"><span class="ok">✓</span><span>Layout mirrors with <code>dir</code>; logical CSS only. Each title carries its own <code>lang</code>/<code>dir</code>.</span></div>
+      <div class="rule"><span class="no">✕</span><span>Never mirror the timeline, play icons, timestamps or digits.</span></div>
+      <div class="rule"><span class="ok">✓</span><span>Keyboard: / opens search, ↑↓ moves, Enter opens, Esc closes; player keys Space, ←/→, C, F.</span></div>
+      <div class="rule" style="border-bottom:0"><span class="ok">✓</span><span>Focus ring 3 px gold; targets ≥ 44 px; text contrast ≥ 4.5:1.</span></div>
+    </div>
+  </section>
+</div>
+</template><div id="host"></div><script type="text/plain" id="logic">
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script></body></html>

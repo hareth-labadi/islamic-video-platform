@@ -1,0 +1,131 @@
+<!doctype html><html lang="ar"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Noto+Naskh+Arabic:wght@500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F3EE}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid #AD9559;outline-offset:3px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 32px;box-sizing:border-box}
+.ui{font-family:'Thmanyah Sans','IBM Plex Sans Arabic',system-ui,sans-serif}
+.disp{font-family:'Thmanyah Serif Display','Noto Naskh Arabic',serif;font-weight:700}
+.lat{font-family:'Inter',sans-serif}
+.nav a{padding:8px 14px;border-radius:999px;font-size:15px;color:#3A403D;white-space:nowrap}
+.nav a.on{background:#E6E1D6;color:#111614;font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 14px;border-radius:999px;border:1px solid #E4E0D6;background:#FFFFFF;font-size:14px;color:#3A403D}
+.chip.on{background:#111614;border-color:#111614;color:#FFFFFF;font-weight:600}
+.res{display:grid;grid-template-columns:260px minmax(0,1fr);gap:24px;padding:20px 12px;border-radius:14px;color:inherit}
+.res:hover{background:#FFFFFF}
+.thumb{position:relative;overflow:hidden;aspect-ratio:16/9;border-radius:12px;background:#DAD5CA}
+.dur{position:absolute;bottom:7px;left:7px;direction:ltr;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:#FFFFFF;background:rgba(17,22,20,.82);padding:2px 7px;border-radius:6px}
+mark{background:#F1E1B4;color:inherit;border-radius:3px;padding:0 2px}
+mark:empty{display:none}
+.why{font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:#EEF4F1;color:#0B3D34}
+.kab{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:#F1E7CF;color:#5E4D22;font-family:'Inter',sans-serif}
+</style>
+<style>*{animation-play-state:paused!important;animation-delay:-10s!important}</style><script>const STATE={};</script>
+<script>
+class DCLogic { constructor(p){ this.props = p || {}; this.state = {}; } setState(s){ Object.assign(this.state, typeof s === 'function' ? s(this.state) : s); } forceUpdate(){} }
+function look(scope, path){ path = path.trim(); if (path === 'true') return true; if (path === 'false') return false; if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+  let v = scope; for (const k of path.split('.')) { if (v == null) return undefined; v = v[k]; } return v; }
+function interp(str, scope){ const m = str.match(/^\s*\{\{([^}]+)\}\}\s*$/); if (m) return look(scope, m[1]);
+  return str.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = look(scope, p); return v == null ? '' : String(v); }); }
+function render(node, scope, out){
+  if (node.nodeType === 3) { out.appendChild(document.createTextNode(interp(node.textContent, scope))); return; }
+  if (node.nodeType !== 1) return;
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'sc-for') { const list = interp(node.getAttribute('list'), scope) || []; const as = node.getAttribute('as');
+    list.forEach((item, i) => { const s = Object.assign(Object.create(scope), { [as]: item, $index: i }); node.childNodes.forEach(c => render(c, s, out)); }); return; }
+  if (tag === 'sc-if') { if (interp(node.getAttribute('value'), scope)) node.childNodes.forEach(c => render(c, scope, out)); return; }
+  const el = document.createElementNS(node.namespaceURI, node.localName);
+  for (const a of node.attributes) { if (/^on[A-Z]/.test(a.name) || a.name.startsWith('hint-')) continue; const v = interp(a.value, scope); if (v === false || v == null) continue; el.setAttribute(a.name, typeof v === 'function' ? '' : v); }
+  const src = tag === 'template' ? node.content : node;
+  src.childNodes.forEach(c => render(c, scope, el));
+  out.appendChild(el);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const C = new Function('DCLogic', document.getElementById('logic').textContent + '; return Component;')(DCLogic);
+  const inst = new C({}); Object.assign(inst.state, STATE);
+  const vals = inst.renderVals();
+  const tpl = document.getElementById('tpl').content;
+  const host = document.getElementById('host');
+  tpl.childNodes.forEach(c => render(c, vals, host));
+});
+</script>
+</head><body><template id="tpl">
+
+<div class="ui" style="width:100%;min-height:100vh;background:#F5F3EE;color:#111614" dir="rtl" lang="ar">
+
+  <header style="background:rgba(245,243,238,.94);border-bottom:1px solid #E4E0D6">
+    <div class="wrap" style="display:flex;align-items:center;gap:12px 20px;min-height:72px;flex-wrap:wrap">
+      <a href="Home.dc.html" style="display:flex;align-items:center;gap:10px;flex:none" aria-label="علم نافع — الرئيسية"><img src="assets/mark.png" alt="" style="height:36px;width:auto"><span class="disp" style="font-size:24px;line-height:1">علم نافع</span></a>
+      <nav class="nav" aria-label="القائمة الرئيسية" style="display:flex;gap:2px;overflow-x:auto;margin-inline-start:10px"><a href="Home.dc.html">الرئيسية</a><a href="Playlist.dc.html">دلائل النبوّة</a><a class="on" href="#">كل المقاطع</a><a href="#">قوائم التشغيل</a><a href="#">عن الشيخ</a></nav>
+      <a href="HomeKabyle.dc.html" lang="kab" class="lat" style="margin-inline-start:auto;height:42px;display:flex;align-items:center;padding:0 12px;font-size:14px;font-weight:500">Taqbaylit</a>
+    </div>
+  </header>
+
+  <main class="wrap" style="padding-top:28px;padding-bottom:80px">
+    <form role="search" style="display:flex;align-items:center;gap:12px;height:60px;padding:0 8px 0 18px;border-radius:16px;background:#FFFFFF;border:2px solid #111614">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      <label for="sq" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">ابحث في كل المقاطع</label>
+      <input id="sq" type="search" value="النبوه" style="flex:1;min-width:0;border:0;outline:none;background:transparent;font:inherit;font-size:19px">
+      <button type="submit" style="height:44px;padding:0 24px;border:0;border-radius:11px;background:#065A4C;color:#FFFFFF;font-size:15px;font-weight:600">بحث</button>
+    </form>
+    <p style="margin:14px 4px 0;font-size:14.5px;line-height:1.8;color:#4A504D"><strong class="lat" style="color:#111614">14</strong> نتيجة. شمل البحث أيضًا <strong>النبوّة</strong>، <strong>نبوّة</strong>، <strong>النبي</strong>، و<strong class="lat" lang="kab">nnbi</strong>. <a href="#" style="color:#065A4C;text-decoration:underline">ابحث حرفيًّا فقط</a></p>
+
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:20px 0;border-bottom:1px solid #E4E0D6">
+      <button type="button" class="chip on" aria-pressed="true">الكل</button>
+      <button type="button" class="chip" aria-pressed="false">حلقات السلسلة <span class="lat" style="color:#8A8F8C">8</span></button>
+      <button type="button" class="chip" aria-pressed="false">مقاطع متنوعة <span class="lat" style="color:#8A8F8C">4</span></button>
+      <button type="button" class="chip" aria-pressed="false">قصيرة <span class="lat" style="color:#8A8F8C">2</span></button>
+      <span style="width:1px;height:24px;background:#E4E0D6;margin:0 6px"></span>
+      <button type="button" class="chip" aria-pressed="false">اللغة: الكل ▾</button>
+      <button type="button" class="chip" aria-pressed="false">المدة ▾</button>
+      <button type="button" class="chip" aria-pressed="false">فيه ترجمة <span class="lat">Taqbaylit</span></button>
+      <span style="margin-inline-start:auto"><select aria-label="الترتيب" style="height:38px;border:1px solid #E4E0D6;border-radius:10px;padding:0 10px;font:inherit;font-size:14px;background:#FFFFFF"><option>الأكثر صلة</option><option>الأحدث</option><option>ترتيب السلسلة</option></select></span>
+    </div>
+
+    <ol style="list-style:none;margin:8px 0 0;padding:0">
+      <sc-for list="{{results}}" as="r" hint-placeholder-count="4">
+        <li style="border-bottom:1px solid #EDEAE3"><a class="res" href="Watch.dc.html">
+          <div class="thumb" style="background:{{r.tone}}"><span class="dur">{{r.dur}}</span></div>
+          <div style="display:flex;flex-direction:column;gap:7px;min-width:0" dir="{{r.dir}}" lang="{{r.lc}}">
+            <span style="font-size:13px;font-weight:600;color:#065A4C;font-family:'Thmanyah Sans','IBM Plex Sans Arabic',sans-serif" dir="rtl">{{r.kind}}</span>
+            <h3 style="margin:0;font-size:19px;font-weight:700;line-height:1.55;font-family:{{r.ff}}">{{r.t1}}<mark>{{r.hit}}</mark>{{r.t2}}</h3>
+            <p style="margin:0;font-size:14.5px;line-height:1.8;color:#5B635F;font-family:{{r.ff}}">{{r.s1}}<mark>{{r.shit}}</mark>{{r.s2}}</p>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap" dir="rtl"><span class="why">{{r.why}}</span><span style="font-size:12.5px;color:#6B706C">{{r.date}}</span><sc-if value="{{r.kab}}" hint-placeholder-val="{{ false }}"><span class="kab">Taqbaylit</span></sc-if></div>
+          </div>
+        </a></li>
+      </sc-for>
+    </ol>
+    <div style="display:flex;justify-content:center;margin-top:24px"><button type="button" style="height:46px;padding:0 24px;border:0;border-radius:12px;background:#E6E1D6;font-size:15px;font-weight:600">عرض <span class="lat">10</span> نتائج أخرى</button></div>
+
+    <section aria-labelledby="none-h" style="margin-top:56px;border-radius:20px;background:#FFFFFF;padding:36px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:center">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font-size:12.5px;font-weight:600;color:#7A6532">حالة أخرى: لا نتائج</span>
+        <h2 id="none-h" class="disp" style="margin:0;font-size:30px;line-height:1.4">لم نجد مقاطع تطابق «المعجزت»</h2>
+        <p style="margin:0;font-size:15px;line-height:1.8;color:#4A504D">هل تقصد <a href="#" style="font-weight:700;color:#065A4C;text-decoration:underline">المعجزات</a>؟ أو جرّب كلمات أقل، أو أزِل عوامل التصفية.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font-size:13px;color:#6B706C">أو ابدأ من هنا:</span>
+        <a href="Playlist.dc.html" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;background:#F5F3EE"><span style="width:40px;height:40px;border-radius:10px;background:#0E4A3F;flex:none"></span><span style="font-weight:600">سلسلة دلائل النبوّة</span><span class="lat" style="margin-inline-start:auto;font-size:13px;color:#6B706C">24</span></a>
+        <a href="#" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;background:#F5F3EE"><span style="width:40px;height:40px;border-radius:10px;background:#C9A24A;flex:none"></span><span style="font-weight:600">أحدث المقاطع</span></a>
+      </div>
+    </section>
+  </main>
+</div>
+</template><div id="host"></div><script type="text/plain" id="logic">
+class Component extends DCLogic {
+  renderVals() {
+    const UI = "'Thmanyah Sans', 'IBM Plex Sans Arabic', system-ui, sans-serif";
+    const LA = "'Inter', system-ui, sans-serif";
+    const r = (o) => Object.assign({ dir: 'rtl', lc: 'ar', ff: UI, kab: false }, o);
+    const results = [
+      r({ kind: 'دلائل النبوّة · الحلقة 01', t1: 'مقدّمة: لماذا ندرس دلائل ', hit: 'النبوّة', t2: '؟', s1: '…تعريف دلائل ', shit: 'النبوّة', s2: ' وأقسامها كما يعرضها الشيخ في هذه الحلقة…', why: 'في العنوان والوصف', date: '2 سبتمبر 2026', dur: '14:20', tone: '#CFD8D2' }),
+      r({ kind: 'مقطع متنوّع', t1: 'عنوان مقطع متنوّع لا يحتوي الكلمة', hit: '', t2: '', s1: '…مقتطف من النص المكتوب يُظهر كلمة ', shit: 'النبي', s2: ' ﷺ في سياقها…', why: 'في النص المكتوب عند 06:14', date: '9 أكتوبر 2026', dur: '12:30', tone: '#D8D2C4' }),
+      r({ kind: 'Taqbaylit', t1: 'Azwel n tvidyut ɣef ', hit: 'Nnbi', t2: '', s1: '…agzul n tvidyut s teqbaylit, ɣef ', shit: 'nnbi', s2: '…', why: 'عبر اللغتين: النبي ↔ nnbi', date: '12 أكتوبر 2026', dur: '11:05', tone: '#D3D9DB', dir: 'ltr', lc: 'kab', ff: LA, kab: true }),
+      r({ kind: 'دلائل النبوّة · الحلقة 07', t1: 'عنوان الحلقة السابعة', hit: '', t2: '', s1: 'وصف قصير يذكر دلائل ', shit: 'النبوّة', s2: ' في سياق مختلف…', why: 'في الوصف', date: '23 سبتمبر 2026', dur: '23:40', tone: '#E0D6CB' })
+    ];
+    return { results };
+  }
+}
+</script></body></html>

@@ -1,0 +1,80 @@
+<!doctype html><html lang="ar"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0;background:#F4F1EA}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+.lat{font-family:'Inter',sans-serif}
+.grp{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#6A6862;padding:18px 16px 6px}
+.it{display:flex;align-items:center;gap:12px;padding:9px 16px}
+.cv{position:relative;overflow:hidden;width:88px;aspect-ratio:16/9;border-radius:9px;flex:none}
+.cv .num{position:absolute;top:-12px;left:-3px;font-family:'Inter',sans-serif;font-size:56px;font-weight:800;line-height:1;letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.45)}
+mark{background:#F2B035;color:#161616;border-radius:3px;padding:0 2px}
+.sub{font-size:12px;color:#6A6862}
+.chip{flex:none;display:inline-flex;align-items:center;gap:5px;height:36px;padding:0 13px;border-radius:999px;border:1.5px solid #111111;font-size:13px;font-weight:600}
+.chip.on{background:#111111;color:#FFFFFF}
+</style>
+<style>*{animation-play-state:paused!important;animation-delay:-10s!important}</style><script>const STATE={};</script>
+<script>
+class DCLogic { constructor(p){ this.props = p || {}; this.state = {}; } setState(s){ Object.assign(this.state, typeof s === 'function' ? s(this.state) : s); } forceUpdate(){} }
+function look(scope, path){ path = path.trim(); if (path === 'true') return true; if (path === 'false') return false; if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+  let v = scope; for (const k of path.split('.')) { if (v == null) return undefined; v = v[k]; } return v; }
+function interp(str, scope){ const m = str.match(/^\s*\{\{([^}]+)\}\}\s*$/); if (m) return look(scope, m[1]);
+  return str.replace(/\{\{([^}]+)\}\}/g, (_, p) => { const v = look(scope, p); return v == null ? '' : String(v); }); }
+function render(node, scope, out){
+  if (node.nodeType === 3) { out.appendChild(document.createTextNode(interp(node.textContent, scope))); return; }
+  if (node.nodeType !== 1) return;
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'sc-for') { const list = interp(node.getAttribute('list'), scope) || []; const as = node.getAttribute('as');
+    list.forEach((item, i) => { const s = Object.assign(Object.create(scope), { [as]: item, $index: i }); node.childNodes.forEach(c => render(c, s, out)); }); return; }
+  if (tag === 'sc-if') { if (interp(node.getAttribute('value'), scope)) node.childNodes.forEach(c => render(c, scope, out)); return; }
+  const el = document.createElementNS(node.namespaceURI, node.localName);
+  for (const a of node.attributes) { if (/^on[A-Z]/.test(a.name) || a.name.startsWith('hint-')) continue; const v = interp(a.value, scope); if (v === false || v == null) continue; el.setAttribute(a.name, typeof v === 'function' ? '' : v); }
+  const src = tag === 'template' ? node.content : node;
+  src.childNodes.forEach(c => render(c, scope, el));
+  out.appendChild(el);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const C = new Function('DCLogic', document.getElementById('logic').textContent + '; return Component;')(DCLogic);
+  const inst = new C({}); Object.assign(inst.state, STATE);
+  const vals = inst.renderVals();
+  const tpl = document.getElementById('tpl').content;
+  const host = document.getElementById('host');
+  tpl.childNodes.forEach(c => render(c, vals, host));
+});
+</script>
+</head><body><template id="tpl">
+
+<div style="position:relative;width:390px;height:960px;overflow:hidden;background:#F4F1EA;color:#111111;font-family:'IBM Plex Sans Arabic',system-ui,sans-serif" dir="rtl" lang="ar">
+  <form role="search" style="background:#161616;padding:12px 12px 14px;display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <label for="mq" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">ابحث في كل المقاطع</label>
+      <div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;height:52px;padding:0 14px;border-radius:16px;background:#2A2A2A">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#F2B035" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <input id="mq" type="search" value="معجز" style="flex:1;min-width:0;width:100%;border:0;outline:none;background:transparent;font:inherit;font-size:18px;font-weight:700;color:#FFFFFF">
+      </div>
+      <a href="MobileHome.dc.html" style="height:44px;display:flex;align-items:center;padding:0 4px;font-size:14px;font-weight:600;color:#F2B035">إلغاء</a>
+    </div>
+    <div style="display:flex;gap:8px;overflow-x:auto"><span class="chip on" style="background:#F2B035;color:#161616;border-color:#F2B035">الكل</span><span class="chip" style="color:#FFFFFF;border-color:#555">حلقات</span><span class="chip" style="color:#FFFFFF;border-color:#555">قصيرة</span><span class="chip lat" style="color:#FFFFFF;border-color:#555">Taqbaylit</span></div>
+  </form>
+
+  <div class="grp"><span style="width:8px;height:8px;border-radius:2px;background:#0B5D45"></span>حلقات من دلائل النبوّة</div>
+  <a class="it" href="MobileWatch.dc.html"><div class="cv" style="background:#0B5D45"><span class="num">14</span></div><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:14.5px;font-weight:700">عنوان حلقة عن ال<mark>معجز</mark>ات</span><span class="sub">الحلقة <span class="lat">14</span> · من <span class="lat">06:40</span></span></div></a>
+  <a class="it" href="MobileWatch.dc.html"><div class="cv" style="background:#0B5D45"><span class="num">15</span></div><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:14.5px;font-weight:700">عنوان حلقة أخرى عن ال<mark>معجز</mark>ة</span><span class="sub">الحلقة <span class="lat">15</span> · في الوصف</span></div></a>
+  <div class="grp"><span style="width:8px;height:8px;border-radius:2px;background:#2F4DC4"></span>مقاطع</div>
+  <a class="it" href="#"><div class="cv" style="background:#2F4DC4"><span class="num">1′</span></div><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:14.5px;font-weight:700">مقطع قصير عن ال<mark>معجز</mark>ة</span><span class="sub">قصير · <span class="lat">0:58</span></span></div></a>
+  <a class="it" href="#" dir="ltr" lang="kab"><div class="cv" style="background:#C2512F"><span class="num">T</span></div><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-family:'Inter',sans-serif"><span style="font-size:14px;font-weight:700">Azwel n tvidyut ɣef <mark>lmuɛjizat</mark></span><span class="sub">Taqbaylit</span></div></a>
+  <a href="Search.dc.html" style="display:flex;align-items:center;justify-content:space-between;margin:20px 16px 0;height:52px;padding:0 18px;border-radius:999px;background:#111111;color:#FFFFFF;font-size:14.5px;font-weight:700">كل النتائج<span class="lat" style="padding:4px 10px;border-radius:999px;background:#F2B035;color:#161616;font-size:12.5px">14 ←</span></a>
+
+  <div style="margin:26px 16px 0;display:flex;flex-direction:column;gap:10px">
+    <span style="font-size:12px;font-weight:700;color:#6A6862">بحثتَ مؤخرًا على هذا الجهاز</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip">البشارات</span><span class="chip lat" lang="kab">nnbi</span><span class="chip">الحلقة الأولى</span></div>
+  </div>
+</div>
+</template><div id="host"></div><script type="text/plain" id="logic">
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script></body></html>
