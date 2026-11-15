@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useState, type ComponentType, type ReactNode, type SVGProps } from "react";
 import { cn } from "@/lib/cn";
+import { BrandMark } from "@/components/ui/BrandMark";
 import { CheckIcon, ChevronDownIcon, CloseIcon } from "@/components/ui/icons";
 import { useAdmin, usePanel } from "../AdminContext";
 import { api, isDemo } from "../api/client";
@@ -40,7 +40,7 @@ function FullPageLoading({ label }: { label: string }) {
       <div className="flex flex-col items-center gap-4">
         <span className="relative grid size-16 place-items-center rounded-full bg-ink">
           <span className="absolute inset-0 animate-pulse-ring rounded-full" />
-          <Image src="/brand/mark-light.png" alt="" width={242} height={164} className="h-6 w-auto" priority />
+          <BrandMark className="h-7 w-auto translate-x-px text-accent" />
         </span>
         <span className="text-sm font-semibold text-subtle">{label}</span>
       </div>
@@ -155,7 +155,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
     <nav aria-label={t.nav.menu} className="flex h-full flex-col gap-6 overflow-y-auto bg-ink px-4 py-5 text-white">
       <div className="flex items-center justify-between gap-2 ps-2">
         <Link href={routes.dashboard} className="flex items-center gap-2.5" onNavigate={onClose}>
-          <Image src="/brand/mark-light.png" alt="" width={242} height={164} className="h-8 w-auto" />
+          <BrandMark className="h-8 w-auto shrink-0 text-accent" />
           <span className="flex flex-col leading-none">
             <span lang="ar" dir="rtl" className="font-sans text-xl font-bold">
               {t.brand}
