@@ -2,7 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { getDictionary } from "@/i18n/dictionaries";
 import { localeConfig, locales } from "@/i18n/config";
 import { localeFrom } from "@/i18n/params";
+import { ensureContent } from "@/data/ensure";
 import { AppShell } from "@/components/layout/AppShell";
+import { ContentHydrator } from "@/components/content/ContentHydrator";
 import { cn } from "@/lib/cn";
 import { fontVariables } from "../fonts";
 import "../globals.css";
@@ -27,11 +29,15 @@ export const viewport: Viewport = { themeColor: "#f4f1ea" };
 export default async function LocaleLayout({ children, params }: LayoutProps<"/[locale]">) {
   const locale = await localeFrom(params);
   const { dir, script } = localeConfig[locale];
+  // Load content from the backend and hand the same snapshot to the browser store.
+  const snapshot = await ensureContent();
 
   return (
     <html lang={locale} dir={dir} className={fontVariables}>
       <body className={cn(script === "latin" && "font-latin")}>
-        <AppShell locale={locale}>{children}</AppShell>
+        <ContentHydrator snapshot={snapshot}>
+          <AppShell locale={locale}>{children}</AppShell>
+        </ContentHydrator>
       </body>
     </html>
   );

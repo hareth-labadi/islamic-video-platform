@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { getEpisodes, getFeaturedSeries, getSheikh, sheikhs, videos } from "@/data/content";
 import { listLabel } from "@/data/present";
-import { scopeCounts, search, type SearchScope } from "@/data/search";
+import { scopeCounts, search, type SearchResults as SearchResultsShape, type SearchScope } from "@/data/search";
+import { fetchSearch, hasApi } from "@/lib/api/public";
 import { getDictionary } from "@/i18n/dictionaries";
 import { cn } from "@/lib/cn";
 import { formatDate } from "@/lib/format";
@@ -48,7 +49,29 @@ function Results({ locale, q, initialKind, initialSheikh }: { locale: Locale; q:
   const [sheikhId, setSheikhId] = useState(sheikhs.some((s) => s.id === initialSheikh) ? initialSheikh : "all");
   const [sort, setSort] = useState<"relevant" | "newest">("relevant");
 
-  const results = useMemo(() => search(q, { sheikhId: sheikhId === "all" ? undefined : sheikhId, locale }), [q, sheikhId, locale]);
+  // Local search runs instantly over the hydrated (backend) store; when a backend is
+  // configured we also ask GET /search and prefer its answer once it arrives. Both
+  // return the same shape, so nothing downstream changes.
+  const local = useMemo(() => search(q, { sheikhId: sheikhId === "all" ? undefined : sheikhId, locale }), [q, sheikhId, locale]);
+  const [remote, setRemote] = useState<SearchResultsShape | null>(null);
+  useEffect(() => {
+    if (!hasApi || !q) {
+      setRemote(null);
+      return;
+    }
+    let cancelled = false;
+    fetchSearch(q, { sheikh: sheikhId === "all" ? undefined : sheikhId })
+      .then((r) => {
+        if (!cancelled) setRemote(r);
+      })
+      .catch(() => {
+        if (!cancelled) setRemote(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [q, sheikhId]);
+  const results = remote ?? local;
   const counts = scopeCounts(results);
 
   const pool = useMemo(() => (q ? results.videos.map((h) => h.video) : videos.filter((v) => sheikhId === "all" || v.sheikhId === sheikhId)), [q, results, sheikhId]);

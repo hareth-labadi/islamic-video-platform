@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { getAnsweredQuestions, getEpisodes, getSheikh, getVideo, playlists, shorts } from "@/data/content";
+import { SEED, playlists } from "@/data/content";
 import { pad2 } from "@/lib/format";
 import { BentoTile } from "@/components/media/BentoTile";
 import { Cover } from "@/components/media/Cover";
@@ -48,9 +48,16 @@ function Block({ title, file, children }: { title: string; file: string; childre
 
 /** Living style guide: every component with sample props. Not linked from the site. */
 export default function ComponentsPage() {
-  const eps = getEpisodes();
-  const kab = getVideo("v-kab-1")!;
-  const mixed = getVideo("v-mix-1")!;
+  // Deterministic sample data for the style guide — always the bundled seed, never the backend.
+  const seedVideo = (id: string) => SEED.videos.find((v) => v.id === id)!;
+  const sheikhOf = (id: string) => SEED.sheikhs.find((s) => s.id === id) ?? SEED.sheikhs[0];
+  const eps = SEED.videos.filter((v) => v.seriesId === "dalail").sort((a, b) => (a.episode ?? 0) - (b.episode ?? 0));
+  const kab = seedVideo("v-kab-1");
+  const mixed = seedVideo("v-mix-1");
+  const sheikh1 = SEED.sheikhs[0];
+  const sheikh2 = sheikhOf("sheikh-2");
+  const sampleShorts = SEED.shorts;
+  const answered = SEED.questions.filter((q) => q.status === "answered" && q.isPublic && q.answer);
 
   return (
     // Sample text on this page is Arabic, so it stays right-to-left in every language.
@@ -118,22 +125,22 @@ export default function ComponentsPage() {
           <Cover video={eps[11]} label="دلائل النبوّة · ح 12" />
           <Cover video={kab} label="Taqbaylit" />
           <Cover video={mixed} label="مقطع متنوّع" />
-          <Cover video={getVideo("v-qa-1")!} label="أسئلة وأجوبة" />
-          <Cover video={{ kind: "short", tone: "short", duration: shorts[0].duration, lang: "ar" }} label="مقطع قصير" />
+          <Cover video={seedVideo("v-qa-1")} label="أسئلة وأجوبة" />
+          <Cover video={{ kind: "short", tone: "short", duration: sampleShorts[0].duration, lang: "ar" }} label="مقطع قصير" />
           <span className="rounded-2xl bg-kabyle p-2">
             <Cover video={kab} label="Taqbaylit" surface="white" />
           </span>
         </div>
         <div className="grid grid-cols-3 gap-3 md:grid-cols-6">
-          {shorts.map((s, i) => (
-            <ShortThumb key={s.id} short={s} href="#" mark={pad2(i + 1)} sheikh={getSheikh(s.sheikhId)} className="w-auto" />
+          {sampleShorts.map((s, i) => (
+            <ShortThumb key={s.id} short={s} href="#" mark={pad2(i + 1)} sheikh={sheikhOf(s.sheikhId)} className="w-auto" />
           ))}
         </div>
       </Block>
 
       <Block title="بطاقات المقاطع" file="components/media/VideoCard.tsx">
         <div className="grid gap-4 md:grid-cols-4">
-          <VideoCard video={eps[11]} href="#" coverLabel="دلائل النبوّة · ح 12" list="دلائل النبوّة" date="منذ يومين" sheikh={{ sheikh: getSheikh(), name: getSheikh().name.ar }} />
+          <VideoCard video={eps[11]} href="#" coverLabel="دلائل النبوّة · ح 12" list="دلائل النبوّة" date="منذ يومين" sheikh={{ sheikh: sheikh1, name: sheikh1.name.ar }} />
           <VideoCard video={kab} href="#" coverLabel="Taqbaylit" list="بالقبائلية" date="منذ 3 أيام" />
           <VideoCard video={mixed} href="#" coverLabel="مقطع متنوّع" list="مقاطع متنوعة" date="منذ 5 أيام" />
         </div>
@@ -180,13 +187,13 @@ export default function ComponentsPage() {
       <Block title="الشيخ والأسئلة والأجوبة" file="ui/SheikhAvatar.tsx · qa/QuestionCard.tsx · qa/VoicePlayer.tsx">
         <div className="flex flex-wrap items-center gap-3">
           {(["xs", "sm", "md", "lg"] as const).map((size) => (
-            <SheikhAvatar key={size} sheikh={getSheikh("sheikh-2")} size={size} />
+            <SheikhAvatar key={size} sheikh={sheikh2} size={size} />
           ))}
-          <SheikhAvatar sheikh={getSheikh()} size="lg" tone="accent" />
+          <SheikhAvatar sheikh={sheikh1} size="lg" tone="accent" />
         </div>
         <VoicePlayer id="style-guide" src="/media/samples/voice-1.m4a" duration="0:42" locale="ar" className="max-w-md" />
         <div className="grid gap-3 md:grid-cols-3">
-          {getAnsweredQuestions()
+          {answered
             .filter((q, i, all) => all.findIndex((x) => x.answer?.kind === q.answer?.kind) === i)
             .map((q) => (
               <QuestionCard key={q.id} question={q} locale="ar" />

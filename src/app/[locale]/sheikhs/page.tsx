@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getDictionary } from "@/i18n/dictionaries";
 import { localeFrom } from "@/i18n/params";
+import { ensureContent } from "@/data/ensure";
 import { SheikhsIndex } from "@/features/sheikhs/SheikhPages";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/sheikhs">): Promise<Metadata> {
@@ -9,5 +10,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/sheikhs"
 }
 
 export default async function Page({ params }: PageProps<"/[locale]/sheikhs">) {
-  return <SheikhsIndex locale={await localeFrom(params)} />;
+  const locale = await localeFrom(params);
+  await ensureContent();
+  return <SheikhsIndex locale={locale} />;
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getDictionary } from "@/i18n/dictionaries";
 import { localeFrom } from "@/i18n/params";
+import { ensureContent } from "@/data/ensure";
 import { ShortsFeed } from "@/features/shorts/ShortsFeed";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/shorts">): Promise<Metadata> {
@@ -9,5 +10,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/shorts">
 }
 
 export default async function Page({ params }: PageProps<"/[locale]/shorts">) {
-  return <ShortsFeed locale={await localeFrom(params)} />;
+  const locale = await localeFrom(params);
+  await ensureContent();
+  return <ShortsFeed locale={locale} />;
 }

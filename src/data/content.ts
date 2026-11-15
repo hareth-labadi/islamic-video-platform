@@ -17,7 +17,7 @@ import importedShorts from "./shorts.imported.json";
  * The second sheikh is a sample (the example name given in the brief) to show
  * how cards and pages look with more than one — replace or remove it.
  */
-export const sheikhs: Sheikh[] = [
+const seedSheikhs: Sheikh[] = [
   {
     id: "sheikh-1",
     slug: "sheikh-1",
@@ -49,7 +49,7 @@ export const sheikhs: Sheikh[] = [
 ];
 
 /** The site's main sheikh (header, footer, home hero). */
-export const featuredSheikhId = sheikhs[0].id;
+export const featuredSheikhId = seedSheikhs[0].id;
 
 const S1 = "sheikh-1";
 const S2 = "sheikh-2";
@@ -61,7 +61,7 @@ const S2 = "sheikh-2";
  * /<locale>/series/<slug> and a tile in the library (/<locale>/series).
  * Give its videos `seriesId`, `episode` and (optionally) `sectionId`.
  */
-export const seriesList: Series[] = [
+const seedSeriesList: Series[] = [
   {
     id: "dalail",
     slug: "dalail-an-nubuwwa",
@@ -210,7 +210,7 @@ const others: Video[] = [
   { id: "v-qa-2", sheikhId: S2, title: "بأي شرح أبدأ الأربعين النووية؟", lang: "ar", kind: "qa", duration: "04:51", publishedAt: "2026-10-20", summary: "جواب مصوَّر عن سؤال وصل عبر الموقع." },
 ];
 
-export const videos: Video[] = [...dalail, ...sira, ...arbain, ...kabyle, ...others];
+const seedVideos: Video[] = [...dalail, ...sira, ...arbain, ...kabyle, ...others];
 
 /* ----------------------------------------------------------------- Shorts */
 
@@ -246,13 +246,13 @@ const sampleShorts: Short[] = (
 
 const imported = importedShorts as Short[];
 
-export const shorts: Short[] = (imported.length > 0 ? imported : sampleShorts)
+const seedShorts: Short[] = (imported.length > 0 ? imported : sampleShorts)
   .filter((s) => s.status === "published")
   .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 
 /* ------------------------------------------------------- Questions & answers */
 
-export const questionCategories: QuestionCategory[] = [
+const seedQuestionCategories: QuestionCategory[] = [
   { id: "aqida", title: { ar: "العقيدة", fr: "Croyance", kab: "Liman" } },
   { id: "worship", title: { ar: "العبادات", fr: "Adoration", kab: "Taɛbadit" } },
   { id: "family", title: { ar: "الأسرة", fr: "Famille", kab: "Twacult" } },
@@ -264,7 +264,7 @@ export const questionCategories: QuestionCategory[] = [
  * Answered questions. The questions are realistic samples; every ANSWER is a
  * placeholder in brackets — the sheikh's real answers replace them.
  */
-export const questions: Question[] = [
+const seedQuestions: Question[] = [
   {
     id: "q-101",
     sheikhId: S1,
@@ -380,6 +380,57 @@ export const questions: Question[] = [
     answer: { kind: "text", text: "[جواب مكتوب يكتبه الشيخ.]", answeredAt: "2026-09-30" },
   },
 ];
+
+/* ------------------------------ Live collections ------------------------------ */
+/*
+ * The site runs on these arrays. They start as the sample content above and are
+ * replaced IN PLACE with data from the backend — on the server by
+ * src/data/ensure.ts, and in the browser by <ContentHydrator>. Mutating in place
+ * (rather than reassigning) keeps every `import { videos } from "@/data/content"`
+ * pointing at the same, now-filled array. The query helpers below read these.
+ */
+
+/** A full content snapshot: everything the public site needs in one shot. */
+export interface ContentSnapshot {
+  sheikhs: Sheikh[];
+  seriesList: Series[];
+  videos: Video[];
+  shorts: Short[];
+  questionCategories: QuestionCategory[];
+  questions: Question[];
+}
+
+export const sheikhs: Sheikh[] = [...seedSheikhs];
+export const seriesList: Series[] = [...seedSeriesList];
+export const videos: Video[] = [...seedVideos];
+export const shorts: Short[] = [...seedShorts];
+export const questionCategories: QuestionCategory[] = [...seedQuestionCategories];
+export const questions: Question[] = [...seedQuestions];
+
+/** The bundled sample content — the fallback when the API is unset or unreachable. */
+export const SEED: ContentSnapshot = {
+  sheikhs: seedSheikhs,
+  seriesList: seedSeriesList,
+  videos: seedVideos,
+  shorts: seedShorts,
+  questionCategories: seedQuestionCategories,
+  questions: seedQuestions,
+};
+
+function replaceAll<T>(target: T[], next: readonly T[]): void {
+  target.length = 0;
+  target.push(...next);
+}
+
+/** Replace the live collections in place with a snapshot from the backend. */
+export function hydrateContent(snapshot: ContentSnapshot): void {
+  replaceAll(sheikhs, snapshot.sheikhs);
+  replaceAll(seriesList, snapshot.seriesList);
+  replaceAll(videos, snapshot.videos);
+  replaceAll(shorts, snapshot.shorts);
+  replaceAll(questionCategories, snapshot.questionCategories);
+  replaceAll(questions, snapshot.questions);
+}
 
 /* -------------------------------------------------------------- Playlists */
 

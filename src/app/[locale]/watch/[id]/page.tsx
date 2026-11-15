@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getVideo, videos } from "@/data/content";
+import { ensureContent } from "@/data/ensure";
 import { localeFrom } from "@/i18n/params";
 import { PageSkeleton } from "@/components/ui/PageSkeleton";
 import { WatchPage } from "@/features/watch/WatchPage";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  await ensureContent();
   return videos.map((v) => ({ id: v.id }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/watch/[id]">): Promise<Metadata> {
   const { id } = await params;
+  await ensureContent();
   return { title: getVideo(id)?.title };
 }
 
@@ -24,5 +27,6 @@ export default function Page({ params }: PageProps<"/[locale]/watch/[id]">) {
 
 async function Watch({ params }: { params: PageProps<"/[locale]/watch/[id]">["params"] }) {
   const { id } = await params;
+  await ensureContent();
   return <WatchPage locale={await localeFrom(params)} id={id} />;
 }
