@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { cn } from "@/lib/cn";
+import { BrandMark } from "@/components/ui/BrandMark";
 import { buttonClasses } from "@/components/ui/Button";
 import { Sticker } from "@/components/ui/Sticker";
 import { useAdmin } from "../../AdminContext";
@@ -118,7 +118,7 @@ function Art() {
   return (
     <div className="relative hidden overflow-hidden bg-ink p-10 text-white lg:m-3 lg:flex lg:flex-col lg:rounded-tile xl:p-14">
       <div className="flex items-center gap-3">
-        <Image src="/brand/mark-light.png" alt="" width={242} height={164} className="h-10 w-auto" priority />
+        <BrandMark className="h-10 w-auto shrink-0 text-accent" />
         <span lang="ar" dir="rtl" className="font-sans text-2xl font-bold">
           {t.brand}
         </span>
