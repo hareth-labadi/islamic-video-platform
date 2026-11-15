@@ -1,5 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
+import { BrandMark } from "@/components/ui/BrandMark";
+import { cn } from "@/lib/cn";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { routes } from "@/lib/routes";
 import type { Locale } from "@/lib/types";
@@ -10,18 +11,11 @@ import { NavLink } from "./NavLink";
 const navLinkClass =
   "border-b-2 py-1.5 text-[15px] whitespace-nowrap transition-colors hover:text-ink";
 
-/** Logo + site name; reused by the footer with the light mark. */
+/** Logo + site name; reused by the footer on ink with the gold mark. */
 export function Brand({ light = false, className }: { light?: boolean; className?: string }) {
   return (
     <span className={className ?? "flex items-center gap-2 md:gap-2.5"}>
-      <Image
-        src={light ? "/brand/mark-light.png" : "/brand/mark.png"}
-        alt=""
-        width={242}
-        height={164}
-        priority={!light}
-        className="h-[30px] w-auto md:h-[38px]"
-      />
+      <BrandMark className={cn("h-[28px] w-auto shrink-0 md:h-[34px]", light ? "text-accent" : "text-series")} />
       <span lang="ar" dir="rtl" className="font-sans text-xl font-bold tracking-[-0.01em] md:text-2xl">
         {/* The Arabic name is the logotype in every language. */}
         علم نافع
